@@ -1,3 +1,11 @@
+
+Overview of changes in yasr 0.6.2:
+
+* Removed the "intl" sub-directory and adjusted configure.in and Makefile.am 
+  to not build it.
+
+----
+
 Overview of changes in yasr 0.6.1:
 
 * Includes acclogin, which provides a speech-enabled login prompt for the

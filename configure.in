@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 
 AC_INIT(configure.in)
-AM_INIT_AUTOMAKE(yasr, 0.6.1)
+AM_INIT_AUTOMAKE(yasr, 0.6.2)
 AM_CONFIG_HEADER(config.h)
 
 AC_ISC_POSIX
@@ -79,6 +79,5 @@ AC_OUTPUT([
 Makefile
 yasr/Makefile
 acclogin/Makefile
-intl/Makefile
 po/Makefile.in
 ])
