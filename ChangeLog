@@ -1,3 +1,9 @@
+2005-01-26 Michael P. Gorse <mgorse@alum.wpi.edu>
+From Rich Burridge <rich.burridge@sun.com>
+tts.c: use l {%c} to have an Emacspeak server say a letter rather than l %c
+       (works around a bug in the FreeTTS server)
+Release v0.6.6
+
 2004-11-18 Michael P. Gorse <mgorse@alum.wpi.edu>
 Add some missing macros around strings to be translated
 From Francisco Javier Dorado <fdma@once.es>:
