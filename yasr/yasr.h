@@ -194,8 +194,8 @@ extern unsigned char buf[256];
 extern int kbuf[100];
 extern int kbuflen;
 extern char usershell[OPT_STR_SIZE];
-extern char ttsbuf[40];
-extern char voices[6][64];
+extern char ttsbuf[80];
+extern char voices[7][64];
 extern int special;
 
 extern Func funcs[];
@@ -314,7 +314,7 @@ extern int forkpty(int *, char *, struct termios *, struct winsize *);
 #define OT_ENUM     0x02
 #define OT_STR      0x03
 #define OT_TREE     0x04
-#define OT_PRESET   0x04
+#define OT_PRESET   0x05
 #define OT_SYNTH    0x40
 #define OT_BITSLICE 0x80
 
