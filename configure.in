@@ -14,7 +14,7 @@ AC_CHECK_LIB(util, openpty)
 
 dnl Checks for header files.
 AC_HEADER_STDC
-AC_CHECK_HEADERS(fcntl.h sys/ioctl.h sys/time.h unistd.h)
+AC_CHECK_HEADERS(fcntl.h sys/ioctl.h sys/time.h unistd.h utmpx.h)
 AC_CHECK_HEADERS(pty.h util.h libutil.h,break)
 
 dnl Checks for typedefs, structures, and compiler characteristics.
