@@ -115,7 +115,7 @@ static void child()
     (void) close(0);
     if (open(devname, O_RDWR) < 0)
     {
-      fprintf(stderr, "open %s failed, errno = %d", devname, errno);
+      perror(devname);
     }
 
     (void) execve(subprog[0], subprog, environ);
