@@ -22,7 +22,7 @@
 #include <arpa/inet.h>
 #include "tts.h"
 
-char ttsbuf[40];
+char ttsbuf[80];
 
 static Tts_synth synth[] = {
   {"", "%s\r", "\030", "\005c3", "\005c0", 1, "", ""},	/* speakout */
