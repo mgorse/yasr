@@ -435,11 +435,15 @@ static int open_tcp(char *port)
   servaddr.sin_family = AF_INET;
   servaddr.sin_port = htons(portnum);
 
+#ifdef HAVE_INET_PTON
   if (inet_pton(AF_INET, host, &servaddr.sin_addr) <= 0)
   {
     perror("inet_pton");
     exit(1);
   }
+#else
+  servaddr.sin_addr.s_addr = inet_addr(host);
+#endif
 
   if (connect(fd, (struct sockaddr *) &servaddr, sizeof(servaddr)) < 0)
   {
