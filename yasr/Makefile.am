@@ -7,18 +7,17 @@ yasr_SOURCES = \
 	cfmakeraw.c \
 	config.c \
 	debug.c \
-	forkpty.c \
 	getfn.c \
 	keybind.c \
-	login_tty.c \
 	main.c \
-	openpty.c \
 	option.c \
 	tts.c \
 	ui.c \
 	term.h \
 	tts.h \
 	yasr.h
+
+yasr_LDADD = $(LIBOBJS)
 
 keytest_SOURCES = \
 	keytest.c \

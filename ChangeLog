@@ -2,6 +2,14 @@
 yasr change history.
 ====================
 
+v0.6.4 - 25 May 03 (mike)
+Makefile.am: Specify $(LIBOBJS) instead of explicitly linking forkpty.o,
+             login_tty.o, and openpty.o
+
+v0.6.4 - 23 May 03 (mike)
+tts.c: Fix for speaking letters with Apollo (don't remember who sent this to me)
+configure.in, main.c: check for utmpx.h (FreeBSD doesn't have it)
+--
 v0.6.3 - 1 Dec 02 (mike)
 Fixed ^[[1K to also erase the character under the cursor.
 Added commands to move forward and backward by paragraph from review mode.
