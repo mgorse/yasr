@@ -79,52 +79,7 @@ dict_write(FILE *fp)
 }
 
 
-static int 
-file_exists(char *name)
-{
-    struct stat st;
-
-    return(stat(name, &st) == 0);
-}
-
-
 /* Search for a program on the path */
-
-static int 
-search(char *name, char *obuf, int obufsize)
-{
-    int maxpathlen = obufsize - strlen(name) - 2;
-    char *path = getenv("PATH");
-    char *p;
-    int i;
-
-    (void) snprintf(obuf, obufsize, "./%s", name);
-    if (file_exists(obuf)) {
-        return(1);
-    }
-    if (!path) {
-        return(0);
-    }
-    p = path;
-    while (*p) {
-        for (i = 0; i < maxpathlen && p[i] && p[i] != ':'; i++) {
-            obuf[i] = p[i];
-        }
-        (void) sprintf(obuf + i, "/%s", name);
-        if (file_exists(obuf)) {
-            return(1);
-        }
-        while (*p && *p != ':') {
-            p++;
-        }
-        if (*p == ':') {
-            p++;
-        }
-    }
-
-    return(0);
-}
-
 
 void 
 tts_flush()
@@ -492,30 +447,6 @@ tts_init()
             mode = O_WRONLY;
         }
         tts.fd = open(portname, mode);
-        if (!strcmp(portname, "/dev/ecififo")) {
-            if (tts.fd == -1) {
-                (void) mkfifo("/dev/ecififo", 0666);
-                if (!(tts.pid = fork())) {
-                    if (!search("elod", buf, sizeof(buf))) {
-                        return(-1);
-                    }
-                    arg[0] = buf;
-                    arg[1] = NULL;
-                    (void) putenv("ECIINI=/usr/lib/ViaVoiceTTS/eci.ini");
-                    (void) execv(buf, arg);
-                    exit(1);
-                }
-                tts.fd = open(portname, O_WRONLY);
-            } else {
-                FILE *fp;
-
-                fp = fopen("/var/run/elod.pid", "r");
-                if (fp) {
-                    (void) fscanf(fp, "%d", &tts.pid);
-                    (void) fclose(fp);
-                }
-            }
-        }
         if (tts.fd == -1) {
             perror("tts");
             exit(1);
