@@ -68,20 +68,13 @@ extern char **environ;
 #define PARM1 (parm[0] ? parm[0] : 1)
 #define PARM2 (parm[1] ? parm[1] : 1)
 
-
 static void yasr_ttyname_r(int fd, char *p, int size)
 {
   char *t;
 
-  if ((t = ttyname(fd)) == NULL)
-  {
-    strcpy(p, "stdin");
-  } else
-  {
-    (void) strncpy(p, t, size);
-  }
+  if ((t = ttyname(fd)) == NULL) strcpy(p, "stdin");
+  else (void) strncpy(p, t, size);
 }
-
 
 static void child()
 {
@@ -119,7 +112,8 @@ static void child()
     }
 
     (void) execve(subprog[0], subprog, environ);
-  } else
+  }
+  else
   {
     (void) execl(usershell, arg, 0);
   }
@@ -127,14 +121,12 @@ static void child()
   exit(1);
 }
 
-
 /* get the appropriate name for a tty from the filename */
 
 static void rnget(char *s, char *d)
 {
   (void) strcpy(d, s + 5);
 }
-
 
 static void utmpconv(char *s, char *d, int pid)
 {
@@ -152,7 +144,8 @@ static void utmpconv(char *s, char *d, int pid)
     if (strstr(rs, "/dev/") != NULL)
     {
       rstail = strdup(rs + sizeof("/dev/") - 1);
-    } else
+    }
+    else
     {
       rstail = strdup(rs);
     }
@@ -163,7 +156,8 @@ static void utmpconv(char *s, char *d, int pid)
     if (strstr(rd, "/dev/") != NULL)
     {
       rdtail = strdup(rd + sizeof("/dev/") - 1);
-    } else
+    }
+    else
     {
       rdtail = strdup(rd);
     }
@@ -219,7 +213,6 @@ static void utmpconv(char *s, char *d, int pid)
 #endif
 }
 
-
  /*ARGSUSED*/ static void finish(int sig)
 {
   tts_end();
@@ -234,6 +227,17 @@ static void utmpconv(char *s, char *d, int pid)
   exit(0);
 }
 
+static int is_char(int ch)
+{
+#ifdef __linux__
+  /* return true as long as ch isn't prefixed by <esc> */
+  while (ch != (ch % 0xff)) ch >>= 8;
+  return (ch != 27);
+#else
+  /* assume high ascii means meta */
+  return (ch >= 32 && ch <= 126);
+#endif
+}
 
 static void getinput()
 {
@@ -263,10 +267,9 @@ static void getinput()
   }
 
   /* Convert high-bit meta keys to escape form */
-  if (key >= 0x80 && key <= 0xff)
-  {
-    key += 0x1a80;
-  }
+#ifndef __linux__
+  if (key >= 0x80 && key <= 0xff) key += 0x1a80;
+#endif
   if (key == ui.disable)
   {
     if (ui.disabled)
@@ -274,14 +277,16 @@ static void getinput()
       tts_initsynth(NULL);
       ui.disabled = ui.silent = 0;
       tts_say("yasr enabled.");
-    } else
+    }
+    else
     {
       tts_silence();
       tts_say("yasr disabled.");
       ui.silent = ui.disabled = 1;
     }
     return;
-  } else if (ui.disabled)
+  }
+  else if (ui.disabled)
   {
     (void) write(master, buf, size);
     return;
@@ -299,7 +304,7 @@ static void getinput()
     ui.meta = 0;
     return;
   }
-  if (ui.kbsay == 2 && (key <= 32 || key >= 127))
+  if (ui.kbsay == 2 && is_char(key))
   {
     tts_out(okbuf, okbuflen);
     okbuflen = tts.oflag = 0;
@@ -310,15 +315,11 @@ static void getinput()
   }
 }
 
-
 static void wincpy(Win ** d, Win * s)
 {
   int i;
 
-  if (*d)
-  {
-    win_end(*d);
-  }
+  if (*d) win_end(*d);
   *d = wininit(s->rows, s->cols);
   (*d)->cr = s->cr;
   (*d)->cc = s->cc;
@@ -329,7 +330,6 @@ static void wincpy(Win ** d, Win * s)
   }
   (void) memcpy(&(*d)->savecp, &s->savecp, sizeof(Curpos));
 }
-
 
 static void win_end(Win * win)
 {
@@ -343,20 +343,13 @@ static void win_end(Win * win)
   free(win->tab);
 }
 
-
 static void win_scrollup()
 {
   int i;
   chartype *tmpc;
 
-  if (rev.cr)
-  {
-    rev.cr--;
-  }
-  if (oldcr)
-  {
-    oldcr--;
-  }
+  if (rev.cr) rev.cr--;
+  if (oldcr) oldcr--;
   tmpc = win->row[win_scrollmin];
   (void) memset(tmpc, 0, win->cols * CHARSIZE);
   for (i = win_scrollmin; i < win_scrollmax; i++)
@@ -367,7 +360,6 @@ static void win_scrollup()
   win->cr--;
 }
 
-
 static void win_lf()
 {
   int i;
@@ -375,14 +367,8 @@ static void win_lf()
 
   if (win->cr == win_scrollmax)
   {
-    if (rev.cr)
-    {
-      rev.cr--;
-    }
-    if (oldcr)
-    {
-      oldcr--;
-    }
+    if (rev.cr) rev.cr--;
+    if (oldcr) oldcr--;
     tmpc = win->row[win_scrollmin];
     (void) memset(tmpc, 0, win->cols * CHARSIZE);
     for (i = win_scrollmin; i < win_scrollmax; i++)
@@ -394,7 +380,6 @@ static void win_lf()
   }
   win->cr++;
 }
-
 
 static void win_scrolldown()
 {
@@ -410,18 +395,10 @@ static void win_scrolldown()
   win->row[win->cr] = tmpc;
 }
 
-
 static void win_rlf()
 {
-  if (win->cr == win_scrollmin)
-  {
-    win_scrolldown();
-  } else
-  {
-    win->cr--;
-  }
+  if (win->cr == win_scrollmin) win_scrolldown(); else win->cr--;
 }
-
 
 static int readable(int fd, int wait)
 {
@@ -433,20 +410,15 @@ static int readable(int fd, int wait)
   FD_ZERO(&fds);
   FD_SET(fd, &fds);
   (void) select(fd + 1, &fds, NULL, NULL, &tv);
-
   return (FD_ISSET(fd, &fds));
 }
-
 
 static char *gulp(unsigned char *buf, int *size, unsigned char *cp, unsigned char **ep)
 {
   int os = *size;
   int n;
 
-  if (!readable(master, 1000000))
-  {
-    return (NULL);
-  }
+  if (!readable(master, 1000000)) return NULL;
   if (cp - buf >= 200)
   {
     if (ep)
@@ -466,17 +438,12 @@ static char *gulp(unsigned char *buf, int *size, unsigned char *cp, unsigned cha
   }
   *size += read(master, buf + *size, 255 - *size);
   buf[*size] = '\0';
-
   return ((char *) (buf + os));
 }
 
-
 static void kbsay()
 {
-  if (!ui.kbsay)
-  {
-    return;
-  }
+  if (!ui.kbsay) return;
   if (buf[0] == 8 || kbuf[0] == 127)
   {
     /*tts_say("back"); */
@@ -489,15 +456,13 @@ static void kbsay()
   }
 
   /* ui.kbsay == 2 -- handle word echo */
-  if (okbuflen < 99 && kbuf[0] > 32 && kbuf[0] < 128)
+  if (okbuflen < sizeof(kbuf) - 1 && is_char(kbuf[0]))
   {
     okbuf[okbuflen++] = kbuf[0];
   }
 }
 
-
 #define MIN(a, b) ((a)>(b)? (b): (a))
-
 
 static void win_csi(char *buf, unsigned char **pp, int *size)
 {
@@ -520,7 +485,8 @@ static void win_csi(char *buf, unsigned char **pp, int *size)
       {
 	return;
       }
-    } else
+    }
+    else
     {
       p++;
     }
@@ -543,13 +509,7 @@ static void win_csi(char *buf, unsigned char **pp, int *size)
     {
       p++;
     }
-    if (*p == ';')
-    {
-      p++;
-    } else
-    {
-      break;			/* tbd -- is this redundant? */
-    }
+    if (*p == ';') p++; else break;	/* tbd -- is this redundant? */
   }
 
   *pp = (unsigned char *) p + 1;
@@ -794,19 +754,14 @@ static void win_csi(char *buf, unsigned char **pp, int *size)
   if (win->cr >= win->rows)
   {
     win->cr = win->rows - 1;
-  } else if (win->cr < 0)
+  }
+  else if (win->cr < 0)
   {
     win->cr = 0;
   }
-  if (win->cc >= win->cols - 1)
-  {
-    win->cc = win->cols - 1;
-  } else if (win->cc < 0)
-  {
-    win->cc = 0;
-  }
+  if (win->cc >= win->cols - 1) win->cc = win->cols - 1;
+  else if (win->cc < 0) win->cc = 0;
 }
-
 
 static void win_addchr(char ch, int tflag)
 {
@@ -830,7 +785,6 @@ static void win_addchr(char ch, int tflag)
   }
 }
 
-
 char realchar(chartype ch)
 {
   char r;
@@ -844,9 +798,7 @@ char realchar(chartype ch)
   return (r);
 }
 
-
 /* bol -- beginning of line? */
-
 static int bol(int cr, int cc)
 {
   int i;
@@ -863,7 +815,6 @@ static int bol(int cr, int cc)
 
   return (1);
 }
-
 
 /* eol -- end of line? */
 
@@ -883,7 +834,6 @@ static int eol(int cr, int cc)
 
   return (1);
 }
-
 
 /* firstword -- are we in the first word of the line? */
 
@@ -908,7 +858,6 @@ static int firstword(int cr, int cc)
 
   return (1);
 }
-
 
 /* lastword -- are we in the last word of the line? */
 
@@ -936,7 +885,6 @@ static int firstword(int cr, int cc)
 
   return (1);
 }
-
 
 static void getoutput()
 {
@@ -974,10 +922,8 @@ static void getoutput()
       break;
 
     case 8:
-      if (win->cc)
-      {
-	win->cc--;
-      } else if (win->carry && win->cr)
+      if (win->cc) win->cc--;
+      else if (win->carry && win->cr)
       {
 	win->cr--;
 	win->cc = win->cols - 1;
@@ -1065,7 +1011,8 @@ static void getoutput()
 	if (ch == '<')
 	{
 	  speaking = 0;		/* hack for medievia.com */
-	} else if (ch == '>')
+	}
+	else if (ch == '>')
 	{
 	  speaking = 1;
 	}
@@ -1073,12 +1020,12 @@ static void getoutput()
 #endif
       if (ch == kbuf[0] && win->cr == oldcr && win->cc == oldcc && kbuflen)
       {
-
 /* this character was (probably) echoed as a result of a keystroke */
 	kbsay();
 	win_addchr(ch, 0);
 	(void) memmove(kbuf + sizeof(int), kbuf, (--kbuflen) * sizeof(int));
-      } else
+      }
+      else
       {
 	win_addchr(ch, speaking && (!special || !win->cr));
       }
@@ -1087,7 +1034,8 @@ static void getoutput()
     if (!chr && ch != 8 && (stathit == 0 || ch < '0' || ch > '9'))
     {
       tts_flush();
-    } else
+    }
+    else
     {
       chr = 0;
     }
@@ -1108,14 +1056,9 @@ static void getoutput()
   }
   if (size > 1)
   {
-    if (!readable(master, 0))
-    {
-      tts_flush();
-    } else
-    {
-      return;
-    }
-  } else if (ch == 32 || ch == 13)
+    if (!readable(master, 0)) tts_flush(); else return;
+  }
+  else if (ch == 32 || ch == 13)
   {
     tts_flush();
   }
@@ -1162,21 +1105,21 @@ static void getoutput()
     default:
       if (ui.curtrack == 2)
       {
-	if (eol(win->cr, win->cc))
-	{
-	  ui_saychar(win->cr, win->cc);
-	} else
+	if (eol(win->cr, win->cc)) ui_saychar(win->cr, win->cc);
+	else
 	{
 	  ui_sayword(win->cr, cblank(win->cr, win->cc) ?
 		     win->cc + 1 : win->cc);
 	}
       }
     }
-  } else if ((kbuf[0] == 0x1b5b43 && bol(win->cr, win->cc)) ||
+  }
+  else if ((kbuf[0] == 0x1b5b43 && bol(win->cr, win->cc)) ||
 	     (kbuf[0] == 0x1b5b44 && eol(win->cr, win->cc)))
   {
     ui_saychar(win->cr, win->cc);
-  } else
+  }
+  else
   {
     switch (win->cr - oldcr)
     {
@@ -1198,35 +1141,31 @@ static void getoutput()
       if (win->cc && bol(win->cr, win->cc) && lastword(oldcr, oldcc) && oldcc)
       {
 	ui_sayword(win->cr, win->cc);
-      } else
+      }
+      else
       {
 	ui_sayline(win->cr, 1);
       }
       break;
-
     case -1:			/* cursor moved up a line */
       if (kbuf[0] == 0x1b5b41)
       {
 	ui_sayline(win->cr, 1);
 	break;
       }
-      if (ui.curtrack < 2)
-      {
-	break;
-      }
+      if (ui.curtrack < 2) break;
       if (win->cc == win->cols - 1 && (oldcr == 0 || kbuf[0] == 0x1b5b44))
       {
 	ui_saychar(win->cr, win->cc);
-      } else if (lastword(win->cr, win->cc) &&
+      }
+      else if (lastword(win->cr, win->cc) &&
 		 !firstword(win->cr, win->cc) &&
 		 (!win->cc || cblank(win->cr, win->cc - 1)) &&
 		 firstword(oldcr, oldcc))
       {
 	ui_sayword(win->cr, win->cc);
-      } else
-      {
-	ui_sayline(win->cr, 1);
       }
+      else ui_sayline(win->cr, 1);
       break;
     }
   }
@@ -1235,12 +1174,10 @@ static void getoutput()
   oldch = win->row[win->cr][win->cc];
 }
 
-
 static void get_tts_input()
 {
   (void) read(tts.fd, buf, 100);
 }
-
 
 static void parent()
 {
@@ -1290,7 +1227,6 @@ static void parent()
   }
 }
 
-
 #if 0
 int isctty()
 {
@@ -1300,7 +1236,6 @@ int isctty()
 	  (!strncmp(buf, "/dev/tty", 8) && isdigit(buf[8])));
 }
 #endif
-
 
 int main(int argc, char *argv[])
 {
@@ -1376,18 +1311,11 @@ int main(int argc, char *argv[])
 
   (void) openpty(&master, &slave, NULL, NULL, &winsz);
   cpid = fork();
-  if (cpid > 0)
-  {
-    parent();
-  } else if (cpid == 0)
-  {
-    child();
-  }
+  if (cpid > 0) parent();
+  else if (cpid == 0) child();
   perror("fork");
-
-  return (-1);			/* suppress gcc warning */
+  return -1;
 }
-
 
 static Win *wininit(int nr, int nc)
 {
@@ -1395,6 +1323,11 @@ static Win *wininit(int nr, int nc)
   Win *win;
 
   win = (Win *) calloc(sizeof(Win), 1);
+  if (!win)
+  {
+    fprintf(stderr, "wininit: cannot allocate %ld bytes\n", sizeof(Win));
+    exit(1);
+  }
   win->rows = nr;
   win->cols = nc;
   win->row = (chartype **) malloc(win->rows * sizeof(chartype *));
@@ -1402,17 +1335,22 @@ static Win *wininit(int nr, int nc)
   for (i = 0; i < win->rows; i++)
   {
     win->row[i] = (chartype *) calloc(win->cols, CHARSIZE);
+    if (!win->row[i])
+    {
+      fprintf(stderr, "wininit: cannot allocate row %d\n", i);
+      exit(1);
+    }
   }
   win->savecp.cr = win->savecp.cc = 0;
   win->tab = (char *) calloc(win->cols, 1);
-  for (i = 0; i < win->cols; i += 8)
+  if (!win->tab)
   {
-    win->tab[i] = 1;
+    fprintf(stderr, "wininit: cannot allocate win->tab\n");
+    exit(1);
   }
-
+  for (i = 0; i < win->cols; i += 8) win->tab[i] = 1;
   return (win);
 }
-
 
 void speak(char *ibuf, int len)
 {
@@ -1421,10 +1359,7 @@ void speak(char *ibuf, int len)
   int len1, olen = 0;
   int i;
 
-  if (!len)
-  {
-    len = strlen(ibuf);
-  }
+  if (!len) len = strlen(ibuf);
   len1 = len - 1;
 
   for (i = 0; i < len; i++)
@@ -1445,7 +1380,8 @@ void speak(char *ibuf, int len)
       tts_saychar(lc);
       tts_out((unsigned char *) obuf, sprintf(obuf, "repeats %d times\r", nc + 1));
       olen = nc = 0;
-    } else
+    }
+	else
     {
       obuf[olen++] = ibuf[i];
       if (ibuf[i] != lc)
@@ -1456,10 +1392,8 @@ void speak(char *ibuf, int len)
 	  ibuf[i] != 32 && ibuf[i] != '=' && ibuf[i] >= 0)
       {
 	lc = ibuf[i];
-      } else
-      {
-	lc = 0;
       }
+      else lc = 0;
       if (olen > 250 && !nc)
       {
 	tts_out((unsigned char *) obuf, olen);
