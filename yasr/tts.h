@@ -19,6 +19,13 @@
 
 /* tts.h -- defines Tts_synth */
 
+#define TTS_SPEAKOUT         0
+#define TTS_DECTALK          1
+#define TTS_EMACSPEAK_SERVER 2
+#define TTS_DOUBLETALK       3
+#define TTS_BNS              4
+#define TTS_APOLLO           5
+
 typedef struct Tts_synth Tts_synth;
 
 struct Tts_synth {

@@ -157,7 +157,7 @@ tts_silence()
  */
 
 #ifndef sun
-    if (tts.synth == 1) {
+    if (tts.synth == TTS_DECTALK) {
         if (read(tts.fd, tmp, 1) == -1) {
             perror("tts_silence");
         }
@@ -486,9 +486,9 @@ tts_init()
         tts.fd = open_tcp(tts.port);
         }
     else if (tts.port[0] != '|') {
-        if (tts.synth == 1) {
+        if (tts.synth == TTS_DECTALK) {
             mode = O_NOCTTY|O_RDWR;
-        } else if (tts.synth == 2) {
+        } else if (tts.synth == TTS_EMACSPEAK_SERVER) {
             mode = O_WRONLY;
         }
         tts.fd = open(portname, mode);

@@ -1,5 +1,5 @@
 .\" %Z%%M% %I% %E%
-.TH YASR 1 "6 August 2002"
+.TH YASR 1 "16 August 2002"
 .ds Ps P\s-2OST\s+2S\s-2CRIPT\s+2
 .SH NAME
 .\" don't use Ps register in line below; goofs up output from whatis command
@@ -18,6 +18,8 @@ screen reader.
 ] [
 .B \-p
 .I synthesizer port
+] [ 
+program arg1 arg2 ... argN
 ]
 .SH DESCRIPTION
 .I yasr
@@ -56,6 +58,10 @@ The TTS synthesizer to use in conjunction with
 .TP
 .BI \-p " synthesizer port"
 The port that the TTS synthesizer is connected to.
+.PP
+.I yasr
+will also fork and exec a program to run, if it (and any optional command
+line arguments it needs) are given as the last command line arguments.
 .SH KEYBOARD SETTINGS
 .B Review mode
 .TP

@@ -22,7 +22,6 @@
 #include <stdarg.h>
 
 #define DEBUG     1 
-#define DEBUGFILE "/tmp/yasr.debug"
 
 #ifdef DEBUG
 static FILE *debugfp;
@@ -30,14 +29,14 @@ static FILE *debugfp;
 
 
 void
-open_debug()
+open_debug(char *basename)
 {
 #ifdef DEBUG
     char filename[1024];
 
-    (void) sprintf(filename, "%s%1d", DEBUGFILE, getpid());
+    (void) sprintf(filename, "%s%1d", basename, getpid());
     if ((debugfp = fopen(filename, "w+")) == NULL) {
-        fprintf(stderr, "Couldn't open debug file %s\n", DEBUGFILE);
+        fprintf(stderr, "Couldn't open debug file %s\n", filename);
     }
 #endif /*DEBUG*/
 }

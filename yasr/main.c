@@ -60,6 +60,8 @@ static char **subprog = NULL;  /* if non-NULL, then exec it instead of shell */
 static Win *wininit(int, int);
 static void win_end(Win *);
 
+extern char **environ;
+
 
 #define PARM1 (parm[0] ? parm[0] : 1)
 #define PARM2 (parm[1] ? parm[1] : 1)
@@ -101,7 +103,7 @@ child()
     (void) sprintf(envstr, "SHELL=%s", usershell);
     (void) putenv(envstr);
     if (subprog) {
-        (void) execvp(subprog[0], subprog);
+        (void) execve(subprog[0], subprog, environ);
     } else {
         (void) execl(usershell, arg, 0);
     }

@@ -2,6 +2,30 @@
 yasr change history.
 ====================
 
+v0.6.1 - 19th August 2002 (richb).
+
+* Adjusted the open_debug() routine so that you have to pass in the basename
+  of the debug file. This means that they can now be easily used from more
+  than one program.
+
+* If the user passes in a subprogram to start via the command line, it's 
+  now exec'ed with execve instead of execvp, so the environment is passed 
+  on as well.
+
+* Mentioned the ability to fork and exec a sub-program in the yasr manual 
+  pages.
+
+* Added a set of TTS_ definitions to tts.h, and adjusted the code to 
+  use them.
+
+----
+
+v0.6.0 - 12th August 2002 (mike).
+
+* First official release on SourceForge.
+
+----
+
 v0.5.5 - 6th August 2002 (richb).
 
 * Added rules to the configure.in file to add the -lsocket and -lnsl libraries

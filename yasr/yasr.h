@@ -242,7 +242,7 @@ void speak(char *ibuf, int len);
 extern char realchar(chartype ch);
 
 /* debug.c prototypes */
-extern void open_debug();
+extern void open_debug(char *);
 extern void debug(char *format, ...);
 extern void close_debug();
 
