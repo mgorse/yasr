@@ -758,7 +758,7 @@ void rev_prevpar(int *argp)
     ui.func = NULL;
     return;
   }
-  tts_say("review");
+  tts_say(_("review"));
   ui.func = &rev_main;
   rev.findbuflen = rev.meta = ui.num = 0;
   if (!ui.rc_detached)
