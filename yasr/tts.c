@@ -31,14 +31,16 @@ static Tts_synth synth[] = {
   {"", "%s", "\030", "\001c", "\001t", 1, "", ""},	/* doubletalk */
   {"", "%s\r\r", "\030\030\r\r", NULL, NULL, 1, NULL, NULL},	/* BNS */
   {"", "%s\r\n", "\030", "@P1", "@P0", 1, "@", ""},	/* Apollo */
-  {"(audio_mode 'async)\n(parameter.set 'Audio_Method 'netaudio)\n",
+  {"(audio_mode 'async)\n",
    "(SayText \"%s\")\n",
    "(audio_mode 'shutup)\n",
    "(SayText '%c)\n",
    NULL,
    1,
    "",
-   "\003\")\n",} /* festival */
+   "\003\")\n"}, /* festival */
+  {"", "%s\r\n", "\033", "%c\r", NULL, 1, "@", ""}	/* Ciber232 */
+
 };
 
 static char *dict[256];
@@ -97,7 +99,9 @@ void tts_flush()
   {
     speak(tts.buf, tts.outlen);
   }
+  
   tts.outlen = 0;
+ 
 }
 
 
@@ -399,7 +403,7 @@ void tts_sayphonetic(unsigned char ch)
   }
   if (isupper(ch))
   {
-    tts_say("cap");
+    tts_say(_("cap"));
   } else
   {
     ch = toupper(ch);
@@ -551,7 +555,7 @@ void tts_addchr(char ch)
   }
   if (!ui.silent)
   {
-    tts_say("Synthesizer reinitialized.");
+    tts_say(_("Synthesizer reinitialized."));
   }
 }
 
