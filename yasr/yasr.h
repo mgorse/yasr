@@ -207,7 +207,7 @@ extern int kbuf[100];
 extern int kbuflen;
 extern char usershell[OPT_STR_SIZE];
 extern char ttsbuf[80];
-extern char voices[7][64];
+extern char voices[8][64];
 extern int special;
 
 extern Func funcs[];
