@@ -51,7 +51,7 @@ static unsigned char okbuf[100];
 static int okbuflen = 0;
 int sighit = 0;
 static int oldcr = 0, oldcc = 0, oldch = 0;
-char voices[6][64];
+char voices[7][64];
 static int shell = 0;
 int special = 0;
 int cl_synth = 0;
