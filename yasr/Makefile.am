@@ -4,7 +4,6 @@ bin_PROGRAMS = yasr
 noinst_PROGRAMS = keytest
 
 yasr_SOURCES = \
-	cfmakeraw.c \
 	config.c \
 	debug.c \
 	getfn.c \
