@@ -118,7 +118,7 @@ void readconf()
     {
       mode = 0;
       buf[strlen((char *) buf) - 1] = '\0';
-      for (i = 0; i <= opt[synthopt].max; i++)
+      for (i = 0; i <= opt[synthopt].v.enum_max; i++)
       {
 	if (!strcasecmp((char *) buf + 1, opt[synthopt].arg[i]))
 	{
