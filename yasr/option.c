@@ -660,7 +660,7 @@ opt_init()
             "some", "none", "all", 1, "[:pu \\p]");
   
 /* Emacspeak settings (first index is 22) */
-    opt_add((void *) 4, -1, "rate", OT_VAL|OT_SYNTH, 0, 250, 2, "r {%d}\r");
+    opt_add((void *) 4, -1, "rate", OT_VAL|OT_SYNTH, 0, 250, 2, "tts_set_speech_rate {%d}\r");
 
 /* DoubleTalk settings (first index is 23) */
     opt_add((void *) 4, -1, "rate", OT_VAL|OT_SYNTH, 0, 9, 3, "\001%ds");
