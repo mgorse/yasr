@@ -6,8 +6,7 @@ yasr_DDIRS= yasr
 endif
 
 SUBDIRS = \
-	$(yasr_DDIRS) \
-	po
+	$(yasr_DDIRS)
 
 pkgdata_DATA = \
 	yasr.conf

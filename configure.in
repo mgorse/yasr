@@ -34,7 +34,6 @@ AC_CHECK_FUNC(gethostbyname,,[AC_CHECK_LIB(nsl,gethostbyname)])
 
 dnl Add the languages which your application supports here.
 ALL_LINGUAS=""
-AM_GNU_GETTEXT
 
 dnl Set PACKAGE_LOCALE_DIR in config.h.
 if test "x${prefix}" = "xNONE"; then
@@ -79,5 +78,4 @@ AC_OUTPUT([
 Makefile
 yasr/Makefile
 acclogin/Makefile
-po/Makefile.in
 ])
