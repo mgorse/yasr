@@ -301,7 +301,15 @@ static void opt_synth_update(int num, int optval)
 
 static void opt_synth_update_float(int num, double optval)
 {
+  int i;
+  
   (void) sprintf(ttsbuf, opt[num].setstr, optval);
+  for (i=0; i<strlen(ttsbuf); i++)
+    {
+      if ((ttsbuf[i])==',')
+        ttsbuf[i]='.';
+    }
+
   tts_send(ttsbuf, strlen(ttsbuf));
 }
 
@@ -731,7 +739,7 @@ void opt_init()
 {
   opq.len = opq.lastlen = 0;
   opt_add(&ui.curtrack, 0, N_("cursor tracking"), OT_ENUM, 3, N_("off"), N_("arrow keys"), N_("full"));
-  opt_add(&tts.synth, 0, N_("synthesizer"), OT_ENUM, 7, N_("speakout"), N_("dectalk"), N_("Emacspeak server"), N_("doubletalk"), N_("bns"), N_("apollo"), N_("festival"));
+  opt_add(&tts.synth, 0, N_("synthesizer"), OT_ENUM, 8, N_("speakout"), N_("dectalk"), N_("Emacspeak server"), N_("doubletalk"), N_("bns"), N_("apollo"), N_("festival"), N_("Ciber232"));
   opt_add(tts.port, 0, N_("synthesizer port"), OT_STR);
   opt_add(&ui.kbsay, 0, N_("key echo"), OT_ENUM, 3, N_("off"), N_("keys"), N_("words"));
   opt_add(usershell, 0, N_("shell"), OT_STR);
@@ -795,5 +803,16 @@ void opt_init()
   opt_add((void *) 32, -1, N_("voice"), OT_INT | OT_SYNTH, 1, 6, 5, "@V%d");
 
   /* festival settings (first index is 43) */
-  opt_add((void *)4, -1, N_("rate"), OT_FLOAT|OT_SYNTH, (double)0.1, (double)4.9, 6, "(Parameter.set 'Duration_Stretch %e)");
+  opt_add((void *)4, -1, N_("rate"), OT_FLOAT|OT_SYNTH, (double)0.4, (double)2.5, 6, "(Parameter.set 'Duration_Stretch %e)");
+
+/* Ciber232 settings  (first index 44)*/
+  opt_add((void *) 4, -1, N_("rate"), OT_INT | OT_SYNTH, 0, 9, 7, "@b%d");
+  opt_add((void *) 8, -1, N_("volume"), OT_INT | OT_SYNTH, 0, 9, 7, "@d%d");
+  opt_add((void *) 12, -1, N_("pitch"), OT_INT | OT_SYNTH, 0, 9, 7, "@a%d");
+  opt_add((void *) 16, -1, N_("sex"), OT_INT | OT_SYNTH, 0, 1, 7, "@c%d");
+  opt_add((void *) 20, -1, N_("Voice"), OT_INT | OT_SYNTH, 0, 1, 7, "@q%d");
+  opt_add((void *) 24, -1, N_("entonation"), OT_INT | OT_SYNTH, 0, 9, 7, "@r%d");
+  opt_add((void *) 28, -1, N_("caseonwarning"), OT_INT | OT_SYNTH, 0, 1, 7, "@n%d");
+  opt_add((void *) 32, -1, N_("deviceonwarning"), OT_INT | OT_SYNTH, 0, 1, 7, "@t%d");
+
 }
