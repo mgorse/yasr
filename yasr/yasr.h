@@ -263,6 +263,9 @@ extern void close_debug();
 char *getfn(char *name);
 
 /* keybind.c prototypes */
+/* Undefine this to remove the keyboard wizard and make yasr slightly smaller*/
+#define USE_KBWIZ
+
 extern int kb_search(Keymap * map, int k);
 extern int kb_add(Keymap * map, int k, int i, int na, int *a, int flag);
 extern int kbwiz(int ch);
