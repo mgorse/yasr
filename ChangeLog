@@ -8,6 +8,7 @@ option.c, tts.c: add preliminary festival support (from Lorenzo Prince)
 main.c, tts.c: use perror to give more descriptive error messages
 option.c, tts.c, ui.c, config.c, yasr.h: code cleanups
 option.c: add framework for allowing float options
+tts.c: have unspeakable() take an unsigned char instead of a char
 
 v0.6.5 - 28 Oct 03 (mike)
 tts.c: no longer send return after text w/DoubleTalk (from Mario Lang)

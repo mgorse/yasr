@@ -252,7 +252,7 @@ void tts_send(char *buf, int len)
 }
 
 
-static int unspeakable(char ch)
+static int unspeakable(unsigned char ch)
 {
   char *p = synth[tts.synth].unspeakable;
 
@@ -297,7 +297,7 @@ void tts_out(unsigned char *buf, int len)
       p++;
       for (i = 0; i < len; i++)
       {
-	if (unspeakable(buf[i]))
+	if (unspeakable((unsigned char)buf[i]))
 	{
 	  if (obp && obuf[obp - 1] != 32)
 	  {
