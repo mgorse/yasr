@@ -33,7 +33,7 @@ static Tts_synth synth[] = {
       "[]{}\\|_@#^*<>\"`~^", "exit" },                  /* emacspeak server */
     { "", "%s\r", "\030", "\001c", "\001t", 1, "", "" },      /* doubletalk */
     { "", "%s\r\r", "\030\030\r\r", NULL, NULL, 1, NULL, NULL },   /* BNS */
-    { "", "%s\r\n", "\030", "@S1", "@S0", 1, "@", "" }        /* Apollo */
+    { "", "%s\r\n", "\030", "@P1", "@P0", 1, "@", "" }        /* Apollo */
 };
 
 static char *dict[256];
