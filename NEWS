@@ -1,4 +1,29 @@
 
+Overview of changes in yasr 0.6.4:
+
+* Punctuation can now be set for an Emacspeak server.
+
+* The keyboard wizard is now compiled in by default.
+
+* Yasr builds under FreeBSD again.
+* Yasr may now read individual letters correctly with an Apollo.
+
+----
+
+Overview of changes in yasr 0.6.3:
+
+* Yasr now correctly interprets the [1K escape sequence.
+
+* Added review mode commands to move forward and back by paragraph.  They are
+  defined by default as ( and ), respectively.  They will bypass text until
+  a blank line is encountered.
+
+* A find can now be aborted by pressing escape.
+
+* Yasr may now be built on Solaris for Intel CPUs.
+
+----
+
 Overview of changes in yasr 0.6.2:
 
 * Removed the "intl" sub-directory and adjusted configure.in and Makefile.am 
