@@ -221,6 +221,10 @@ static void utmpconv(char *s, char *d, int pid)
   {
     (void) kill(tts.pid, 9);
   }
+  if (cpid)
+  {
+    (void) kill(cpid, 9);
+  }
   exit(0);
 }
 
