@@ -147,10 +147,12 @@ struct Ui
     int disabled;		/* true if disabled */
     int (*func) (int);
     int kbsay;
-    int num;			/* number that the user is entering */
+    int num;	/* number that the user is entering */
+    char str[100];	/* string that the user is entering */
+    int strlen;
     int (*oldfunc) (int);
     int meta;
-    int minrc;
+    int minrc;	/* min. repeat count */
     int revmode;
     int silent;
     int rc_detached;
@@ -166,8 +168,13 @@ struct Opt
     int type;
     int shift;			/* # bits to shift, if type & 0x80 */
     int tree;
-    int d1;
-    int max;
+    union
+    {
+      struct { int min; int max; } val_int;
+      struct { double min; double max; } val_float;
+      int enum_max;
+      int submenu;
+    } v;
     int synth;
     char **arg;
 };
@@ -207,6 +214,7 @@ extern void rev_searchtocursor(int *argp);
 extern void rev_searchtoend(int *argp);
 extern void rev_find(int *argp);
 extern int ui_ennum(int ch);
+extern int ui_build_str(int ch);
 extern void ui_funcman(int (*f) (int));
 extern void ui_kbwiz(int *argp);
 extern void ui_optmenu(int *argp);
@@ -298,7 +306,17 @@ extern int forkpty(int *, char *, struct termios *, struct winsize *);
 #define cblank(r, c)  ((win->row[r][c] & 0xdf) == 0)
 #define ttssend(x)    if (x) tts_send(x, strlen(x))
 
-#define NUMOPTS 43
+#define NUMOPTS 44
+
+/* Option types */
+#define OT_INT      0x00
+#define OT_FLOAT    0x01
+#define OT_ENUM     0x02
+#define OT_STR      0x03
+#define OT_TREE     0x04
+#define OT_PRESET   0x04
+#define OT_SYNTH    0x40
+#define OT_BITSLICE 0x80
 
 #if DEBUG
 #include "debug.h"
