@@ -1,0 +1,11 @@
+There are several people who deserve credit for various things.  here is a
+partial list:
+
+Rich Burridge <rich.burridge@sun.com>: Ported yasr to Solaris, created
+the manpage and Automake script
+
+Victor Tsaran: Wrote the DoubleTalk code, which I (M. Gorse) subsequently
+broke.
+
+Jason White <jasonw@ariel.ucs.unimelb.edu.au>: Contributed code for
+phonetic reading of letters and routing the review cursor

@@ -1,0 +1,208 @@
+.\" %Z%%M% %I% %E%
+.TH YASR 1 "6 August 2002"
+.ds Ps P\s-2OST\s+2S\s-2CRIPT\s+2
+.SH NAME
+.\" don't use Ps register in line below; goofs up output from whatis command
+yasr (Yet Another Screen Reader) \- is an attempt at a lightweight, portable 
+screen reader.
+.SH SYNOPSIS
+.B yasr
+[
+.B \-C
+.I config file
+] [
+.B \-c
+] [
+.B \-s
+.I synthesizer
+] [
+.B \-p
+.I synthesizer port
+]
+.SH DESCRIPTION
+.I yasr
+is a lightweight, portable screen reader. It works by opening a shell in a 
+pty and intercepting all user input/output, maintaining a window of what
+should be on the screen by looking at the codes and text sent to the
+screen. It only requires that the user be able to access the text to speech
+(TTS) device.
+.LP
+.I yasr
+was originally designed in conjunction with a Speak-out TTS device.
+Yasr also attempts to support DEC-Talk, DoubleTalk, Apollo, and ViaVoice 
+Outloud,  but more work is needed to get these to work fully. It may be able 
+to work with Emacspeak servers, however.
+.LP
+Currently
+.I yasr
+has two sets of keymaps, one for "review mode" (ie, reviewing the screen) and 
+one for the standard mode.  Keys defined for the standard mode are checked 
+irrespective of whether the user is in review mode or standard mode, but the 
+review mode keymap is checked first in the former case.
+.SH OPTIONS
+.TP
+.BI \-C " config file"
+The configuration file that yasr should use.
+.TP
+.B \-c
+Attempts to emulate bash's -c command. It runs
+.I /bin/sh,
+passing it the arguments that were passed to
+.I yasr.
+.TP
+.BI \-s " synthesizer"
+The TTS synthesizer to use in conjunction with
+.I yasr.
+.TP
+.BI \-p " synthesizer port"
+The port that the TTS synthesizer is connected to.
+.SH KEYBOARD SETTINGS
+.B Review mode
+.TP
+.B spacebar
+Say review cursor position.
+.TP
+.B ^
+Move to the first character on the line, and say word.
+.TP
+.B $
+Move to the last character on the line, and say word.
+.TP
+.B b
+Say previous character.
+.TP
+.B c
+Say character.
+.TP
+.B d
+Say next character.
+.TP
+.B e
+Read from cursor to bottom of screen.
+.TP
+.B f
+Search for text on the screen.
+.TP
+.B <
+Search from cursor to top of screen, using the previously-entered search string.
+.TP
+.B >
+Search from cursor to bottom of screen, using the previously-entered search
+string.
+.TP
+.B k
+Move up a line and read the line (currently same as up arrow).
+.TP
+.B l
+Say current line.
+.TP
+.B m
+Move down a line and read the line (currently same as down arrow).
+.TP
+.B n
+Bypass (send directly to the application).
+.TP
+.B t
+Read from top to cursor.
+.TP
+.B w
+Read entire screen.
+.TP
+.B z
+Move to beginning of previous word and read the word.
+.TP
+.B x
+Move to beginning of next word and read the word.
+.TP
+.B up arrow
+Move to previous line and read the line.
+.TP
+.B down arrow
+Move to next line and read the line.
+.TP
+.B left arrow
+Move back one character and read the character.
+.TP
+.B right arrow
+Move ahead one character and read the character.
+.TP
+.B alt-i
+Reinitialize the synthesizer.
+.TP
+.B `
+Read the ASCII value of the current character.
+
+.B Standard mode
+These keys also work in review mode.
+.TP
+.B ctrl-a
+Say application cursor position.
+.TP
+.B ctrl-l
+Say line.
+.TP
+.B ctrl-n
+Bypass.
+.TP
+.B ctrl-x
+Flush speech buffer.
+.TP
+.B alt-b
+Say previous character.
+.TP
+.B alt-c
+Say chracter.
+.TP
+.B alt-d
+Say word.
+.TP
+.B alt-e
+Read cursor to bottom of screen.
+.TP
+.B alt-k
+Say previous line.
+.TP
+.B alt-l
+Read line.
+.TP
+.B alt-m
+Read next line.
+.TP
+.B alt-r
+Toggle review mode.
+.TP
+.B alt-t
+Read top to cursor.
+.TP
+.B alt-w
+Read entire screen.
+.TP
+.B alt-x
+Silence speech. Like ctrl-x but will continue to be silent until a key
+is pressed (pressing alt-x a second time will start speech again, for
+example).
+.TP
+.B ctrl-alt-k
+Keyboard wizard. Allows the user to move, copy, or delete keybindings 
+from within 
+.I yasr.
+.TP
+.B ctrl-alt-o
+Options menu. Allows the user to set options from within 
+.I yasr.
+.TP
+.B ctrl-alt-s
+Save configuration to disk.
+.TP
+.B alt-enter
+Disable 
+.I yasr.  Yasr 
+is silent and ignores all keys when disabled. Press again to re-enable.
+Note: this key is defined in the [options] section as "DisableKey"
+.SH FILES
+.TP
+.I /usr/local/share/yasr/yasr.conf
+.I yasr
+configuration file.
+.SH AUTHOR
+Michael P. Gorse <mgorse@users.sourceforge.net>

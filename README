@@ -1,0 +1,91 @@
+YASR ("Yet Another Screen Reader") is my attempt at a lightweight,
+portable screen reader. It works by opening a shell in a pty and
+intercepting all user input/output, maintaining a window of what
+should be on the screen by looking at the codes and text sent to the
+screen. It thus uses no Linuxisms such as /dev/vcsa0 and does not 
+necessarily need to be setuid root (the only requirement being that 
+the user be able to access the tts device).  Yasr is developed under 
+GNU/Linux, but I have attempted to port it to FreeBSD, and it should 
+work on similar Unix-like operating systems with minor tweaking.
+
+Yasr is still being developed, but I think it's becoming fairly usable, 
+as long as you have a Speak-out anyway.  Yasr also attempts to directly support
+the DEC-Talk, DoubleTalk, Braille 'n Speak, and Apollo, but work is needed to
+get these to work well.  It can also be used with Emacspeak servers, however.
+
+To install, see the INSTALL file.
+
+By default, yasr.conf will be copied into /usr/local/share/yasr. If you
+want your own customised yasr configuration file, you should copy yasr.conf
+to your home directory as .yasr.conf, and adjust appropriately. ~/.yasr.conf
+is checked first. This file contains all of yasr's keybindings and options, 
+which can be redefined by modifying the file. Most parameters can now also 
+be changed from within yasr.
+
+Currently yasr has two sets of keymaps, one for "review mode" (ie,
+reviewing the screen) and one for the standard mode.  Keys defined for the
+standard mode are checked whether the user is in review mode or standard mode,
+but the review mode keymap is checked first in the former case.  Following is
+a list of keys and their functions that are defined by default.  Keys preceeded
+by [n] can optionally be preceeded by a number.
+
+-- Review mode --
+
+spacebar: say review cursor position
+^: move to the first character on the line, and say word
+$: move to the last character on the line, and say word
+[n]b: say previous character, or move left n characters
+[n]c: say character, or move to character n on the line and say it
+[n]d: say next character, or move right n characters
+e: read from cursor to bottom of screen
+f: search for text on the screen.
+<: search from cursor to top of screen, using the previously-entered search
+   string.
+>: search from cursor to bottom of screen, using the previously-entered search
+   string.
+[n]k: move up a line and read the line (currently same as up arrow)
+[n]l: say current line, or jump to line n and read it
+[n]m: move down a line and read the line (currently same as down arrow)
+n: bypass (send directly to the application)
+t: read from top to cursor.
+w: read entire screen.
+z: move to beginning of previous word and read the word.
+x: move to beginning of next word and read the word.
+[n]up arrow: move to previous line and read the line. (tbd -- allow up and down
+   arrow to read a word or character instead of the line if desired)
+[n]down arrow: move to next line and read the line.
+[n]left arrow: move back one character and read the character.
+[n]right arrow: move ahead one character and read the character.
+alt-i: reinitialize the synthesizer
+`: read the ASCII value of the current character
+
+** standard mode ** (these keys also work in review mode)
+
+ctrl-a: say application cursor position.
+ctrl-l: say line.
+ctrl-n: bypass
+ctrl-x: flush speech buffer
+alt-b: say previous character
+alt-c: say character
+alt-d: say word
+alt-e: read cursor to bottom of screen
+alt-k: say previous line
+alt-l: read line
+alt-m: read next line
+alt-r: toggle review mode
+alt-t: read top to cursor
+alt-w: read entire screen
+alt-x: silence speech. like ctrl-x but will continue to be silent until a key
+   is pressed (pressing alt-x a second time will start speech again, for
+   example)
+ctrl-alt-k: keyboard wizard.  Allows the user to move, copy, or delete
+	keybindings from within yasr.
+ctrl-alt-o: options menu.  Allows the user to set options from within yasr.
+ctrl-alt-s: save configuration to disk.
+alt-enter: disable yasr.  Yasr is silent and ignores all keys when disabled.
+	Press again to re-enable.
+	Note: this key is defined in the [options] section as "DisableKey"
+
+Suggestions, patches, etc. welcome.
+
+   -Michael P. Gorse <mgorse@users.sourceforge.net>

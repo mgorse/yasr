@@ -1,0 +1,7 @@
+Overview of changes in yasr 0.5.2:
+
+* works on Solaris as well as Linux. 
+* can be installed by any user anywhere (i.e. do not need root permission to
+  install and is self contained).
+
+====
