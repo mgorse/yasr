@@ -375,13 +375,14 @@ int ui_build_str(int ch)
     return 1;
   case 27:	/* escape */
     tts_say("aborting");
+    ui.abort = 1;
     ui_funcman(0);
-    return 1;
+    return 2;
   case 13:
   case 10:
     ui.str[ui.strlen] = 0;
     ui_funcman(0);
-    return 1;
+    return 2;
   default:
     if (ui.strlen < sizeof(ui.str) - 1)	/* ascii dep. */
     {
@@ -532,6 +533,7 @@ static int rev_find_aux(int ch)
     case 27:			/* escape */
       tts_say("aborting");
       ui_funcman(0);
+      ui.abort = 1;
       return 1;
 
     case 13:
