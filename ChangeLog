@@ -1,3 +1,9 @@
+2005-01-28 Michael P. Gorse <mgorse@alum.wpi.edu>
+From Rich Burridge <rich.burridge@sun.com>:
+Increase size of voices array by 1
+When receiving a SIGCHLD, only finish if the signal was caused by the child yasr process
+Release v0.6.7
+
 2005-01-26 Michael P. Gorse <mgorse@alum.wpi.edu>
 From Rich Burridge <rich.burridge@sun.com>
 tts.c: use l {%c} to have an Emacspeak server say a letter rather than l %c

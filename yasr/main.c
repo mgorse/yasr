@@ -30,6 +30,8 @@
 #endif
 #define UTMP_HACK
 #include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 
 static int cpid;
 static int size;
@@ -51,7 +53,7 @@ static unsigned char okbuf[100];
 static int okbuflen = 0;
 int sighit = 0;
 static int oldcr = 0, oldcc = 0, oldch = 0;
-char voices[7][64];
+char voices[8][64];
 static int shell = 0;
 int special = 0;
 int cl_synth = 0;
@@ -226,6 +228,17 @@ static void utmpconv(char *s, char *d, int pid)
     (void) kill(cpid, 9);
   }
   exit(0);
+}
+
+/*ARGSUSED*/ static void child_finish(int sig)
+{
+  int status;
+
+  (void) signal(SIGCHLD, &child_finish);
+  if (waitpid(-1, &status, WNOHANG) == cpid)
+  {
+    finish(0);
+  }
 }
 
 static int is_char(int ch)
@@ -1192,7 +1205,7 @@ static void parent()
   rt.c_cc[VMIN] = 1;
   rt.c_cc[VTIME] = 0;
   (void) tcsetattr(0, TCSAFLUSH, &rt);
-  (void) signal(SIGCHLD, &finish);
+  (void) signal(SIGCHLD, &child_finish);
   yasr_ttyname_r(0, (char *) (buf + 128), 32);
   yasr_ttyname_r(slave, (char *) (buf + 192), 32);
   utmpconv((char *) (buf + 128), (char *) (buf + 192), cpid);
