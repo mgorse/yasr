@@ -1,0 +1,12 @@
+# List of source files containing translatable strings.
+
+yasr/cfmakeraw.c
+yasr/config.c
+yasr/forkpty.c
+yasr/getfn.c
+yasr/keybind.c
+yasr/main.c
+yasr/openpty.c
+yasr/option.c
+yasr/tts.c
+yasr/ui.c

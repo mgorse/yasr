@@ -1,0 +1,5 @@
+The Speak-out occasionally begins speaking all punctuation or all caps (I think that this is caused by ^ec0 not being resent after speech is silenced)
+Key echo locks up the virtual console (from Jacob Schmude -- I have not been able to reproduce this)
+Can occasionally lock up (in read()?); I've noticed this while in a telnet session
+Apollo support is broken. Same may be true for the DoubleTalk.  Also, support for Emacspeak servers does not work well.
+

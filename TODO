@@ -1,0 +1,9 @@
+[Here is my todo list.  Help with any of these would be welcome.]
+
+Add exception dictionary.
+Terminal emulation probably still isn't perfect.  Test it on OS's other than Linux.  Also, do other OS's use differeing schemes for meta keys?
+Refine code to interact with synthesizers somehow.  Maybe write a separate daemon to handle this; this approach would also have the advantage that other packages could use it simultaneously.  Maybe make this daemon able to read ssil specifications.  Retaining yasr's ability to control synthesizers directly would be preferable though (for root disks, for instance)
+Get yasr hosted on sourceforge.
+Support other platforms (serial_name and parallel_name in getfn.c, keybindings, and anything else)
+Eliminate compiler warnings (gcc -Wall and non-gcc compilers)
+
