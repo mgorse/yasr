@@ -10,7 +10,7 @@
  * GNU Lesser General Public License, as published by the Free Software
  * Foundation.  Please see the file COPYING for details.
  *
- * Web Page: http://mgorse.dhs.org:8000/yasr/
+ * Web Page: http://yasr.sf.net
  *
  * This software is maintained by:
  * Michael P. Gorse <mgorse@users.sourceforge.net>
@@ -256,21 +256,13 @@ static int unspeakable(unsigned char ch)
 {
   char *p = synth[tts.synth].unspeakable;
 
-  if (ch < 32)
-  {
-    return (1);
-  }
+  if (ch < 32) return 1;
   while (*p)
   {
-    if (*p++ == ch)
-    {
-      return (1);
-    }
+    if (*p++ == ch) return 1;
   }
-
   return (0);
 }
-
 
 void tts_end()
 {
@@ -441,7 +433,7 @@ static int open_tcp(char *port)
   }
   memset(&servaddr, 0, sizeof(servaddr));
   servaddr.sin_family = AF_INET;
-  servaddr.sin_port = portnum;
+  servaddr.sin_port = htons(portnum);
 
   if (inet_pton(AF_INET, host, &servaddr.sin_addr) <= 0)
   {
