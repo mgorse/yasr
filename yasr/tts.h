@@ -25,6 +25,8 @@
 #define TTS_DOUBLETALK       3
 #define TTS_BNS              4
 #define TTS_APOLLO           5
+#define TTS_FESTIVAL	     6	
+#define TTS_Ciber232         7
 
 typedef struct Tts_synth Tts_synth;
 
