@@ -359,6 +359,38 @@ int ui_ennum(int ch)
   return (2);
 }
 
+int ui_build_str(int ch)
+{
+  switch (ch)
+  {
+  case 0:
+    ui.strlen = ui.abort = 0;
+    return 1;
+  case 0x08:
+  case 0x7f:
+    if (ui.strlen)
+    {
+      tts_saychar(ui.str[--ui.strlen]);
+    }
+    return 1;
+  case 27:	/* escape */
+    tts_say("aborting");
+    ui_funcman(0);
+    return 1;
+  case 13:
+  case 10:
+    ui.str[ui.strlen] = 0;
+    ui_funcman(0);
+    return 1;
+  default:
+    if (ui.strlen < sizeof(ui.str) - 1)	/* ascii dep. */
+    {
+      ui.str[ui.strlen++] = ch;
+    }
+    return 1;
+  }
+}
+
 
 static int rev_searchline(int l, int c1, int c2, int reverse)
 {
@@ -936,16 +968,18 @@ void ui_opt_set(int *argp)
   }
   switch (opt[*argp].type)
   {
-  case 0:
+  case OT_STR:
     opt_set(*argp, argp + 1);
     break;
 
-  case 1:
-  case 4:
-    t = (opt_getval(*argp, 0) + 1) % (opt[*argp].max + 1);
+  case OT_INT:
+    t = (opt_getval(*argp, 0) + 1) % (opt[*argp].v.val_int.max + 1);
     opt_set(*argp, &t);
     break;
-
+  case OT_ENUM:
+    t = (opt_getval(*argp, 0) + 1) % (opt[*argp].v.enum_max + 1);
+    opt_set(*argp, &t);
+    break;
   default:
     tts_say("error in keybinding: unsupported option type");
     break;
