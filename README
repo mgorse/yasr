@@ -56,6 +56,8 @@ x: move to beginning of next word and read the word.
 [n]down arrow: move to next line and read the line.
 [n]left arrow: move back one character and read the character.
 [n]right arrow: move ahead one character and read the character.
+(: go to previous paragraph
+): go to next paragraph
 alt-i: reinitialize the synthesizer
 `: read the ASCII value of the current character
 
