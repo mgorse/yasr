@@ -298,7 +298,7 @@ extern int forkpty(int *, char *, struct termios *, struct winsize *);
 #define cblank(r, c)  ((win->row[r][c] & 0xdf) == 0)
 #define ttssend(x)    if (x) tts_send(x, strlen(x))
 
-#define NUMOPTS 42
+#define NUMOPTS 43
 
 #if DEBUG
 #include "debug.h"

@@ -221,7 +221,7 @@ static void opt_synth_update(int num, int optval)
   /* This assumes that no synth will need a \ code at the beginning of a
    * setstr string.  If one does, then this code will need to be changed.
    */
-  if (!strchr(p1 + 1, '\\'))
+  if (!strchr(p1 + 1, '\\') && !strstr(p1, "%s"))
   {
     (void) sprintf(ttsbuf, p1, optval);
   } else
@@ -229,11 +229,9 @@ static void opt_synth_update(int num, int optval)
     p2 = ttsbuf;
     while (*p1)
     {
-      if (*p1 != '\\')
+      switch (*p1)
       {
-	*(p2++) = *(p1++);
-      } else
-      {
+      case '\\':
 	p1++;
 	switch (*(p1++))
 	{
@@ -245,10 +243,10 @@ static void opt_synth_update(int num, int optval)
 	  *(p2++) = opt[num].arg[(int) *((char *) opt_ptr(num))][0];
 	  break;
 
-	case '?':
+	case '?':	/* hard-coded special handling */
 	  switch (num)
 	  {
-	  case 33:
+	  case 32:	/* bns punctuation: tbd - rework using : form */
 	    switch (*(short *) opt_ptr(num))
 	    {
 	    case 0:
@@ -267,6 +265,22 @@ static void opt_synth_update(int num, int optval)
 	  }
 	  break;
 	}
+	break;
+      case '%':
+	p1++;
+	switch (*(p1++))
+	{
+	case 's':	/* send string of numeric option */
+	  strcpy(p2, opt[num].arg[optval]);
+	  while (*p2) p2++;
+	  break;
+	default:
+	  /* tbd - error */
+	  break;
+	}
+	break;
+      default:
+	*(p2++) = *(p1++);
       }
     }
     *p2 = '\0';
@@ -712,6 +726,7 @@ void opt_init()
 
 /* Emacspeak settings (first index is 22) */
   opt_add((void *) 4, -1, "rate", OT_VAL | OT_SYNTH, 0, 250, 2, "tts_set_speech_rate {%d}\r");
+  opt_add((void *) 0, -1, "punctuation", OT_ENUM | OT_SYNTH, 3, "none", "some", "all", 2, "tts_set_punctuations %s\r");
 
 /* DoubleTalk settings (first index is 23) */
   opt_add((void *) 4, -1, "rate", OT_VAL | OT_SYNTH, 0, 9, 3, "\001%ds");
