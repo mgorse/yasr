@@ -12,6 +12,7 @@ yasr_SOURCES = \
 	option.c \
 	tts.c \
 	ui.c \
+	gettext.h \
 	term.h \
 	tts.h \
 	yasr.h
@@ -19,11 +20,15 @@ yasr_SOURCES = \
 yasr_LDADD = $(LIBOBJS)
 
 keytest_SOURCES = \
-	keytest.c \
-	cfmakeraw.c
+	keytest.c
+
+keytest_LDADD = $(LIBOBJS)
 
 man1_MANS = \
 	yasr.1
 
 EXTRA_DIST = \
 	$(man1_MANS)
+
+localedir = $(datadir)/locale
+DEFS = -DLOCALEDIR=\"$(localedir)\" @DEFS@
