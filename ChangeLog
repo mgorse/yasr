@@ -1,6 +1,6 @@
 2004-11-18 Michael P. Gorse <mgorse@alum.wpi.edu>
 Add some missing macros around strings to be translated
-From Francisco Javier <fdma@once.es>:
+From Francisco Javier Dorado <fdma@once.es>:
 Add Ciber232 support
 opt_synth_update_float: allow comma as decimal point
 delete .audiomethod parameter to festival initialization; causes errors
