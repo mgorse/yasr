@@ -2,7 +2,7 @@
  * YASR ("Yet Another Screen Reader") is an attempt at a lightweight,
  * portable screen reader.
  *
- * Copyright (C) 2001-2002 by Michael P. Gorse. All rights reserved.
+ * Copyright (C) 2001-2003 by Michael P. Gorse. All rights reserved.
  *
  * YASR comes with ABSOLUTELY NO WARRANTY.
  *
@@ -10,7 +10,7 @@
  * GNU Lesser General Public License, as published by the Free Software
  * Foundation.  Please see the file COPYING for details.
  *
- * Web Page: http://mgorse.dhs.org:8000/yasr/
+ * Web Page: http://yasr.sf.net
  *
  * This software is maintained by:
  * Michael P. Gorse <mgorse@users.sourceforge.net>
@@ -125,11 +125,11 @@ void kb_del(Keymap * map, int key)
     if (ui.revmode)
     {
       map = &rev.keymap;
-      tts_say("Editing review keymap. Enter command.");
+      tts_say(_("Editing review keymap. Enter command."));
     } else
     {
       map = &ui.keymap;
-      tts_say("Editing normal keymap. Enter command.");
+      tts_say(_("Editing normal keymap. Enter command."));
     }
     return (1);
   }
@@ -142,28 +142,24 @@ void kb_del(Keymap * map, int key)
     case 'c':
     case 'C':
       state = 1;
-      tts_say("Copy which key?");
+      tts_say(_("Copy which key?"));
       break;
-
     case 'd':
     case 'D':
       state = 3;
-      tts_say("Delete which key?");
+      tts_say(_("Delete which key?"));
       break;
-
     case 'm':
     case 'M':
       state = 5;
-      tts_say("Move which key?");
+      tts_say(_("Move which key?"));
       break;
-
     case 27:
-      tts_say("exit keyboard wizard.");
+      tts_say(_("Exiting keyboard wizard."));
       ui_funcman(0);
       break;
-
     default:
-      tts_say("c to copy, d to delete, m to move.");
+      tts_say(_("c to copy, d to delete, m to move."));
       break;
     }
     break;
@@ -174,32 +170,32 @@ void kb_del(Keymap * map, int key)
     if (key == 27)
     {
       state = 0;
-      tts_say("Command aborted.");
+      tts_say(_("Command aborted."));
       break;
     }
     if (kb_search(map, key) == -1)
     {
-      tts_say("Key not defined.");
+      tts_say(_("Key not defined."));
       break;
     }
     if (state == 3)
     {
       kb_del(map, key);
       state = 0;
-      tts_say("Key deleted.");
-    } else
+      tts_say(_("Key deleted."));
+    }
+    else
     {
       state++;
-      tts_say("To which key?");
+      tts_say(_("To which key?"));
       sourcekey = key;
     }
     break;
-
   case 2:
   case 6:
     if (kb_search(map, key) != -1)
     {
-      tts_say("Keystroke already defined. Aborting.");
+      tts_say(_("Keystroke already defined. Aborting."));
       state = 0;
       break;
     }
@@ -208,19 +204,19 @@ void kb_del(Keymap * map, int key)
     if (state == 6)
     {
       kb_del(map, sourcekey);
-      tts_say("key moved.");
-    } else
+      tts_say(_("key moved."));
+    }
+    else
     {
-      tts_say("Key copied.");
+      tts_say(_("Key copied."));
     }
     state = 0;
     break;
   }
-
   return (1);
 }
 #else
-  tts_say("Not implemented");
+  tts_say(_("Not available."));
   ui_funcman(0);
   return (1);
 }

@@ -2,7 +2,7 @@
  * YASR ("Yet Another Screen Reader") is an attempt at a lightweight,
  * portable screen reader.
  *
- * Copyright (C) 2001-2002 by Michael P. Gorse. All rights reserved.
+ * Copyright (C) 2001-2003 by Michael P. Gorse. All rights reserved.
  *
  * YASR comes with ABSOLUTELY NO WARRANTY.
  *
@@ -10,7 +10,7 @@
  * GNU Lesser General Public License, as published by the Free Software
  * Foundation.  Please see the file COPYING for details.
  *
- * Web Page: http://mgorse.dhs.org:8000/yasr/
+ * Web Page: http://yasr.sf.net
  *
  * This software is maintained by:
  * Michael P. Gorse <mgorse@users.sourceforge.net>
@@ -166,11 +166,12 @@ void rev_line(int *argp)
   if (nr < 0)
   {
     nr = 0;
-    tts_say("top");
-  } else if (nr >= win->rows)
+    tts_say(_("top"));
+  }
+  else if (nr >= win->rows)
   {
     nr = win->rows - 1;
-    tts_say("bottom");
+    tts_say(_("bottom"));
   }
   if (ui.revmode)
   {
@@ -235,7 +236,7 @@ void rev_word(int *argp)
       {
 	if (++nr == win->rows)
 	{
-	  tts_say("bottom right");
+	  tts_say(_("bottom right"));
 	  nr--;
 	  nc--;
 	  break;
@@ -256,7 +257,7 @@ void rev_word(int *argp)
       {
 	if (--nr < 0)
 	{
-	  tts_say("top left");
+	  tts_say(_("top left"));
 	  nr = nc = 0;
 	  break;
 	}
@@ -321,12 +322,13 @@ void rev_ch(int *argp)
   if (nr < 0)
   {
     nr = nc = 0;
-    tts_say("top left");
-  } else if (nr >= win->rows)
+    tts_say(_("top left"));
+  }
+  else if (nr >= win->rows)
   {
     nr = win->rows - 1;
     nc = win->cols - 1;
-    tts_say("bottom right");
+    tts_say(_("bottom right"));
   }
   (rev.repeat & 1 && !argp ? ui_sayphonetic : ui_saychar) (nr, nc);
   if (ui.revmode)
@@ -351,7 +353,7 @@ int ui_ennum(int ch)
   ui_funcman(0);
   if (ch == 27)
   {
-    tts_say("Aborting.");
+    tts_say(_("Aborting."));
     ui.abort = 1;
     ui.num = 0;
   }
@@ -374,7 +376,7 @@ int ui_build_str(int ch)
     }
     return 1;
   case 27:	/* escape */
-    tts_say("aborting");
+    tts_say(_("Aborting."));
     ui.abort = 1;
     ui_funcman(0);
     return 2;
@@ -457,9 +459,8 @@ static int rev_searchline(int l, int c1, int c2, int reverse)
       return;
     }
   }
-  tts_say("not found");
+  tts_say(_("not found"));
 }
-
 
  /*ARGSUSED*/ void rev_searchtoend(int *argp)
 {
@@ -476,7 +477,7 @@ static int rev_searchline(int l, int c1, int c2, int reverse)
       return;
     }
   }
-  tts_say("not found");
+  tts_say(_("not found"));
 }
 
 
@@ -491,7 +492,7 @@ static int rev_searchline(int l, int c1, int c2, int reverse)
       return;
     }
   }
-  tts_say("not found");
+  tts_say(_("not found"));
 }
 
 
@@ -503,7 +504,7 @@ static int rev_find_aux(int ch)
     {
     case 0:			/* initialize */
       rev.findbuflen = rev.meta = 0;
-      tts_say("Enter pattern to find");
+      tts_say(_("Enter pattern to find"));
       return (1);
 
     case '>':
@@ -531,7 +532,7 @@ static int rev_find_aux(int ch)
       return (1);
 
     case 27:			/* escape */
-      tts_say("aborting");
+      tts_say(_("Aborting."));
       ui_funcman(0);
       ui.abort = 1;
       return 1;
@@ -590,10 +591,11 @@ void rev_toline(int *argp)
   {
     if (!rev.cr)
     {
-      tts_say("top");
-    } else if (rev.cr == win->rows - 1)
+      tts_say(_("top"));
+    }
+    else if (rev.cr == win->rows - 1)
     {
-      tts_say("bottom");
+      tts_say(_("bottom"));
     }
   }
 
@@ -649,10 +651,11 @@ void rev_tocol(int *argp)
   {
     if (!rev.cc)
     {
-      tts_say("left");
-    } else if (rev.cc == win->cols - 1 || rev.cc == c)
+      tts_say(_("left"));
+    }
+    else if (rev.cc == win->cols - 1 || rev.cc == c)
     {
-      tts_say("right");
+      tts_say(_("right"));
     }
   }
   ui_saychar(rev.cr, rev.cc);
@@ -751,7 +754,7 @@ void rev_prevpar(int *argp)
   ui.revmode ^= 1;
   if (ui.revmode == 0)
   {
-    tts_say("exit");
+    tts_say(_("exit"));
     ui.func = NULL;
     return;
   }
@@ -765,20 +768,18 @@ void rev_prevpar(int *argp)
   }
 }
 
-
  /*ARGSUSED*/ void ui_detachtog(int *argp)
 {
   ui.rc_detached ^= 1;
   if (ui.rc_detached)
   {
-    tts_say("Detached");
+    tts_say(_("Detached"));
     return;
   }
   rev.cr = win->cr;
   rev.cc = win->cc;
-  tts_say("Attached");
+  tts_say(_("Attached"));
 }
-
 
 void ui_routerc(int *argp)
 {
@@ -788,7 +789,7 @@ void ui_routerc(int *argp)
   {
     if (*argp > 1)
     {
-      tts_say("Cursor routed");
+      tts_say(_("Cursor routed."));
     }
     if (*argp == 1 || *argp == 3)
     {
@@ -850,7 +851,7 @@ void ui_saychar(int row, int col)
 
 static void ui_sayblankline()
 {
-  tts_say("blank");
+  tts_say(_("blank"));
 }
 
 void ui_saylinepart(int row, int c1, int c2, int say_blank)
@@ -938,7 +939,7 @@ int ui_addstr(int ch)
   switch (ch)
   {
   case 27:
-    tts_say("Aborting.");
+    tts_say(_("Aborting."));
     ui_funcman(0);
    /*FALLTHROUGH*/ case 0:
     ui.buflen = 0;
@@ -965,7 +966,7 @@ void ui_opt_set(int *argp)
 
   if (!argp)
   {
-    tts_say("error, fix keybinding.");
+    tts_say(_("Error; no option to set.  Fix keybinding in yasr.conf."));
     return;
   }
   switch (opt[*argp].type)
@@ -983,7 +984,7 @@ void ui_opt_set(int *argp)
     opt_set(*argp, &t);
     break;
   default:
-    tts_say("error in keybinding: unsupported option type");
+    tts_say(_("error in keybinding: unsupported option type"));
     break;
   }
   opt_say(*argp, 0);

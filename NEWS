@@ -6,6 +6,7 @@ Overview of changes in yasr 0.6.4:
 * The keyboard wizard is now compiled in by default.
 
 * Yasr builds under FreeBSD again.
+
 * Yasr may now read individual letters correctly with an Apollo.
 
 ----

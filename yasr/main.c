@@ -10,7 +10,7 @@
  * GNU Lesser General Public License, as published by the Free Software
  * Foundation.  Please see the file COPYING for details.
  *
- * Web Page: http://mgorse.dhs.org:8000/yasr/
+ * Web Page: http://yasr.sf.net
  *
  * This software is maintained by:
  * Michael P. Gorse <mgorse@users.sourceforge.net>
@@ -188,10 +188,7 @@ static void utmpconv(char *s, char *d, int pid)
   rnget(s, rs);
   rnget(d, rd);
   fp = fopen("/var/run/utmp", "r+");
-  if (!fp)
-  {
-    return;
-  }
+  if (!fp) return;
   for (;;)
   {
     (void) fgetpos(fp, &fpos);
@@ -276,12 +273,12 @@ static void getinput()
     {
       tts_initsynth(NULL);
       ui.disabled = ui.silent = 0;
-      tts_say("yasr enabled.");
+      tts_say(_("yasr enabled."));
     }
     else
     {
       tts_silence();
-      tts_say("yasr disabled.");
+      tts_say(_("yasr disabled."));
       ui.silent = ui.disabled = 1;
     }
     return;
@@ -446,7 +443,7 @@ static void kbsay()
   if (!ui.kbsay) return;
   if (buf[0] == 8 || kbuf[0] == 127)
   {
-    /*tts_say("back"); */
+    /*tts_say(_("back")); */
     return;
   }
   if (ui.kbsay == 1)
@@ -1242,10 +1239,14 @@ int main(int argc, char *argv[])
   struct winsize winsz = { 0, 0 };
   int flag = 1;
 
-  if (argv[0][0] == '-')
-  {
-    shell = 1;
-  }
+  /* initialize gettext */
+#ifdef ENABLE_NLS
+  setlocale(LC_ALL, "");
+  bindtextdomain(PACKAGE, LOCALEDIR);
+  textdomain(PACKAGE);
+#endif
+
+  if (argv[0][0] == '-') shell = 1;
   if (isatty(0))
   {
     (void) ioctl(0, TIOCGWINSZ, &winsz);

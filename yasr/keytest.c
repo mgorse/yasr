@@ -18,7 +18,6 @@
 
 #include <stdio.h>
 #include <unistd.h>
-#include "yasr.h"
 #include <string.h>
 #include <fcntl.h>
 #include <termios.h>

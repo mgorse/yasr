@@ -3,7 +3,7 @@
  * YASR ("Yet Another Screen Reader") is an attempt at a lightweight,
  * portable screen reader.
  *
- * Copyright (C) 2001-2002 by Michael P. Gorse. All rights reserved.
+ * Copyright (C) 2001-2003 by Michael P. Gorse. All rights reserved.
  *
  * YASR comes with ABSOLUTELY NO WARRANTY.
  *
@@ -11,7 +11,7 @@
  * GNU Lesser General Public License, as published by the Free Software
  * Foundation.  Please see the file COPYING for details.
  *
- * Web Page: http://mgorse.dhs.org:8000/yasr/
+ * Web Page: http://yasr.sf.net
  *
  * This software is maintained by:
  * Michael P. Gorse <mgorse@users.sourceforge.net>
@@ -33,6 +33,17 @@
 #include <unistd.h>
 #include <termios.h>
 #include <sys/time.h>
+#ifdef HAVE_LOCALE_H
+#include <locale.h>
+#endif
+#include "gettext.h"
+#ifdef ENABLE_NLS
+#define _(x) gettext(x)
+#define N_(x) gettext_noop(x)
+#else
+#define _(x) x
+#define N_(x) x
+#endif
 
 #ifdef HAVE_UTIL_H
 #include <util.h>
@@ -163,7 +174,8 @@ typedef struct Opt Opt;
 struct Opt
 {
     int *ptr;
-    char *name;
+    char *internal_name;	/* English name */
+    char *localized_name;
     char *setstr;
     int type;
     int shift;			/* # bits to shift, if type & 0x80 */

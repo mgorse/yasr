@@ -105,16 +105,20 @@ void readconf()
     if (!strcasecmp(ptr, "[reviewkeys]"))
     {
       mode = 1;
-    } else if (!strcasecmp(ptr, "[normalkeys]"))
+    }
+    else if (!strcasecmp(ptr, "[normalkeys]"))
     {
       mode = 2;
-    } else if (!strcasecmp((char *) buf, "[options]"))
+    }
+    else if (!strcasecmp((char *) buf, "[options]"))
     {
       mode = 3;
-    } else if (!strcasecmp((char *) buf, "[dict]"))
+    }
+    else if (!strcasecmp((char *) buf, "[dict]"))
     {
       mode = 4;
-    } else if (buf[0] == '[')
+    }
+    else if (buf[0] == '[')
     {
       mode = 0;
       buf[strlen((char *) buf) - 1] = '\0';
@@ -125,7 +129,8 @@ void readconf()
 	  mode = -i - 1;
 	}
       }
-    } else
+    }
+    else
     {
       switch (mode)
       {
@@ -134,10 +139,9 @@ void readconf()
 	key = strtol(ptr, &s, 0);
 	s++;
 	ptr = strtok(s, ":");
-	if (atoi(s))
+	if (atoi(s)) i = atoi(s);
+	else
 	{
-	  i = atoi(s);
-	} else
 	  for (i = 0; funcs[i].desc; i++)
 	  {
 	    if (!strcasecmp(s, funcs[i].desc))
@@ -145,6 +149,7 @@ void readconf()
 	      break;
 	    }
 	  }
+	}
 	if (!funcs[i].desc)
 	{
 	  printf("Syntax error on line %d of configuration file.\n", ln);
@@ -160,14 +165,13 @@ void readconf()
 	{
 	  argp = (int *) malloc(args * sizeof(int));
 	  (void) memcpy(argp, arg, args * sizeof(int));
-	} else
-	{
-	  argp = NULL;
 	}
+	else argp = NULL;
 	if (mode == 1)
 	{
 	  (void) kb_add(&rev.keymap, key, i, args, argp, 2);
-	} else
+	}
+	else
 	{
 	  (void) kb_add(&ui.keymap, key, i, args, argp, 2);
 	}
