@@ -452,7 +452,7 @@ tts_init()
             exit(1);
         }
         (void) tcgetattr(tts.fd, &t);
-        t.c_cflag |= CRTSCTS;
+        t.c_cflag |= CRTSCTS|CLOCAL;
         t.c_cc[VMIN] = 0;
         t.c_cc[VTIME] = 10;
         (void) tcsetattr(tts.fd, 0, &t);

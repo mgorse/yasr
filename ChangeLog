@@ -2,6 +2,10 @@
 yasr change history.
 ====================
 
+v0.6.1 - 2002-09-02 (mike).
+* Added CLOCAL to the flags set when initializing the synthesizer port.  This
+is needed for NetBSD, at least.
+
 v0.6.1 - 26th August 2002 (richb).
 
 * Adjusted the open_debug() routine so that you have to pass in the basename
