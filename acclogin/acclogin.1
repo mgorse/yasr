@@ -1,0 +1,92 @@
+.\" @(#)acclogin.1 1.1 02/08/19
+.TH ACCLOGIN 1 "19 August 2002"
+.ds Ps P\s-2OST\s+2S\s-2CRIPT\s+2
+.SH NAME
+.\" don't use Ps register in line below; goofs up output from whatis command
+acclogin is a small program that provides an accessible login prompt on the
+console, with the help of the
+.I yasr
+screen reader.
+.SH SYNOPSIS
+.B acclogin
+[
+.B \-C
+.I config file
+] [
+.B \-l
+.I login program
+] [
+.B \-s
+.I synthesizer
+] [
+.B \-p
+.I synthesizer port
+] [
+.B \-y
+.I yasr program
+]
+.SH DESCRIPTION
+.I acclogin
+is a small frontend program that provides an accessible login prompt on the
+console screen. It uses
+.I yasr
+to speak the login prompt and password lines as they are presented to the user.
+If the login is successful, then the login program
+starts the users shell, and provides screen reading functionality. See the
+.I yasr
+manual pages for more details.
+.LP
+On
+.I Solaris
+the following actions have to be taken in order to enable this accessible
+login. Firstly, the graphical login program
+.I dtlogin
+needs to be disabled. This can be achieved, by running the following command
+as root (super-user):
+.LP
+.I dtconfig -d
+.LP
+Next, the 
+.I ttymon
+entry in
+.I /etc/inittab
+needs to be replaced with:
+.LP
+.I co:234:respawn:/spare/yasr/dist/bin/acclogin
+.LP
+(adding in any command line options to
+.I acclogin
+that are needed).
+Finally,
+.I init
+needs to reread its configuration file. This can be achieved, by running the following command
+as root (super-user):
+.LP
+.I init q
+.LP
+The next time the user on the console does a logout,
+.I acclogin
+will be run.
+.SH OPTIONS
+.TP
+.BI \-C " config file"
+The configuration file that yasr should use.
+.TP
+.BI \-l "login program"
+An alternate login program to use. The default is
+.I /bin/login
+.TP
+.BI \-s " synthesizer"
+The TTS synthesizer to use in conjunction with
+.I yasr.
+.TP
+.BI \-p " synthesizer port"
+The port that the TTS synthesizer is connected to.
+.TP
+.BI \-y "yasr program"
+An alternate 
+.I yasr 
+program to use. The default is
+.I /usr/local/bin/yasr
+.SH AUTHOR
+Rich Burridge <rich.burridge@sun.com>
