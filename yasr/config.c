@@ -195,12 +195,13 @@ static void
 conf_write(int *argp)
 {
     FILE *fp;
+  char filename[200];
 
-    (void) strcpy((char *) buf, getenv("HOME"));
-    (void) strcat((char *) buf, "/.yasr.conf");
-    fp = fopen((char *) buf, "w");
+    (void) strcpy(filename, getenv("HOME"));
+    (void) strcat(filename, "/.yasr.conf");
+    fp = fopen(filename, "w");
     if (!fp) { 
-        tts_say("Unable to write configurationf ile."); 
+        tts_say_printf("Unable to write configuration file %s.", filename); 
         return; 
     }
     (void) fprintf(fp, "[normalkeys]\n");
@@ -212,5 +213,5 @@ conf_write(int *argp)
     (void) fprintf(fp, "[dict]\n");
     dict_write(fp);
     (void) fclose(fp);
-    tts_say("Configuration saved.");
+    tts_say_printf("Configuration saved to %s.", filename);
 }
