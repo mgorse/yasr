@@ -202,7 +202,8 @@ extern void ui_kbwiz(int *argp);
 extern void ui_optmenu(int *argp);
 extern void ui_saychar(int row, int col);
 extern void ui_sayword(int cr, int cc);
-extern void ui_sayline(int row, int c1, int c2, int reading);
+extern void ui_saylinepart(int row, int c1, int c2, int say_blank);
+extern void ui_sayline(int row, int say_blank);
 extern void ui_bypass(int *argp);
 extern void ui_curpos(int *argp);
 extern void ui_revtog(int *argp);
@@ -214,6 +215,8 @@ extern void ui_bol(int *argp);
 extern void ui_eol(int *argp);
 extern int ui_keypress(int key);
 extern void ui_sayascii(int *argp);
+extern void rev_nextpar(int *argp);
+extern void rev_prevpar(int *argp);
 extern void uinit();
 
 /* tts.c prototypes */

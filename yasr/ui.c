@@ -52,9 +52,9 @@ rev_rttc(int *argp)
         cc = win->cc; 
     }
     for (i = 0; i < cr; i++) {
-        ui_sayline(i, 0, 0, 0);
+        ui_sayline(i, 0);
     }
-    ui_sayline(i, 0, cc, 0);
+    ui_saylinepart(i, 0, cc, 0);
 }
 
 
@@ -72,9 +72,9 @@ rev_rctb(int *argp)
         cr = win->cr; 
         cc = win->cc; 
     }
-    ui_sayline(cr, cc, 0, 0);
+    ui_saylinepart(cr, cc, -1, 0);
     for (i = cr+1; i < win->rows; i++) {
-        ui_sayline(i, 0, 0, 0);
+        ui_sayline(i, 0);
     }
 }
 
@@ -94,7 +94,7 @@ rev_rs(int *argp)
     }
 
     for (i = a; i <= b; i++) {
-        ui_sayline(i, 0, 0, 0);
+        ui_sayline(i, 0);
     }
 }
 
@@ -166,7 +166,7 @@ rev_line(int *argp)
     }
 
     if (!argp || !rev.udmode || !(*(argp+1))) { 
-        ui_sayline(nr, 0, 0, 1); 
+        ui_sayline(nr, 1); 
         return; 
     }
 
@@ -445,6 +445,11 @@ rev_find_aux(int ch)
                 }
                 return(1);
 
+            case 27:	/* escape */
+                tts_say("aborting");
+                ui_funcman(0);
+                return 1;
+
             case 13: 
             case 10:
                 rev.findbuf[rev.findbuflen] = 0;
@@ -502,7 +507,7 @@ rev_toline(int *argp) {
     if (arg2 > 1) {
         reading = 1;
     }
-    ui_sayline(rev.cr,0,0,reading);
+    ui_sayline(rev.cr, reading);
 }
 
 
@@ -573,6 +578,54 @@ rev_main(int ch)
     return(1);
 }
 
+static int line_is_blank(int row, int c1, int c2)
+{
+    int i;
+    int len;
+    chartype *rptr;
+
+  len = c2 - c1;
+    rptr = win->row[row] + c1;
+    for (i = 0; i < len; i++) {
+        if (!y_isblank(*rptr++)) return 0;
+    }
+    return 1;
+}
+
+void rev_nextpar(int *argp)
+{
+  int i;
+
+  for (i = rev.cr; i < win->rows && !line_is_blank(i, 0, win->cols); i++);
+  for (; i < win->rows && line_is_blank(i, 0, win->cols); i++);
+  if (i == win->rows) return;
+  rev.cr = i;
+  rev.cc = 0;
+  rev_rctb(NULL);
+}
+
+void rev_prevpar(int *argp)
+{
+  int i;
+
+  if (rev.cr == 0) return;
+  for (i = rev.cr; i >= 0 && !line_is_blank(i, 0, win->cols); i--);
+  if (i >= rev.cr - 1)
+  {
+    for (; i >= 0 && line_is_blank(i, 0, win->cols); i--);
+    for (; i >= 0 && !line_is_blank(i, 0, win->cols); i--);
+    if (i < 0)
+    {
+      for (i = 0; i < win->rows && line_is_blank(i, 0, win->cols); i++);
+      if (i >= rev.cr) return;
+    }
+    else i++;
+  }
+  else i++;
+  rev.cr = i;
+  rev.cc = 0;
+  rev_rctb(NULL);
+}
 
 /*ARGSUSED*/
 void 
@@ -630,9 +683,8 @@ ui_routerc(int *argp) {
     }
 }
 
-
-int 
-ui_keypress(int key)
+/* Returns non-zero if the key has been processed. */
+int ui_keypress(int key)
 {
     Keybind *kf;
     int used = 0;
@@ -681,28 +733,24 @@ ui_sayblankline()
     tts_say("blank");
 }
 
-
-void 
-ui_sayline(int row, int c1, int c2, int reading)
+void ui_saylinepart(int row, int c1, int c2, int say_blank)
 {
-    int i;
     int blank = 1;
     int len;
-    chartype *rptr;
+  chartype *rptr;
+  int i;
 
-    if (!c2) {
+    if (c2 == -1) {
         c2 = win->cols;
     }
     len = c2 - c1;
     rptr = win->row[row] + c1;
     for (i = 0; i < len; i++) {
         buf[i] = realchar(*(rptr++));
-        if (buf[i] != 32) {
-            blank = 0;
-        }
+        if (buf[i] != 32) blank = 0;
     }
     if (blank) {
-        if (reading) {
+        if (say_blank) {
             ui_sayblankline();
         }
         return;
@@ -710,6 +758,10 @@ ui_sayline(int row, int c1, int c2, int reading)
     speak((char *) buf, len);
 }
 
+void ui_sayline(int row, int say_blank)
+{
+  ui_saylinepart(row, 0, win->cols, say_blank);
+}
 
 /*ARGSUSED*/
 void 

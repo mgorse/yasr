@@ -596,7 +596,7 @@ win_csi(char *buf, unsigned char **pp, int *size)
                     break;
 
                 case 1: 
-                    (void) memset(win->row[win->cr], 0, win->cc * CHARSIZE); 
+                    (void) memset(win->row[win->cr], 0, (win->cc + 1) * CHARSIZE); 
                     break;
 
                 case 2: 
@@ -1077,7 +1077,7 @@ getoutput()
         switch (win->cr - oldcr) {
             case 1:       /* cursor moved down a line */
                 if (kbuf[0] == 0x1b5b42) {
-                    ui_sayline(win->cr, 0, 0, 1);
+                    ui_sayline(win->cr, 1);
                     break;
                 }
                 if (win->cc == 0 && (oldcr == win->cols - 1 || 
@@ -1092,13 +1092,13 @@ getoutput()
                     lastword(oldcr, oldcc) && oldcc) {
                     ui_sayword(win->cr, win->cc);
                 } else {
-                    ui_sayline(win->cr, 0, 0, 1);
+                    ui_sayline(win->cr, 1);
                 }
                 break;
 
                 case -1:      /* cursor moved up a line */
                     if (kbuf[0] == 0x1b5b41) {
-                        ui_sayline(win->cr, 0, 0, 1);
+                        ui_sayline(win->cr, 1);
                         break;
                     }
                     if (ui.curtrack < 2) {
@@ -1113,7 +1113,7 @@ getoutput()
                                firstword(oldcr, oldcc)) {
                         ui_sayword(win->cr, win->cc);
                     } else {
-                        ui_sayline(win->cr, 0, 0, 1);
+                        ui_sayline(win->cr, 1);
                     }
                     break;
         }

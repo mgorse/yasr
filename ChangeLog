@@ -2,6 +2,12 @@
 yasr change history.
 ====================
 
+v0.6.3 - 1 Dec 02 (mike)
+Fixed ^[[1K to also erase the character under the cursor.
+Added commands to move forward and backward by paragraph from review mode.
+Allow aborting a find by pressing esc.
+(from richb): Fix configure.in to support Solaris on Intel
+
 v0.6.2 - 23rd October 2002 (richb).
 
 * Removed the "intl" sub-directory and adjusted configure.in and Makefile.am

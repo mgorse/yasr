@@ -48,10 +48,12 @@ Func funcs[] = {
     { &rev_toline,         "Move review cursor to line" },  /* 22 */
     { &rev_tocol,          "move review cursor to column"}, /* 23 */
     { &ui_routerc,         "route review cursor" },         /* 24 */
-    { &ui_sayascii,        "ascii" }                        /* 25 */
+    { &ui_sayascii,        "ascii" },                       /* 25 */
+    { &rev_nextpar,         "next paragraph" },              /* 26 */
+    { &rev_prevpar,         "previous paragraph" },          /* 27 */
+  { NULL,                  NULL }                           /* required terminator */
 };
 
-#define FUNCS 26
 
 void
 readconf()
@@ -121,12 +123,12 @@ readconf()
                     ptr = strtok(s, ":");
                     if (atoi(s)) {
                         i = atoi(s);
-                    } else for (i = 0; i < FUNCS; i++) {
+                    } else for (i = 0; funcs[i].desc; i++) {
                         if (!strcasecmp(s, funcs[i].desc)) {
                             break;
                         }
                     }
-                    if (i == FUNCS) {
+                    if (!funcs[i].desc) {
                         printf("Syntax error on line %d of configuration file.\n", ln);
                         exit(1);
                     }
