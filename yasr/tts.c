@@ -30,7 +30,15 @@ static Tts_synth synth[] = {
   {"s\r", "q {%s}\rd\r", "s\r", "l %c\r", NULL, 0, "[]{}\\|_@#^*<>\"`~^", "exit"},	/* emacspeak server */
   {"", "%s", "\030", "\001c", "\001t", 1, "", ""},	/* doubletalk */
   {"", "%s\r\r", "\030\030\r\r", NULL, NULL, 1, NULL, NULL},	/* BNS */
-  {"", "%s\r\n", "\030", "@P1", "@P0", 1, "@", ""}	/* Apollo */
+  {"", "%s\r\n", "\030", "@P1", "@P0", 1, "@", ""},	/* Apollo */
+  {"(audio_mode 'async)\n(parameter.set 'Audio_Method 'netaudio)\n",
+   "(SayText \"%s\")\n",
+   "(audio_mode 'shutup)\n",
+   "(SayText '%c)\n",
+   NULL,
+   1,
+   "",
+   "\003\")\n",} /* festival */
 };
 
 static char *dict[256];
@@ -248,7 +256,7 @@ static int unspeakable(char ch)
 {
   char *p = synth[tts.synth].unspeakable;
 
-  if (ch < 32 || ch > 126)
+  if (ch < 32)
   {
     return (1);
   }
@@ -357,11 +365,11 @@ void tts_saychar(unsigned char ch)
 
   for (i = 0; i < NUMOPTS; i++)
   {
-    if ((opt[i].type & 0x3f) != 3 && !opt[i].ptr && opt[i].synth == tts.synth)
+    if ((opt[i].type & 0x3f) != OT_TREE && !opt[i].ptr && opt[i].synth == tts.synth)
     {
       stack[j++] = i;
       stack[j++] = opt_getval(i, 0);
-      opt_set(i, &opt[i].max);
+      opt_set(i, &opt[i].v.enum_max);
     }
   }
   ttsbuf[1] = 0;
@@ -437,13 +445,13 @@ static int open_tcp(char *port)
 
   if (inet_pton(AF_INET, host, &servaddr.sin_addr) <= 0)
   {
-    fprintf(stderr, "inet_pton error %d\n", errno);
+    perror("inet_pton");
     exit(1);
   }
 
   if (connect(fd, (struct sockaddr *) &servaddr, sizeof(servaddr)) < 0)
   {
-    fprintf(stderr, "connect error %d\n", errno);
+    perror("connect");
     exit(1);
   }
   return fd;
