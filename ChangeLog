@@ -2,6 +2,13 @@
 yasr change history.
 ====================
 
+v0.6.5 - 07 Dec 03 (mike)
+option.c: various fixes for recent changes
+tts.c, yasr.h: extend size of ttsbuf array
+main.c, yasr.h: extend voices array for festival
+ui.c: fix ui_ennum and ui_build_str to set ui.abort and return proper values
+main.c: on Linux, only assume meta for a char if prefixed by <esc>
+
 v0.6.5 - 06 Dec 03 (mike)
 ui.c: add ui_build_str
 option.c, tts.c: add preliminary festival support (from Lorenzo Prince)
