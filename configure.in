@@ -25,7 +25,7 @@ AC_HEADER_TIME
 dnl Checks for library functions.
 AC_PROG_GCC_TRADITIONAL
 AC_TYPE_SIGNAL
-AC_CHECK_FUNCS(select strdup strtol cfmakeraw)
+AC_CHECK_FUNCS(select strdup strtol inet_pton)
 AC_REPLACE_FUNCS(openpty forkpty login_tty cfmakeraw)
 
 dnl Check for network libraries.
