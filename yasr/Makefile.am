@@ -17,7 +17,7 @@ yasr_SOURCES = \
 	tts.h \
 	yasr.h
 
-yasr_LDADD = $(LIBOBJS)
+yasr_LDADD = $(LIBOBJS) $(INTLLIBS)
 
 keytest_SOURCES = \
 	keytest.c
