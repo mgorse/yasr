@@ -1,3 +1,10 @@
+Overview of changes in yasr 0.6.1:
+
+* Includes acclogin, which provides a speech-enabled login prompt for the
+  Solaris platform.
+
+----
+
 Overview of changes in yasr 0.6.0:
 
 * first official release on SourceForge.

@@ -26,6 +26,7 @@
 #include "yasr.h"
 #include "term.h"
 #include <utmp.h>
+#include <utmpx.h>
 #define UTMP_HACK
 #include <unistd.h>
 
@@ -103,6 +104,14 @@ child()
     (void) sprintf(envstr, "SHELL=%s", usershell);
     (void) putenv(envstr);
     if (subprog) {
+        char *devname = ttyname(0);
+
+        (void) setsid();
+        (void) close(0);
+        if (open(devname, O_RDWR) < 0) {
+            fprintf(stderr, "open %s failed, errno = %d", devname, errno);
+        }
+
         (void) execve(subprog[0], subprog, environ);
     } else {
         (void) execl(usershell, arg, 0);
@@ -122,9 +131,48 @@ rnget(char *s, char *d)
 
 
 static void 
-utmpconv(char *s, char *d)
+utmpconv(char *s, char *d, int pid)
 {
 #ifdef UTMP_HACK
+#ifdef sun
+    struct utmpx *up;
+    char *rs = (char *) buf, *rd = (char *) buf + 64;
+    char *rstail = NULL, *rdtail = NULL;
+ 
+    rnget(s, rs);
+    rnget(d, rd);
+ 
+    if (rs) {
+        if (strstr(rs, "/dev/") != NULL) {
+            rstail = strdup(rs + sizeof ("/dev/") - 1);
+        } else {
+            rstail = strdup(rs);
+        }
+    }  
+ 
+    if (rd) {
+        if (strstr(rd, "/dev/") != NULL) {
+            rdtail = strdup(rd + sizeof ("/dev/") - 1);
+        } else {
+            rdtail = strdup(rd);
+        }
+    }  
+ 
+    setutxent();
+    while ((up = getutxent()) != NULL) {
+        if (!strcmp(up->ut_line, rstail)) {
+            (void) strcpy(up->ut_line, rdtail);
+            (void) time(&up->ut_tv.tv_sec);
+            up->ut_pid = pid;
+
+            (void) pututxline(up);
+            updwtmpx("wtmpx", up);
+            break;
+        }
+    }  
+
+    endutxent();
+#else
     FILE *fp;
     fpos_t fpos;
     struct utmp u;
@@ -150,6 +198,7 @@ utmpconv(char *s, char *d)
         }
     }
     (void) fclose(fp);
+#endif /*sun*/
 #endif
 }
 
@@ -162,7 +211,7 @@ finish(int sig)
     (void) tcsetattr(0, TCSAFLUSH, &t);
     yasr_ttyname_r(slave, (char *) buf + 128, 32);
     yasr_ttyname_r(0, (char *) buf + 192, 32);
-    utmpconv((char *) buf + 128, (char *) buf + 192);
+    utmpconv((char *) buf + 128, (char *) buf + 192, getpid());
     if (tts.pid) {
         (void) kill(tts.pid, 9);
     }
@@ -1098,7 +1147,7 @@ parent()
     (void) signal(SIGCHLD, &finish);
     yasr_ttyname_r(0, (char *) (buf + 128), 32);
     yasr_ttyname_r(slave, (char *) (buf + 192), 32);
-    utmpconv((char *) (buf + 128), (char *) (buf + 192));
+    utmpconv((char *) (buf + 128), (char *) (buf + 192), cpid);
     maxfd = (master > tts.fd ? master : tts.fd) + 1;
 
     FD_ZERO(&rf);

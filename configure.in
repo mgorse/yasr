@@ -54,6 +54,13 @@ else
   AC_DEFINE_UNQUOTED(PACKAGE_DATA_DIR, "${datadir}/${PACKAGE}")
 fi
 
+AC_CANONICAL_HOST
+case "$host" in
+sparc-*-solaris*)   yasr_type_sun=true;;
+*)                  yasr_type_sun=false;;
+esac
+AM_CONDITIONAL(YASR_SUN, $yasr_type_sun)
+
 dnl Set PACKAGE_SOURCE_DIR in config.h.
 packagesrcdir=`cd $srcdir && pwd`
 AC_DEFINE_UNQUOTED(PACKAGE_SOURCE_DIR, "${packagesrcdir}")
@@ -71,6 +78,7 @@ changequote([,])dnl
 AC_OUTPUT([
 Makefile
 yasr/Makefile
+acclogin/Makefile
 intl/Makefile
 po/Makefile.in
 ])

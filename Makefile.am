@@ -1,6 +1,12 @@
 
+if YASR_SUN
+yasr_DDIRS= yasr acclogin
+else
+yasr_DDIRS= yasr
+endif
+
 SUBDIRS = \
-	yasr \
+	$(yasr_DDIRS) \
 	po \
 	intl
 
