@@ -27,7 +27,7 @@ char ttsbuf[80];
 static Tts_synth synth[] = {
   {"", "%s\r", "\030", "\005c3", "\005c0", 1, "", ""},	/* speakout */
   {"", "%s[:syn]", "\003", "[:sa le]", "[:sa c]", 0, "[]{}\\|_@#^*<>\"`~", ""},	/* DECtalk */
-  {"s\r", "q {%s}\rd\r", "s\r", "l %c\r", NULL, 0, "[]{}\\|_@#^*<>\"`~^", "exit"},	/* emacspeak server */
+  {"s\r", "q {%s}\rd\r", "s\r", "l {%c}\r", NULL, 0, "[]{}\\|_@#^*<>\"`~^", "exit"},	/* emacspeak server */
   {"", "%s", "\030", "\001c", "\001t", 1, "", ""},	/* doubletalk */
   {"", "%s\r\r", "\030\030\r\r", NULL, NULL, 1, NULL, NULL},	/* BNS */
   {"", "%s\r\n", "\030", "@P1", "@P0", 1, "@", ""},	/* Apollo */
