@@ -26,7 +26,9 @@
 #include "yasr.h"
 #include "term.h"
 #include <utmp.h>
+#ifdef HAVE_UTMPX_H
 #include <utmpx.h>
+#endif
 #define UTMP_HACK
 #include <unistd.h>
 
@@ -1224,10 +1226,12 @@ main(int argc, char *argv[])
             case 's':
                 (void) sprintf((char *) buf, "synthesizer=%s", optarg);
                 opt_read((char *) buf, 0);
+		cl_synth = 1;
                 break;
             case 'p':
                 (void) sprintf((char *) buf, "synthesizer port=%s", optarg);
                 opt_read((char *) buf, 0);
+		cl_synthport = 1;
                 break;
 
             default:
