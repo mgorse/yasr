@@ -2,6 +2,11 @@
 yasr change history.
 ====================
 
+v0.6.5 - 28 Oct 03 (mike)
+tts.c: no longer send return after text w/DoubleTalk (from Mario Lang)
+tts.c: set serial port to 9600 baud initially
+tts.c: re-alarm after alarm from flood if still flooded
+
 v0.6.4 - 25 May 03 (mike)
 yasr.h, option.c: allow punctuation to be set for an Emacspeak server
 yasr.h: define USE_KBWIZ

@@ -28,7 +28,7 @@ static Tts_synth synth[] = {
   {"", "%s\r", "\030", "\005c3", "\005c0", 1, "", ""},	/* speakout */
   {"", "%s[:syn]", "\003", "[:sa le]", "[:sa c]", 0, "[]{}\\|_@#^*<>\"`~", ""},	/* DECtalk */
   {"s\r", "q {%s}\rd\r", "s\r", "l %c\r", NULL, 0, "[]{}\\|_@#^*<>\"`~^", "exit"},	/* emacspeak server */
-  {"", "%s\r", "\030", "\001c", "\001t", 1, "", ""},	/* doubletalk */
+  {"", "%s", "\030", "\001c", "\001t", 1, "", ""},	/* doubletalk */
   {"", "%s\r\r", "\030\030\r\r", NULL, NULL, 1, NULL, NULL},	/* BNS */
   {"", "%s\r\n", "\030", "@P1", "@P0", 1, "@", ""}	/* Apollo */
 };
@@ -166,6 +166,7 @@ static int ofd;
     {
       tts.oflag = oldoflag;
       (void) signal(SIGALRM, &tts_obufout);
+      alarm(1);
       return;
     }
     while (tts.obufhead < tts.obuftail && !tts.obuf[tts.obufhead])
@@ -491,6 +492,7 @@ int tts_init()
     t.c_cflag |= CRTSCTS | CLOCAL;
     t.c_cc[VMIN] = 0;
     t.c_cc[VTIME] = 10;
+    cfsetospeed(&t, B9600);
     (void) tcsetattr(tts.fd, 0, &t);
   } else
   {				/* a pipe */
