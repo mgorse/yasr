@@ -1,4 +1,3 @@
-
 /*
  * YASR ("Yet Another Screen Reader") is an attempt at a lightweight,
  * portable screen reader.
@@ -27,25 +26,27 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-int 
+int
 forkpty(int *master, char *name, struct termios *term, struct winsize *winsz)
 {
-    int slave;
-    int pid;
+  int slave;
+  int pid;
 
-    if (openpty(master, &slave, name, term, winsz) == -1) {
-        return(-1);
-    }
-    if ((pid = fork())) {
-        return(pid);
-    }
+  if (openpty(master, &slave, name, term, winsz) == -1)
+  {
+    return (-1);
+  }
+  if ((pid = fork()))
+  {
+    return (pid);
+  }
 
-    /* child -- set up tty */
-    (void) dup2(slave, 0);
-    (void) dup2(slave, 1);
-    (void) dup2(slave, 2);
+  /* child -- set up tty */
+  (void) dup2(slave, 0);
+  (void) dup2(slave, 1);
+  (void) dup2(slave, 2);
 
-    return(pid);
+  return (pid);
 }
 
-#endif /*HAVE_FORKPTY*/
+#endif /*HAVE_FORKPTY */

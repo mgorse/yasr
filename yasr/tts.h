@@ -28,7 +28,8 @@
 
 typedef struct Tts_synth Tts_synth;
 
-struct Tts_synth {
+struct Tts_synth
+{
     char *init;
     char *say;
     char *flush;

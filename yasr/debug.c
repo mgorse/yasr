@@ -1,4 +1,3 @@
-
 /*
  * YASR ("Yet Another Screen Reader") is an attempt at a lightweight,
  * portable screen reader.
@@ -23,46 +22,42 @@
 #include <stdarg.h>
 #include <sys/types.h>
 
-#define DEBUG     1 
+#define DEBUG     1
 
 #ifdef DEBUG
 static FILE *debugfp;
 #endif /*DEBUG*/
-
-
-void
-open_debug(char *basename)
+void open_debug(char *basename)
 {
 #ifdef DEBUG
-    char filename[1024];
+  char filename[1024];
 
-    (void) sprintf(filename, "%s%1d", basename, getpid());
-    if ((debugfp = fopen(filename, "w+")) == NULL) {
-        fprintf(stderr, "Couldn't open debug file %s\n", filename);
-    }
+  (void) sprintf(filename, "%s%1d", basename, getpid());
+  if ((debugfp = fopen(filename, "w+")) == NULL)
+  {
+    fprintf(stderr, "Couldn't open debug file %s\n", filename);
+  }
 #endif /*DEBUG*/
 }
 
 
-void
-debug(char *format, ...)
+void debug(char *format, ...)
 {
 #ifdef DEBUG
-    va_list argp;
-    va_start(argp, format);
+  va_list argp;
+  va_start(argp, format);
 
-    vfprintf(debugfp, format, argp);
-    (void) fflush(debugfp);
+  vfprintf(debugfp, format, argp);
+  (void) fflush(debugfp);
 
-    va_end(argp);
+  va_end(argp);
 #endif /*DEBUG*/
 }
 
 
-void
-close_debug()
+void close_debug()
 {
 #ifdef DEBUG
-    (void) fclose(debugfp);
+  (void) fclose(debugfp);
 #endif /*DEBUG*/
 }

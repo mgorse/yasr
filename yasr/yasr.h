@@ -49,19 +49,21 @@ typedef short chartype;
 typedef unsigned char uchar;
 
 typedef struct Curpos Curpos;
-struct Curpos {
+struct Curpos
+{
     int cr;
     int cc;
 };
 
 typedef struct Win Win;
-struct Win {
+struct Win
+{
     int carry;
     int cc;
     int cols;
     int cr;
-    int mode;         /* flags changed by h/l csi sequences */
-    char attr;        /* flags changed by the m csi sequences */
+    int mode;			/* flags changed by h/l csi sequences */
+    char attr;			/* flags changed by the m csi sequences */
     Curpos savecp;
     chartype **row;
     int rows;
@@ -70,13 +72,15 @@ struct Win {
 };
 
 typedef struct Func Func;
-struct Func {
-    void (*f)();
+struct Func
+{
+    void (*f) ();
     char *desc;
 };
 
 typedef struct Keybind Keybind;
-struct Keybind {
+struct Keybind
+{
     int key;
     int index;
     int numargs;
@@ -85,13 +89,15 @@ struct Keybind {
 };
 
 typedef struct Keymap Keymap;
-struct Keymap {
+struct Keymap
+{
     int numkeys;
     Keybind *kb;
 };
 
 typedef enum mpunct mpunct;
-enum mpunct {
+enum mpunct
+{
     PUNCT_NONE,
     PUNCT_SOME,
     PUNCT_MOST,
@@ -101,12 +107,13 @@ enum mpunct {
 #define OPT_STR_SIZE 80
 
 typedef struct Tts Tts;
-struct Tts {
+struct Tts
+{
     int fd;
     int flood;
     char *obuf;
     int obufhead, obuflen, obuftail;
-    int oflag;         /* set to 1 every time tts_send is called */
+    int oflag;			/* set to 1 every time tts_send is called */
     int outlen;
     char buf[256];
     int synth;
@@ -115,7 +122,8 @@ struct Tts {
 };
 
 typedef struct Uirev Uirev;
-struct Uirev {
+struct Uirev
+{
     int cc;
     int cr;
     int lastkey;
@@ -129,17 +137,18 @@ struct Uirev {
 };
 
 typedef struct Ui Ui;
-struct Ui {
-    int abort;         /* set if the user aborts entering something */
+struct Ui
+{
+    int abort;			/* set if the user aborts entering something */
     char buf[100];
     int buflen;
-    int curtrack;      /* 0 = none, 1 = with cursor keys, 2 = always */
-    int disable;       /* key to disable */
-    int disabled;      /* true if disabled */
-    int (*func)(int);
+    int curtrack;		/* 0 = none, 1 = with cursor keys, 2 = always */
+    int disable;		/* key to disable */
+    int disabled;		/* true if disabled */
+    int (*func) (int);
     int kbsay;
-    int num;           /* number that the user is entering */
-    int (*oldfunc)(int);
+    int num;			/* number that the user is entering */
+    int (*oldfunc) (int);
     int meta;
     int minrc;
     int revmode;
@@ -149,12 +158,13 @@ struct Ui {
 };
 
 typedef struct Opt Opt;
-struct Opt {
+struct Opt
+{
     int *ptr;
     char *name;
     char *setstr;
     int type;
-    int shift;    /* # bits to shift, if type & 0x80 */
+    int shift;			/* # bits to shift, if type & 0x80 */
     int tree;
     int d1;
     int max;
@@ -197,7 +207,7 @@ extern void rev_searchtocursor(int *argp);
 extern void rev_searchtoend(int *argp);
 extern void rev_find(int *argp);
 extern int ui_ennum(int ch);
-extern void ui_funcman(int (*f)(int));
+extern void ui_funcman(int (*f) (int));
 extern void ui_kbwiz(int *argp);
 extern void ui_optmenu(int *argp);
 extern void ui_saychar(int row, int col);
@@ -235,7 +245,7 @@ extern int tts_init();
 extern void tts_say_printf(char *fmt, ...);
 extern void tts_initsynth(int *argp);
 extern int dict_read(char *buf);
-extern void dict_write(FILE *fp);
+extern void dict_write(FILE * fp);
 
 /* config.c prototypes */
 extern void readconf();
@@ -253,8 +263,8 @@ extern void close_debug();
 char *getfn(char *name);
 
 /* keybind.c prototypes */
-extern int kb_search(Keymap *map, int k);
-extern int kb_add(Keymap *map, int k, int i, int na, int *a, int flag);
+extern int kb_search(Keymap * map, int k);
+extern int kb_add(Keymap * map, int k, int i, int na, int *a, int flag);
 extern int kbwiz(int ch);
 
 /* option.c prototypes */
@@ -265,7 +275,7 @@ extern int opt_read(char *buf, int synth);
 extern void opt_say(int num, int flag);
 extern void opt_set(int num, void *val);
 extern void opt_queue_empty(int ll);
-extern void opt_write(FILE *fp);
+extern void opt_write(FILE * fp);
 
 /* openpty.c prototypes */
 extern int openpty(int *, int *, char *, struct termios *, struct winsize *);
