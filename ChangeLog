@@ -1,3 +1,17 @@
+2005-06-05 Michael P. Gorse <mgorse@alum.wpi.edu>
+main.c, yasr.h: define voices array size based on TTS_SYNTH_COUNT define in tts.h
+main.c: in child_finish(), process any pending output upon child exit
+main.c: in getinput(), finish upon error
+main.c: in getoutput(), fix arguments to memmove; fixes segfault upon full kbuf
+main.c: set SIGCHLD before forking so that it will be set if the child exits before the parent is next scheduled after the fork
+option.c: fix reading of float values (sscanf %f rather than %lf)
+option.c: change Emacspeak server rate maximum from 250 to 999
+tts.c: in synth[], use TRUE/FALSE where appropriate rather than 1/0
+tts.c: add support for xml escaping
+From Gilles Casse <gcasse@oralux.org>:
+main.c: Fix "say word" option
+Restart an external speech server upon reinitialization
+
 2005-01-28 Michael P. Gorse <mgorse@alum.wpi.edu>
 From Rich Burridge <rich.burridge@sun.com>:
 Increase size of voices array by 1
