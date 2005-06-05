@@ -20,27 +20,32 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#include "tts.h"
+
+#ifndef TRUE
+#define TRUE 1
+#endif
+#ifndef FALSE
+#define FALSE 1
+#endif
 
 char ttsbuf[80];
 
 static Tts_synth synth[] = {
-  {"", "%s\r", "\030", "\005c3", "\005c0", 1, "", ""},	/* speakout */
-  {"", "%s[:syn]", "\003", "[:sa le]", "[:sa c]", 0, "[]{}\\|_@#^*<>\"`~", ""},	/* DECtalk */
-  {"s\r", "q {%s}\rd\r", "s\r", "l {%c}\r", NULL, 0, "[]{}\\|_@#^*<>\"`~^", "exit"},	/* emacspeak server */
-  {"", "%s", "\030", "\001c", "\001t", 1, "", ""},	/* doubletalk */
-  {"", "%s\r\r", "\030\030\r\r", NULL, NULL, 1, NULL, NULL},	/* BNS */
-  {"", "%s\r\n", "\030", "@P1", "@P0", 1, "@", ""},	/* Apollo */
+  {"", "%s\r", "\030", "\005c3", "\005c0", TRUE, "", ""},	/* speakout */
+  {"", "%s[:syn]", "\003", "[:sa le]", "[:sa c]", FALSE, "[]{}\\|_@#^*<>\"`~", ""},	/* DECtalk */
+  {"s\r", "q {%s}\rd\r", "s\r", "l {%c}\r", NULL, FALSE, "[]{}\\|_@#^*<>\"`~^", "exit"},	/* emacspeak server */
+  {"", "%s", "\030", "\001c", "\001t", TRUE, "", ""},	/* doubletalk */
+  {"", "%s\r\r", "\030\030\r\r", NULL, NULL, TRUE, NULL, NULL},	/* BNS */
+  {"", "%s\r\n", "\030", "@P1", "@P0", TRUE, "@", ""},	/* Apollo */
   {"(audio_mode 'async)\n",
    "(SayText \"%s\")\n",
    "(audio_mode 'shutup)\n",
    "(SayText '%c)\n",
    NULL,
-   1,
+   TRUE,
    "",
    "\003\")\n"}, /* festival */
-  {"", "%s\r\n", "\033", "%c\r", NULL, 1, "@", ""}	/* Ciber232 */
-
+  {"", "%s\r\n", "\033", "%c\r", NULL, TRUE, "@", ""},	/* Ciber232 */
 };
 
 static char *dict[256];
@@ -273,16 +278,15 @@ void tts_end()
   tts_send(synth[tts.synth].end, strlen(synth[tts.synth].end));
 }
 
-
 void tts_out(unsigned char *buf, int len)
 {
   char obuf[1024];
   char *p;
-  int obp = 0;
+  int obo = 0;	/* current offset into obuf */
   int i;
+  int xml = (tts.synth == TTS_VOICEXML);
 
-  if (!len)
-    return;
+  if (!len) return;
   opt_queue_empty(0);
   p = synth[tts.synth].say;
   opt_queue_empty(0);
@@ -295,30 +299,49 @@ void tts_out(unsigned char *buf, int len)
       {
 	if (unspeakable((unsigned char)buf[i]))
 	{
-	  if (obp && obuf[obp - 1] != 32)
+	  if (obo > 0 && obuf[obo - 1] != ' ')
 	  {
-	    obuf[obp++] = ' ';
+	    obuf[obo++] = ' ';
+	    tts_send(obuf, obo);
+	    obo = 0;
 	  }
 	  if (dict[buf[i]])
 	  {
-	    (void) strcpy(obuf + obp, dict[buf[i]]);
-	    obp = strlen(obuf);
+	    (void) strcpy(obuf + obo, dict[buf[i]]);
+	    obo = strlen(obuf);
 	  }
-	  obuf[obp++] = 32;
-	} else
+	  obuf[obo++] = 32;
+	}
+	else if (xml)
 	{
-	  obuf[obp++] = buf[i];
+	  switch (buf[i])
+	  {
+	  /* For some reason, &lt; does not work for me with Voxeo */
+	  case '<': strcpy(obuf + obo, " less than "); obo += 11; break;
+	  case '>': strcpy(obuf + obo, "&gt;"); obo += 4; break;
+	  case '&': strcpy(obuf + obo, "&amp;"); obo += 5; break;
+	  default: obuf[obo++] = buf[i]; break;
+	  }
+	}
+	else
+	{
+	  obuf[obo++] = buf[i];
+	}
+	if (obo > (sizeof(obuf) / sizeof(obuf[0])) - 6)
+	{
+	  tts_send(obuf, obo);
+	  obo = 0;
 	}
       }
-    } else
+    }
+    else
     {
-      obuf[obp++] = *p;
+      obuf[obo++] = *p;
     }
     p++;
   }
-  tts_send(obuf, obp);
+  tts_send(obuf, obo);
 }
-
 
 void tts_say(char *buf)
 {
@@ -457,7 +480,7 @@ static int open_tcp(char *port)
   return fd;
 }
 
-int tts_init()
+int tts_init( int first_call)
 {
   struct termios t;
   char *arg[8];
@@ -468,6 +491,8 @@ int tts_init()
 
   portname = getfn(tts.port);
   tts.pid = 0;
+  tts.reinit = !first_call; 
+
   (void) memset(dict, 0, sizeof(dict));
   (void) signal(SIGALRM, &tts_obufout);
 
@@ -478,7 +503,7 @@ int tts_init()
     perror("open");
   }
 #endif
-  if (tts.port[0] != '|' && strstr(tts.port, ":"))
+  if (first_call && tts.port[0] != '|' && strstr(tts.port, ":"))
   {
     tts.fd = open_tcp(tts.port);
   } else if (tts.port[0] != '|')
@@ -490,7 +515,10 @@ int tts_init()
     {
       mode = O_WRONLY;
     }
-    tts.fd = open(portname, mode);
+    if (first_call)
+    {
+      tts.fd = open(portname, mode);
+    }
     if (tts.fd == -1)
     {
       perror("tts");
@@ -513,7 +541,25 @@ int tts_init()
 	break;
       }
     }
-    if (!(tts.pid = forkpty(&tts.fd, NULL, NULL, NULL)))
+
+    if (first_call)
+    {
+      if (openpty(&tts.fd, &tts.fd_slave, NULL, NULL, NULL) == -1)
+      {
+	perror("openpty");
+	exit(1);
+      }
+    } 
+
+    if (!(tts.pid = fork()))
+    {
+      /* child -- set up tty */
+      (void) dup2(tts.fd_slave, 0);
+      (void) dup2(tts.fd_slave, 1);
+      (void) dup2(tts.fd_slave, 2);
+      /* tts.fd_slave is not closed */
+    }
+    if (!tts.pid)
     {
       (void) execvp(arg[0], arg);
       perror("execpv");
@@ -526,9 +572,18 @@ int tts_init()
   }
   tts_send(synth[tts.synth].init, strlen(synth[tts.synth].init));
 
+  /* init is now finished */
+  tts.reinit = 0;
+  
   return (0);
 }
 
+int tts_reinit2()
+{
+  tts_init(0);
+  tts_initsynth(NULL);
+  return (0);
+}
 
 void tts_addchr(char ch)
 {
@@ -556,6 +611,41 @@ void tts_addchr(char ch)
   if (!ui.silent)
   {
     tts_say(_("Synthesizer reinitialized."));
+  }
+}
+
+
+
+ /*ARGSUSED*/ void tts_reinit(int *argp)
+{
+  int pid=tts.pid;
+
+  if (pid==0)
+  {
+      return;
+  }
+  
+  tts.reinit=1; /* Start reinit */
+
+  tts_silence();
+  usleep(500000);
+
+  if (kill (pid, SIGTERM)!=0)
+  {
+    if (errno==ESRCH)
+    {
+      tts_reinit2();
+    }
+    else
+    {
+      kill (pid, SIGKILL);
+    }
+  }
+
+  /* wait init completion (tts.fd must be available) */
+  while(tts.reinit)
+  {
+      usleep(100000);
   }
 }
 
