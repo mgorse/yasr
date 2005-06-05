@@ -53,7 +53,7 @@ static unsigned char okbuf[100];
 static int okbuflen = 0;
 int sighit = 0;
 static int oldcr = 0, oldcc = 0, oldch = 0;
-char voices[8][64];
+char voices[TTS_SYNTH_COUNT][64];
 static int shell = 0;
 int special = 0;
 int cl_synth = 0;
@@ -230,12 +230,24 @@ static void utmpconv(char *s, char *d, int pid)
   exit(0);
 }
 
+static void getoutput();
+static int readable(int fd, int wait);
+
 /*ARGSUSED*/ static void child_finish(int sig)
 {
-  int status;
+  int pid = 0;
 
+while (readable(master, 0)) getoutput();
   (void) signal(SIGCHLD, &child_finish);
-  if (waitpid(-1, &status, WNOHANG) == cpid)
+  pid = waitpid(-1, NULL, WNOHANG);
+  /* It is possible for the child to die and for this handler to be called
+     before fork() ever returned, in which case cpid will still hold a value
+     of 0, so need to check for that. */
+  if ((pid == tts.pid) && tts.reinit)
+  {
+    tts_reinit2();
+  }
+  else if (cpid == 0 || pid == cpid)
   {
     finish(0);
   }
@@ -253,12 +265,33 @@ static int is_char(int ch)
 #endif
 }
 
+static int is_separator(int ch)
+{
+  int result=0;
+  if ((ch != ch % 0xFF) || isspace(ch))
+  {
+    result=1;
+  }
+  else if (((ch >= 0x21) && (ch <= 0x2F))
+	   || ((ch >= 0x3A) && (ch <= 0x40))
+	   || ((ch >= 0x5B) && (ch <= 0x60))
+	   || ((ch >= 0x7B) && (ch <= 0x7E))
+	   )
+  {
+    result=1;
+  }
+  return result;
+}
+
+
+
+
 static void getinput()
 {
   int key;
 
   size = read(0, buf, 255);
-  if (!size)
+  if (size <= 0)
   {
     finish(0);
   }
@@ -318,7 +351,7 @@ static void getinput()
     ui.meta = 0;
     return;
   }
-  if (ui.kbsay == 2 && is_char(key))
+  if (ui.kbsay == 2 && is_separator(key))
   {
     tts_out(okbuf, okbuflen);
     okbuflen = tts.oflag = 0;
@@ -460,6 +493,12 @@ static void kbsay()
   if (!ui.kbsay) return;
   if (buf[0] == 8 || kbuf[0] == 127)
   {
+    if ((ui.kbsay == 2) 
+	&& (okbuflen!=0))
+    {
+      okbuf[--okbuflen] = 0;
+    }
+
     /*tts_say(_("back")); */
     return;
   }
@@ -1032,12 +1071,12 @@ static void getoutput()
 	}
       }
 #endif
-      if (ch == kbuf[0] && win->cr == oldcr && win->cc == oldcc && kbuflen)
+      if (ch == (char)kbuf[0] && win->cr == oldcr && win->cc == oldcc && kbuflen)
       {
 /* this character was (probably) echoed as a result of a keystroke */
 	kbsay();
 	win_addchr(ch, 0);
-	(void) memmove(kbuf + sizeof(int), kbuf, (--kbuflen) * sizeof(int));
+	(void) memmove(kbuf, kbuf + 1, (--kbuflen) * sizeof(int));
       }
       else
       {
@@ -1100,7 +1139,9 @@ static void getoutput()
       {
 	break;
       }
-      if (kbuf[0] == 0x1b5b43 || ui.curtrack == 2)
+      if (kbuf[0] == 0x1b5b43 || 
+	  ((ui.curtrack == 2) 
+	   && (ui.kbsay != 2 || is_separator(kbuf[0]))))
       {
 	ui_saychar(win->cr, win->cc);
       }
@@ -1199,13 +1240,11 @@ static void parent()
   struct termios rt;
   int maxfd;
 
-  (void) tcgetattr(0, &t);
   (void) memcpy(&rt, &t, sizeof(struct termios));
   cfmakeraw(&rt);
   rt.c_cc[VMIN] = 1;
   rt.c_cc[VTIME] = 0;
   (void) tcsetattr(0, TCSAFLUSH, &rt);
-  (void) signal(SIGCHLD, &child_finish);
   yasr_ttyname_r(0, (char *) (buf + 128), 32);
   yasr_ttyname_r(slave, (char *) (buf + 192), 32);
   utmpconv((char *) (buf + 128), (char *) (buf + 192), cpid);
@@ -1280,7 +1319,7 @@ int main(int argc, char *argv[])
   uinit();
   (void) memset(&tts, 0, sizeof(Tts));
   opt_init();
-  (void) memset(voices, 0, 128);
+  (void) memset(voices, 0, sizeof(voices));
   while (flag)
   {
     switch (getopt(argc, argv, "C:c:s:p:"))
@@ -1328,6 +1367,8 @@ int main(int argc, char *argv[])
 #endif
 
   (void) openpty(&master, &slave, NULL, NULL, &winsz);
+  (void) signal(SIGCHLD, &child_finish);
+  (void) tcgetattr(0, &t);
   cpid = fork();
   if (cpid > 0) parent();
   else if (cpid == 0) child();
