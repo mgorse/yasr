@@ -665,7 +665,7 @@ int opt_read(char *buf, int synth)
     break;
 
   case OT_FLOAT:
-    sscanf(p, "%lf", &float_val);
+    sscanf(p, "%f", &float_val);
     opt_set(i, &float_val);
     break;
 
@@ -774,7 +774,7 @@ void opt_init()
   opt_add((void *) 0, -1, N_("punctuation"), OT_ENUM | OT_SYNTH, 3, N_("some"), N_("none"), N_("all"), 1, "[:pu \\p]");
 
 /* Emacspeak settings (first index is 22) */
-  opt_add((void *) 4, -1, N_("rate"), OT_INT | OT_SYNTH, 0, 250, 2, "tts_set_speech_rate {%d}\r");
+  opt_add((void *) 4, -1, N_("rate"), OT_INT | OT_SYNTH, 0, 999, 2, "tts_set_speech_rate {%d}\r");
   opt_add((void *) 0, -1, N_("punctuation"), OT_ENUM | OT_SYNTH, 3, N_("none"), N_("some"), N_("all"), 2, "tts_set_punctuations %s\r");
 
 /* DoubleTalk settings (first index is 23) */
