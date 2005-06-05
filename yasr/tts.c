@@ -284,7 +284,7 @@ void tts_out(unsigned char *buf, int len)
   char *p;
   int obo = 0;	/* current offset into obuf */
   int i;
-  int xml = (tts.synth == TTS_VOICEXML);
+  int xml = 0;
 
   if (!len) return;
   opt_queue_empty(0);
