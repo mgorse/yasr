@@ -42,7 +42,7 @@ Func funcs[] = {
   {&ui_opt_set, "set option"},	/* 17 */
   {&ui_bol, "beginning of line"},	/* 18 */
   {&ui_eol, "end of line"},	/* 19 */
-  {&tts_initsynth, "reinitialize"},	/* 20 */
+  {&tts_reinit, "reinitialize"},	/* 20 */
   {&ui_detachtog, "toggle cursor detachment"},	/* 21 */
   {&rev_toline, "Move review cursor to line"},	/* 22 */
   {&rev_tocol, "move review cursor to column"},	/* 23 */
@@ -190,7 +190,7 @@ void readconf()
 	}
 	if (!strcasecmp((char *) buf, "synthesizer port"))
 	{
-	  (void) tts_init();
+	  (void) tts_init(1);
 	}
 	break;
       }
