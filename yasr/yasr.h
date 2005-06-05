@@ -55,6 +55,8 @@
 
 #include <errno.h>
 
+#include "tts.h"
+
 typedef short chartype;
 
 typedef unsigned char uchar;
@@ -130,6 +132,8 @@ struct Tts
     int synth;
     pid_t pid;
     char port[OPT_STR_SIZE];
+    int reinit; /* 1 if tts is being reinitialized */
+    int fd_slave;
 };
 
 typedef struct Uirev Uirev;
@@ -207,7 +211,7 @@ extern int kbuf[100];
 extern int kbuflen;
 extern char usershell[OPT_STR_SIZE];
 extern char ttsbuf[80];
-extern char voices[8][64];
+extern char voices[TTS_SYNTH_COUNT][64];
 extern int special;
 
 extern Func funcs[];
@@ -261,7 +265,9 @@ extern void tts_send(char *buf, int len);
 extern void tts_flush();
 extern void tts_silence();
 extern void tts_end();
-extern int tts_init();
+extern int tts_init(int first_call);
+extern void tts_reinit(int *argp);
+extern int tts_reinit2();
 extern void tts_say_printf(char *fmt, ...);
 extern void tts_initsynth(int *argp);
 extern int dict_read(char *buf);
