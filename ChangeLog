@@ -1,4 +1,21 @@
+2005-08-02 Francisco Javier Dorado <fdma@once.es>:
+
+	* po/es.po: Add.
+	po/linguas: Add.
+	po/yasr.pot: Add missing entries.
+	yasr/main.c: Add missing calls to gettext.
+	yasr/option.c: Ditto.
+
+2005-08-02 Michael P. Gorse <mgorse@alum.wpi.edu>
+
+	yasr/* main.c: Make readable() non-static.
+	yasr/yasr.h: Ditto.
+	yasr/tts.c (tts_init): Make serial port raw for the DEC-talk.
+	(tts_silence): Only fetch a ^A if readable() returns TRUE within 50 ms.
+	Remove #ifndef SUN around SYNTH_DECTALK code.
+
 2005-06-05 Michael P. Gorse <mgorse@alum.wpi.edu>
+
 main.c, yasr.h: define voices array size based on TTS_SYNTH_COUNT define in tts.h
 main.c: in child_finish(), process any pending output upon child exit
 main.c: in getinput(), finish upon error
@@ -8,33 +25,32 @@ option.c: fix reading of float values (sscanf %f rather than %lf)
 option.c: change Emacspeak server rate maximum from 250 to 999
 tts.c: in synth[], use TRUE/FALSE where appropriate rather than 1/0
 tts.c: add support for xml escaping
-From Gilles Casse <gcasse@oralux.org>:
+
+2005-06-05 Gilles Casse <gcasse@oralux.org>:
 main.c: Fix "say word" option
 Restart an external speech server upon reinitialization
 
-2005-01-28 Michael P. Gorse <mgorse@alum.wpi.edu>
-From Rich Burridge <rich.burridge@sun.com>:
+2005-01-28 Rich Burridge <rich.burridge@sun.com>:
 Increase size of voices array by 1
 When receiving a SIGCHLD, only finish if the signal was caused by the child yasr process
 Release v0.6.7
 
-2005-01-26 Michael P. Gorse <mgorse@alum.wpi.edu>
-From Rich Burridge <rich.burridge@sun.com>
+2005-01-26 Rich Burridge <rich.burridge@sun.com>
 tts.c: use l {%c} to have an Emacspeak server say a letter rather than l %c
        (works around a bug in the FreeTTS server)
 Release v0.6.6
 
 2004-11-18 Michael P. Gorse <mgorse@alum.wpi.edu>
 Add some missing macros around strings to be translated
-From Francisco Javier Dorado <fdma@once.es>:
+
+2004-11-18 Francisco Javier Dorado <fdma@once.es>:
 Add Ciber232 support
 opt_synth_update_float: allow comma as decimal point
 delete .audiomethod parameter to festival initialization; causes errors
    and probably not necessary
 change min/max rate values for festival
 
-2004-11-16 Michael P. Gorse <mgorse@alum.wpi.edu>
-from Gilles Casse (gcasse@oralux.org):
+2004-11-16 Gilles Casse (gcasse@oralux.org):
 Kill forked program if the synth crashes
 
 2004-03-13 Michael P. GOrse <mgorse@alum.wpi.edu>
@@ -48,8 +64,8 @@ various: add gettext support
 Makefile.am: Remove cfmakeraw.c from keytest sources; will add it if needed
 Release v0.6.5
 
-2004-01-25 Michael P. Gorse <mgorse@alum.wpi.edu>
-tts.c: (from rich.burridge@sun.com): fix conversion of tcp port
+2004-01-25 Rich Burridge <rich.burridge@sun.com>
+tts.c: fix conversion of tcp port
 
 2003-12-07  gettextize  <bug-gnu-gettext@gnu.org>
 
