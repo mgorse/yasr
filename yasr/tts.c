@@ -125,20 +125,22 @@ void tts_silence()
   tts.oflag = 0;
   tts_flushed = 1;
 
-/* XXX: note that this code hangs on the read on the Solaris platform ,
- *      so it's #ifdef'ed out for now. This might hang on other platforms
- *      to, in which case a better solution might be to remove it entirely.
- */
-
-#ifndef sun
   if (tts.synth == TTS_DECTALK)
   {
-    if (read(tts.fd, tmp, 1) == -1)
+    do
     {
-      perror("tts_silence");
-    }
+      if (!readable(tts.fd, 50000)) break;
+      if (read(tts.fd, tmp, 1) == -1)
+      {
+	perror("tts_silence");
+	break;
+      }
+    } while (tmp[0] != 1 && tmp[0] != 0);
+    /* Following is a hack; without it, [:sa c] could have been sent and
+       lost by the DEC-talk if a silence happens immediately after it */
+    tts_send("[:sa c]", 7);
+    tts.oflag = 0;	/* pretend we didn't just do that */
   }
-#endif /*!sun */
 }
 
 
@@ -506,12 +508,14 @@ int tts_init( int first_call)
   if (first_call && tts.port[0] != '|' && strstr(tts.port, ":"))
   {
     tts.fd = open_tcp(tts.port);
-  } else if (tts.port[0] != '|')
+  }
+  else if (tts.port[0] != '|')
   {
     if (tts.synth == TTS_DECTALK)
     {
       mode = O_NOCTTY | O_RDWR;
-    } else if (tts.synth == TTS_EMACSPEAK_SERVER)
+    }
+    else if (tts.synth == TTS_EMACSPEAK_SERVER)
     {
       mode = O_WRONLY;
     }
@@ -525,12 +529,20 @@ int tts_init( int first_call)
       exit(1);
     }
     (void) tcgetattr(tts.fd, &t);
+    if (tts.synth == TTS_DECTALK)
+    {
+      /* When sending a ^C, make sure we send a ^C and not a break */
+      cfmakeraw(&t);
+      /* When the DEC-talk powers on, it sends several ^A's.  Discard them */
+      tcflush(tts.fd, TCIFLUSH);
+    }
     t.c_cflag |= CRTSCTS | CLOCAL;
     t.c_cc[VMIN] = 0;
     t.c_cc[VTIME] = 10;
     cfsetospeed(&t, B9600);
     (void) tcsetattr(tts.fd, 0, &t);
-  } else
+  }
+  else
   {				/* a pipe */
     (void) strcpy(buf, tts.port + 1);
     arg[i = 0] = strtok(buf, " ");
