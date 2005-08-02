@@ -279,6 +279,7 @@ extern void readconf();
 /* main.c prototypes */
 void speak(char *ibuf, int len);
 extern char realchar(chartype ch);
+int readable(int fd, int wait);
 
 /* debug.c prototypes */
 extern void open_debug(char *);
