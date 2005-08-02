@@ -534,13 +534,13 @@ int optmenu(int ch)
     switch (opt[curopt].type & 0x3f)
     {
     case OT_INT:
-      (void) sprintf((char *) buf, "Enter a number from %d to %d.", opt[curopt].v.val_int.min, opt[curopt].v.val_int.max);
+      (void) sprintf((char *) buf, "%s %d %s %d.",_("Enter a number from"), opt[curopt].v.val_int.min, _("to"), opt[curopt].v.val_int.max);
       tts_say((char *) buf);
       ui_funcman(&ui_build_str);
       state = 1;
       break;
     case OT_FLOAT:
-      (void) sprintf((char *) buf, "Enter a number from %lf to %lf.", opt[curopt].v.val_float.min, opt[curopt].v.val_float.max);
+      (void) sprintf((char *) buf, "%s %lf %s %lf.",_("Enter a number from"), opt[curopt].v.val_float.min,_("to"),  opt[curopt].v.val_float.max);
       tts_say((char *) buf);
       ui_funcman(&ui_build_str);
       state = 2;
