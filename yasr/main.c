@@ -231,7 +231,6 @@ static void utmpconv(char *s, char *d, int pid)
 }
 
 static void getoutput();
-static int readable(int fd, int wait);
 
 /*ARGSUSED*/ static void child_finish(int sig)
 {
@@ -447,7 +446,7 @@ static void win_rlf()
   if (win->cr == win_scrollmin) win_scrolldown(); else win->cr--;
 }
 
-static int readable(int fd, int wait)
+int readable(int fd, int wait)
 {
   fd_set fds;
   struct timeval tv;
@@ -1437,7 +1436,7 @@ void speak(char *ibuf, int len)
 	nc++;
       }
       tts_saychar(lc);
-      tts_out((unsigned char *) obuf, sprintf(obuf, "repeats %d times\r", nc + 1));
+      tts_out((unsigned char *) obuf, sprintf(obuf, "%s %d %s\r",_("repeats"), nc + 1,_("times")));
       olen = nc = 0;
     }
 	else
