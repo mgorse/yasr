@@ -1,0 +1,444 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR Michael P. Gorse
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: yasr 0.6.7\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2005-01-28 07:50-0500\n"
+"PO-Revision-Date: 2005-09-04 01:17+0200\n"
+"Last-Translator: Gilles Casse <gcasse@oralux.org>\n"
+"Language-Team: French <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=ISO-8859-1\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: yasr/keybind.c:128
+msgid "Editing review keymap. Enter command."
+msgstr "Édition des raccourcis du mode revue. Taper une commande."
+
+#: yasr/keybind.c:132
+msgid "Editing normal keymap. Enter command."
+msgstr "Édition des raccourcis du mode normal. Taper une commande."
+
+#: yasr/keybind.c:145
+msgid "Copy which key?"
+msgstr "Copier quelle touche ?"
+
+#: yasr/keybind.c:150
+msgid "Delete which key?"
+msgstr "Effacer quelle touche ?"
+
+#: yasr/keybind.c:155
+msgid "Move which key?"
+msgstr "Déplacer quelle touche ?"
+
+#: yasr/keybind.c:158
+msgid "Exiting keyboard wizard."
+msgstr "Sortie de l'assistant de clavier."
+
+#: yasr/keybind.c:162
+msgid "c to copy, d to delete, m to move."
+msgstr "c pour copier, d pour effacer, m pour déplacer."
+
+#: yasr/keybind.c:173
+msgid "Command aborted."
+msgstr "Commande annulée."
+
+#: yasr/keybind.c:178
+msgid "Key not defined."
+msgstr "Touche non définie."
+
+#: yasr/keybind.c:185
+msgid "Key deleted."
+msgstr "Touche effacée."
+
+#: yasr/keybind.c:190
+msgid "To which key?"
+msgstr "Pour quelle touche ?"
+
+#: yasr/keybind.c:198
+msgid "Keystroke already defined. Aborting."
+msgstr "Séquence de touches déjà définie. Annulation."
+
+#: yasr/keybind.c:207
+msgid "key moved."
+msgstr "Touche déplacée."
+
+#: yasr/keybind.c:211
+msgid "Key copied."
+msgstr "Touche copiée."
+
+#: yasr/keybind.c:219
+msgid "Not available."
+msgstr "Non disponible."
+
+#: yasr/main.c:293
+msgid "yasr enabled."
+msgstr "yasr activé."
+
+#: yasr/main.c:298
+msgid "yasr disabled."
+msgstr "yasr désactivé."
+
+#: yasr/option.c:446 yasr/option.c:462
+msgid "Value accepted."
+msgstr "Valeur acceptée."
+
+#: yasr/option.c:449 yasr/option.c:465
+msgid "Value out of range."
+msgstr "Valeur hors limite."
+
+#: yasr/option.c:475
+msgid "value accepted."
+msgstr "Valeur acceptée."
+
+#: yasr/option.c:483
+msgid "Setting options..."
+msgstr "Mise à jour des options..."
+
+#: yasr/option.c:574
+msgid "exiting options menu."
+msgstr "Sortie du menu des options."
+
+#: yasr/option.c:741
+msgid "cursor tracking"
+msgstr "Suivi de curseur"
+
+#: yasr/option.c:741 yasr/option.c:744 yasr/option.c:765 yasr/option.c:766
+#: yasr/option.c:767 yasr/option.c:768 yasr/option.c:795
+msgid "off"
+msgstr "non sélectionné"
+
+#: yasr/option.c:741
+msgid "arrow keys"
+msgstr "Flèches"
+
+#: yasr/option.c:741
+msgid "full"
+msgstr "Complet"
+
+#: yasr/option.c:742
+msgid "synthesizer"
+msgstr "Synthèse vocale"
+
+#: yasr/option.c:742
+msgid "speakout"
+msgstr "speakout"
+
+#: yasr/option.c:742
+msgid "dectalk"
+msgstr "dectalk"
+
+#: yasr/option.c:742
+msgid "Emacspeak server"
+msgstr "Serveur Emacspeak"
+
+#: yasr/option.c:742
+msgid "doubletalk"
+msgstr "doubletalk"
+
+#: yasr/option.c:742
+msgid "bns"
+msgstr "bns"
+
+# apollo
+#: yasr/option.c:742
+msgid "apollo"
+msgstr "apollo"
+
+#: yasr/option.c:742
+msgid "festival"
+msgstr "festival"
+
+#: yasr/option.c:742
+msgid "Ciber232"
+msgstr "Ciber232"
+
+#: yasr/option.c:743
+msgid "synthesizer port"
+msgstr "Port de la synthèse"
+
+#: yasr/option.c:744
+msgid "key echo"
+msgstr "Écho de la touche"
+
+#: yasr/option.c:744
+msgid "keys"
+msgstr "Touches"
+
+#: yasr/option.c:744
+msgid "words"
+msgstr "mots"
+
+#: yasr/option.c:745
+msgid "shell"
+msgstr "shell"
+
+#: yasr/option.c:752
+msgid "up and down arrows"
+msgstr "Flèches haute et basse"
+
+#: yasr/option.c:752
+msgid "speak line"
+msgstr "prononce la ligne"
+
+#: yasr/option.c:752
+msgid "speak character"
+msgstr "prononce le caractère"
+
+#: yasr/option.c:752
+msgid "speak word"
+msgstr "prononce le mot"
+
+#: yasr/option.c:755
+msgid "DisableKey"
+msgstr ""
+
+#: yasr/option.c:757
+msgid "synthesizer options"
+msgstr "Options de synthèse vocale"
+
+#: yasr/option.c:760 yasr/option.c:771 yasr/option.c:777 yasr/option.c:781
+#: yasr/option.c:789 yasr/option.c:796 yasr/option.c:806 yasr/option.c:809
+msgid "rate"
+msgstr "vitesse"
+
+#: yasr/option.c:761 yasr/option.c:782 yasr/option.c:790 yasr/option.c:797
+#: yasr/option.c:811
+msgid "pitch"
+msgstr "hauteur (pitch)"
+
+#: yasr/option.c:762 yasr/option.c:772 yasr/option.c:783 yasr/option.c:791
+#: yasr/option.c:802 yasr/option.c:810
+msgid "volume"
+msgstr "volume"
+
+#: yasr/option.c:763 yasr/option.c:784
+msgid "tone"
+msgstr "intonation"
+
+#: yasr/option.c:764
+msgid "Punctuation"
+msgstr "ponctuation"
+
+#: yasr/option.c:765
+msgid "textual"
+msgstr "textuel"
+
+#: yasr/option.c:765 yasr/option.c:766 yasr/option.c:767 yasr/option.c:768
+#: yasr/option.c:795
+msgid "on"
+msgstr "sélectionné"
+
+#: yasr/option.c:766
+msgid "math"
+msgstr "math"
+
+#: yasr/option.c:767
+msgid "miscelaneous"
+msgstr "divers"
+
+#: yasr/option.c:768
+msgid "spaces"
+msgstr "espaces"
+
+#: yasr/option.c:773 yasr/option.c:785 yasr/option.c:803
+msgid "voice"
+msgstr "voix"
+
+#: yasr/option.c:773 yasr/option.c:785
+msgid "paul"
+msgstr "paul"
+
+#: yasr/option.c:773
+msgid "harry"
+msgstr "harry"
+
+#: yasr/option.c:773
+msgid "frank"
+msgstr "frank"
+
+#: yasr/option.c:773
+msgid "dennis"
+msgstr "dennis"
+
+#: yasr/option.c:773
+msgid "betty"
+msgstr "betty"
+
+#: yasr/option.c:773
+msgid "ursula"
+msgstr "ursula"
+
+#: yasr/option.c:773
+msgid "rita"
+msgstr "rita"
+
+#: yasr/option.c:773
+msgid "wendy"
+msgstr "wendy"
+
+#: yasr/option.c:773
+msgid "kit"
+msgstr "kit"
+
+#: yasr/option.c:773
+msgid "val"
+msgstr "valeur"
+
+#: yasr/option.c:774 yasr/option.c:778 yasr/option.c:786 yasr/option.c:792
+#: yasr/option.c:795
+msgid "punctuation"
+msgstr "ponctuation"
+
+#: yasr/option.c:774 yasr/option.c:778 yasr/option.c:786 yasr/option.c:792
+msgid "some"
+msgstr "quelques-unes"
+
+#: yasr/option.c:774 yasr/option.c:778 yasr/option.c:786 yasr/option.c:792
+msgid "none"
+msgstr "aucune"
+
+#: yasr/option.c:774 yasr/option.c:778 yasr/option.c:786 yasr/option.c:792
+msgid "all"
+msgstr "toutes"
+
+#: yasr/option.c:785
+msgid "vader"
+msgstr "vader"
+
+#: yasr/option.c:785
+msgid "bob"
+msgstr "bob"
+
+#: yasr/option.c:785
+msgid "pete"
+msgstr "pete"
+
+#: yasr/option.c:785
+msgid "randy"
+msgstr "rabdy"
+
+#: yasr/option.c:785
+msgid "biff"
+msgstr "biff"
+
+#: yasr/option.c:785
+msgid "skip"
+msgstr "sauter"
+
+#: yasr/option.c:785
+msgid "roborobert"
+msgstr "roborobert"
+
+#: yasr/option.c:786 yasr/option.c:792
+msgid "most"
+msgstr "la plupart"
+
+#: yasr/option.c:798
+msgid "prosody"
+msgstr "prosodie"
+
+#: yasr/option.c:799
+msgid "word pause"
+msgstr "pause entre chaque mot"
+
+#: yasr/option.c:800
+msgid "sentence pause"
+msgstr "pause entre chaque phrase"
+
+#: yasr/option.c:801
+msgid "degree"
+msgstr "degré"
+
+#: yasr/option.c:812
+msgid "sex"
+msgstr "sexe"
+
+#: yasr/option.c:813
+msgid "Voice"
+msgstr "Voix"
+
+#: yasr/option.c:814
+msgid "entonation"
+msgstr "intonation"
+
+#: yasr/option.c:815
+msgid "caseonwarning"
+msgstr ""
+
+#: yasr/option.c:816
+msgid "deviceonwarning"
+msgstr ""
+
+#: yasr/ui.c:169 yasr/ui.c:594
+msgid "top"
+msgstr "en haut"
+
+#: yasr/ui.c:174 yasr/ui.c:598
+msgid "bottom"
+msgstr "en bas"
+
+#: yasr/ui.c:239 yasr/ui.c:331
+msgid "bottom right"
+msgstr "en bas à droite"
+
+#: yasr/ui.c:260 yasr/ui.c:325
+msgid "top left"
+msgstr "en haut à gauche"
+
+#: yasr/ui.c:356 yasr/ui.c:379 yasr/ui.c:535 yasr/ui.c:942
+msgid "Aborting."
+msgstr "Annulation."
+
+#: yasr/ui.c:462 yasr/ui.c:480 yasr/ui.c:495
+msgid "not found"
+msgstr "non trouvé"
+
+#: yasr/ui.c:507
+msgid "Enter pattern to find"
+msgstr "Tapez le modèle à rechercher"
+
+#: yasr/ui.c:654
+msgid "left"
+msgstr "gauche"
+
+#: yasr/ui.c:658
+msgid "right"
+msgstr "droite"
+
+#: yasr/ui.c:757
+msgid "exit"
+msgstr "sortie"
+
+#: yasr/ui.c:761
+msgid "review"
+msgstr "revue"
+
+#: yasr/ui.c:776
+msgid "Detached"
+msgstr "Déconnecté"
+
+#: yasr/ui.c:781
+msgid "Attached"
+msgstr "Connecté"
+
+#: yasr/ui.c:792
+msgid "Cursor routed."
+msgstr "Routage du curseur."
+
+#: yasr/ui.c:854
+msgid "blank"
+msgstr "blanc"
+
+#: yasr/ui.c:969
+msgid "Error; no option to set.  Fix keybinding in yasr.conf."
+msgstr "Erreur ; aucune option a configurer. Corriger le raccourci dans yasr.conf."
+
+#: yasr/ui.c:987
+msgid "error in keybinding: unsupported option type"
+msgstr "Erreur de raccourci : type d'option inconnu."
