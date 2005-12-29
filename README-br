@@ -1,0 +1,100 @@
+YASR ("É um leitor de tela ") no qual nós estamos trabalhando para torná-lo
+mais eficiente. Ele funciona como um comando do shell e intercepta
+tudo que o usuário digita ou o que é mostrado na tela. Ele não utiliza
+caminhos como /dev/vcsa0 e não é necessário estar logado como root
+para configurá-lo. (O usuário só precisa ter permissões para acessar
+as opções do dispositivo TTS). O Yasr foi desenvolvido para o ambiente
+GNU/Linux, mas nós estamos tentando portá-lo para o FreeBSD, de modo
+que ele funcione em sistemas operacionais do tipo Unix ou similares
+sem problemas. 
+
+O Yasr ainda está em fase de desenvolvimento, porém, está podendo ser
+utilizado sem problemas. O Yasr provê suporte a oDEC-Talk, DoubleTalk,
+Braille 'n Speak, e ao Apollo, outros também funcionam sem
+problemas. Ele pode ser usado também com servidores Emacspeak,
+entretanto. 
+
+Para instalar, leia o arquivo "INSTALL" primeiro.
+
+Por padrão o yasr.conf é copiado para o diretório
+/usr/local/share/yasr. Se você desejar personalizar o arquivo
+yasr.conf, basta copiá-lo para o diretório "home" com o nome de
+.yasr.conf e alterar conforme sua necessidade. Primeiro o arquivo
+~/.yasr.conf é verificado. Este arquivo contém todas as teclas de
+atalho e opções podem ser redefinidas alterando este arquivo. A
+maioria dos parâmetros agora podem ser alterados de dentro do Yasr.
+
+Atualmente o Yasr possui dois conjuntos de mapas de teclas (keymaps), um
+para o modo de revisão (ie, revisar a tela) e um para o modo
+padrão). Teclas definidas para o modo padrão são verificadas tanto no
+modo padrão como no modo de revisão, mas o mapa de teclas do modo de
+revisão é verificado antes no primeiro caso. Segue abaixo uma lista de
+teclas e suas funções definidas por padrão. Teclas precedidas por [n]
+podem opcionalmente serem precedidas por um número.
+
+-- Modo de revisão --
+
+Barra de espaços: fala a posição do cursor.
+^: move para o primeiro caracter da linha, e lê a palavra.
+$: move para o último caracter da linha, e lê a palavra.
+[n]b: Lê o caracter anterior, ou move a esquerda n caracteres.
+[n]c: Lê o caracter, ou move para o caracter n na linha e o lê.
+[n]d: Lê o próximo caracter, ou move a direita n caracteres.
+e: Lê da posição atual do cursor até o fim da tela.
+f: Busca por um determinado texto na tela.
+<: Faz uma busca da posição atual do cursor até o início da janela,
+   utilizando uma palavra que tenha cido especificada.
+>: Faz uma busca da posição atual do cursor até o fim da janela,
+   utilizando uma palavra que tenha cido especificada.
+
+[n]k: Vai para a linha anterior e a lê, o mesmo que seta acima.
+[n]l: Lê a linha atual, ou vai para a linha n e a lê.
+[n]m: move para a próxima linha e a lê, o mesmo que seta abaixo.
+n: envia diretamente ao aplicativo.
+t: lê início da janela até a posição atual do cursor.
+w: lê toda a tela.
+z: Move para o início da palavra anterior e a lê.
+x: Move para o início da próxima palavra e a lê.
+[n] Seta acima: Vai para linha anterior e a lê. (tbd -- seta acima e
+   abaixo para ler a palavra ou caracter na linha desejada).
+[n] Seta abaixo: Vai para a próxima linha e a lê.
+[n]Seta para a esquerda: Volta um caracter e o lê.
+[n]Seta a direita: Vai para o próximo caracter e o lê.
+(: Vai para o parágrafo anterior.
+): Vai para o próximo parágrafo.
+`: Lê o valor ASCII do caracter atual.
+
+** Modo padrão ** (Estas teclas funcionam também no modo de revisão)
+
+ctrl-a: Fala a posição do cursor na aplicação.
+ctrl-l: Lê a linha atual.
+ctrl-n: bypass.
+ctrl-x: Lê o conteúdo do buffer.
+alt-b: Lê o caracter anterior.
+alt-c: Lê caracter.
+alt-d: Lê Palavra.
+alt-e: Lê da posição atual do cursor até o final da tela.
+alt-i: Reinicia o sintetizador.
+alt-k: Lê a linha anterior.
+alt-l: Lê a linha.
+alt-m: Lê a próxima linha.
+alt-r: Altera o modo de revisão.
+alt-t: Lê da posição do cursor até o início da tela.
+alt-w: Lê toda a tela.
+alt-x: Ativa a opção mudo do sintetizador. Mantenha pressionado
+   control-X para continuar com esta opção ativa. Para reativa-lo
+   pressione alt-x novamente).
+ctrl-alt-k: Assistente de teclado. Permite ao usuário mover, copiar,
+   ou excluir combinações de teclas no Yasr.
+ctrl-alt-o: Menu Opções. Permite ao usuário configurar o Yass conforme
+   suas preferências.
+ctrl-alt-s: Salva as configurações do Yass no disco.
+alt-enter: Desativa o Yass. Sinlencia o sintetizador e desabilita suas
+   combinações de teclas.
+	Pressione novamente para reativá-lo.
+	Nota: esta tecla está definida no Menu Opções? como
+	"Teclas-Desabilitadas".
+
+Sugestões, correções, ETC. Serão bem-vindas!
+
+   -Michael P. Gorse <mgorse@users.sourceforge.net>

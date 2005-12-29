@@ -1,0 +1,97 @@
+YASR (acronyme en anglais de "Yet Another Screen Reader") est ma tentative de
+lecteur d'écran léger et portable. Il fonctionne en ouvrant un shell dans un
+pty et en interceptant toutes les entrées/sorties utilisateur; il met à jour
+une fenêtre de ce qui devrait se trouver à l'écran en interprétant les codes et
+textes envoyés à l'écran. Il n'utilise donc aucun Linuxisme tel que /dev/vcsa0
+et ne nécessite pas nécessairement d'être setuid root (la seule contrainte
+étant que l'utilisateur puisse accéder au tts). Yasr est développé sous
+GNU/Linux, mais j'ai tenté de le porter sur FreeBSD, et il devrait fonctionner
+sur les OS similaires proches d'Unix avec des ajustements minimes. 
+
+Yasr est toujours en cours de développement, mais je pense qu'il devient bien
+utilisable si du moins vous avez un Speakout. Yasr tente aussi de directement
+piloter le DEC-Talk, DoubleTalk, Braille 'n Speak, et Apollo, mais il reste du
+travail pour qu'ils fonctionnent correctement. Il peut aussi être utilisé avec
+les serveurs vocaux d'Emacspeak.
+
+Pour l'installation, voir le fichier INSTALL.
+
+Par défaut, yasr.conf sera copié dans /usr/local/share/yasr. Si vous voulez
+votre propre fichier de configuration de yasr, vous devriez copier yasr.conf
+dans votre répertoire utilisateur en le renommant en .yasr.conf puis adaptez-le
+comme souhaité. ~/.yasr.conf est lu en premier. Ce fichier contient tous les
+raccourcis et options de yasr, qui peuvent être redéfinis en modifiant ce
+fichier. La plupart des paramètres peuvent maintenant être aussi modifiés via
+Yasr.
+
+Il y a deux jeux de raccourcis, l'un pour le mode revue qui sert à relire
+l'écran, et l'autre pour le mode standard. Les raccourcis pour le mode standard
+sont aussi valables en mode revue, mais en mode revue, les raccourcis définis
+pour ce mode sont contrôlés en premier. Voici la liste de quelques touches et
+de leur fonctions définies par défaut. Si une touche est précédée de [n], cela
+signifie qu'un nombre peut optionnellement précéder la commande.
+
+-- Mode revue--
+
+Barre d'espace: lire la position du curseur en mode revue
+^: se déplacer au premier caractère de la ligne et lire le mot.
+$: se déplacer au dernier caractère de la ligne et lire le mot.
+[n]b: lire le caractère précédant ou bien se déplacer de N caractères vers la
+   gauche
+[n]c: lire le caractère courant ou bien le caractère N.
+[n]d: lire le caractère suivant ou bien se déplacer de N caractères vers la
+   droite
+e: Lire du curseur jusqu'en bas de l'écran.
+f: recherche de texte sur l'écran.
+<: recherche à partir de la position du curseur vers le haut de l'écran en
+   utilisant la chaîne précédemment saisie.
+>: recherche à partir de la position du curseur vers le bas de l'écran en
+   utilisant la chaîne précédemment saisie.
+[n]k: monter d'une ligne et la lire (comme flèche en haut).
+[n]l: lire la ligne courante, ou bien sauter en ligne N et la lire.
+[n]m: descendre d'une ligne et la lire (comme flèche en bas).
+n: envoie direct à l'application
+t: lire du haut de l'écran jusqu'au curseur.
+w: lire l'écran en entier.
+z: se déplacer au début du mot précédant et le lire.
+x: se déplacer au début du mot suivant et le lire.
+[n]flèche vers le haut : se déplacer à la ligne précédante et la lire.
+[n]flèche vers le bas : se déplacer à la ligne suivante et la lire.
+[n]flèche vers la gauche : se déplacer au caractère précédant et le lire.
+[n]flèche vers la droite : se déplacer au caractère suivant et le lire.
+(: aller au paragraphe précédant.
+): aller au paragraphe suivant.
+`: lire la valeur ASCII du caractère courant.
+
+** mode standard ** (ces touches fonctionnent aussi en mode revue)
+ctrl-a: dire la position du curseur de l'application
+ctrl-l: lire la ligne.
+ctrl-n: passer la commande directement à l'application
+ctrl-x: traiter et vider le tampon pour la synthèse.
+alt-b: lire le caractère précédant
+alt-c: lire le caractère
+alt-d: lire le mot
+alt-e: lire du curseur jusqu'en bas de l'écran.
+alt-i: réinitialiser la synthèse.
+alt-k: lire la ligne précédente.
+alt-l: lire la ligne.
+alt-m: lire la ligne suivante.
+alt-r: changer de mode
+alt-t: lire du haut de l'écran jusqu'au curseur.
+alt-w: lire tout l'écran.
+alt-x: silence. Comme ctrl-x mais continuera à être silencieux jusqu'à ce
+   qu'une touche soit appuyée (par exemple, appuyer sur alt-x une seconde fois,
+   relancera la voix).
+ctrl-alt-k: assistant de clavier. Permet à l'utilisateur de déplacer, copier,
+   ou effacer des raccourcis de yasr.
+ctrl-alt-o: menu options. Permet à l'utilisateur de configurer les options à
+   partir de yasr.
+ctrl-alt-s: sauvegarde de la configuration sur disque.
+alt-enter: désactiver yasr. Yasr est silencieux et ignore toute touche appuyée.
+	   Appuyer à nouveau sur alt-enter pour le réactiver.
+	   Remarque: cette touche est appelée dans la section [options] :
+	   "DisableKey".
+
+Les suggestions, patchs, etc,... sont bienvenus.
+
+   -Michael P. Gorse <mgorse@users.sourceforge.net>

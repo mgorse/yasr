@@ -1,0 +1,103 @@
+YASR (acrónimo en inglés de "Otro lector de pantalla más") es mi intento de
+crear un lector de pantalla portatil y ligero. Funciona abriendo un intérprete
+de comandos (`shell') en una terminal pty e interceptando todas las entradas y
+salidas del usuario, manteniendo una ventana de lo que habría en la pantalla y
+observando los códigos y textos enviados a la pantalla. De esta forma, no usa
+Linuxismos tales y como el dispositivo /dev/vcsa0 y no es necesario correr como
+superusuario mediante setuid root (el único requisito es que el usuario sea
+capaz de accesar el dispositivo tts). Yasr se desarrolla bajo el sistema
+GNU/Linux, pero he intentado transladarlo a FreeBSD y debe funcionar en otros
+sistemas similares a Unix con pequeñas modificaciones.
+
+Yasr se halla aún en desarrollo, pero creo que se está volviendo más o menos
+útil, siempre y cuando tenga un dispositivo de síntesis de habla. Yasr también
+trabaja con los sintetisadores Dec-Talk, Braille 'n Speak y Apollo, aunque aún
+se requiere trabajo para que ellos trabajen bien. Sin embargo, puede ser
+empleado con servidores de Emacspeak. 
+
+Para instalarlo, lea el archivo INSTALL.
+
+En general, el archivo yasr.conf será copiado a /usr/local/share/yasr. Si usted
+desea su propio archivo de configuración, deberá copiar yasr.conf a su
+directorio inicial, renombrarlo como .yasr.conf y editar su
+contenido. ~/.yasr.conf es checado inicialmente. Este archivo contiene las
+definiciones para su teclado y sus opciones, las cuales pueden modificarse
+editando el archivo. La mayor parte de los parámetros pueden modificarse desde
+el programa yasr.
+
+Actualmente yasr tiene dos mapas de teclado, uno para el "modo de revisión"
+(por ejemplo, para revisar la pantalla) y otro para el modo estándar. Las
+teclas definidas en el modo estándar son checadas ya sea que el usuario se
+halle en modo de revisión o en modo estándar, pero en el primer caso, el mapa
+específico para el modo de revisión es checado primero. A continuación se
+muestra una lista de teclas y sus funciones, las cuales están definidas por
+defecto. Teclas precedidas por [n] pueden ser precedidas por un número.
+
+-- Modo de revisión --
+
+Espacio: dí la posición del cursor.
+^: muévete al primer caracter de la línea y dí palabra.
+$: muévete al último caracter de la línea y dí palabra.
+[n]b: dí el caracter previo o muevete hacia la izquierda n caracteres.
+[n]c: dí el caracter, o muevete hacia el caracter n de la línea y dilo.
+[n]d: dí el siguiente caracter o muevete hacia la derecha n caracteres.
+e: lee del cursor al fondo de la pantalla.
+f: busca texto en la pantalla.
+<: busca desde el cursor hacia el principio de la pantalla empleando la cadena
+   de caracteres buscada previamente.
+>: busca desde el cursor hacia el final de la pantalla empleando la cadena de
+   caracteres buscada previamente.
+[n]k: muevete hacia arriba una línea y leela (actualmente es igual que la
+   flecha para arriba).
+[n]l: dí la línea actual o salta a la línea n y leela.
+[n]m: muevete hacia abajo una línea y leela (actualmente es igual a la flecha
+   hacia abajo).
+n: rodea (envía directamente a la aplicación sin interpretar).
+t: lee desde el principio hasta el cursor.
+w: lee toda la pantalla.
+z: muevete al principio de la palabra previa y leela.
+x: muevete al principio de la siguiente palabra y leela.
+[n]flecha para arriba: muévete a la línea previa y lee la línea (por hacer --
+  opcionalmente permitir a las flechas leer una palabra o caracter en lugar de
+  un línea).
+[n]flecha para abajo: muévete a la siguiente línea y leela.
+[n]flecha a la izquierda: muévete hacia atrás un caracter y leelo.
+[n]flecha a la derecha: muévete hacia adelante un caracter y leelo.
+(: vé al párrafo previo.
+): vé al parrafó siguiente.
+`: lee el valor ASCII del caracter actual.
+
+** modoestándar ** (éstas teclas también funcionan en modo de revisión)
+
+ctrl-a: dí la posición del cursor en la aplicación.
+ctrl-l: dí la línea.
+ctrl-n: rodea.
+ctrl-x: vacía el almacén de habla.
+alt-b: dí el caracter previo.
+alt-c: dí el caracter.
+alt-d: dí palabra.
+alt-e: lee desde el cursor hasta el final de la pantalla.
+alt-i: reinicializa el sintetizador.
+alt-k: dí la línea previa.
+alt-l: lee línea.
+alt-m: lee la siguiente línea.
+alt-r: cambia modo de revisión.
+alt-t: lee desde el inicio hasta el cursor.
+alt-w: lee la pantalla completa
+alt-x: silencia el habla. Como ctrl-x pero continúa en silencia hasta que
+   alguna tecla sea pulsada (por ejemplo, presionando alt-x por segunda vez
+   reinicia el habla).
+ctrl-alt-k: Invoca al mago del teclado. Permite mover, copiar o borrar las
+   asignaciones de teclas desde yasr.
+ctrl-alt-o: Menú de opciones. Permite al usuario establecer opciones desde
+   yasr.
+ctrl-alt-s: Salva la configuración a disco.
+alt-enter: Inhabilita yasr. Yasr es silencioso e ignora todas las teclas cuando
+   se halla inhabilitado.
+	Pulselo de nuevo para rehabilitarlo.
+	Nota: esta tecla está definida en la sección de opciones [options] como
+	"DisableKey".
+
+Sugerencias, parches, etc. son bienvenidos.
+
+   -Michael P. Gorse <mgorse@users.sourceforge.net>
