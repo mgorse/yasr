@@ -1,4 +1,4 @@
-2006-04-25 Francisco Javier Dorado <javier@tivlolinux.org>
+2006-04-25 Francisco Javier Dorado <javier@tiflolinux.org>
 
 	* yasr/tts.c: Set BNS unspeakable to non-NULL string.
 
