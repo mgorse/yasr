@@ -35,7 +35,7 @@ static Tts_synth synth[] = {
   {"", "%s[:syn]", "\003", "[:sa le]", "[:sa c]", FALSE, "[]{}\\|_@#^*<>\"`~", ""},	/* DECtalk */
   {"s\r", "q {%s}\rd\r", "s\r", "l {%c}\r", NULL, FALSE, "[]{}\\|_@#^*<>\"`~^", "exit"},	/* emacspeak server */
   {"", "%s", "\030", "\001c", "\001t", TRUE, "", ""},	/* doubletalk */
-  {"", "%s\r\r", "\030\030\r\r", NULL, NULL, TRUE, NULL, NULL},	/* BNS */
+  {"", "%s\r\r", "\030\030\r\r", NULL, NULL, TRUE, "", ""},	/* BNS */
   {"", "%s\r\n", "\030", "@P1", "@P0", TRUE, "@", ""},	/* Apollo */
   {"(audio_mode 'async)\n",
    "(SayText \"%s\")\n",

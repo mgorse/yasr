@@ -1,8 +1,14 @@
+2006-04-25 Francisco Javier Dorado <javier@tivlolinux.org>
+
+	* yasr/tts.c: Set BNS unspeakable to non-NULL string.
+
 2006-04-21 Lukas Loehrer <loehrerl@gmx.net>
-Add README-de
+
+	* Add README-de
 
 2005-12-29 Gilles Casse <gcasse@oralux.org>
-Add README-br, README-es, README-fr, and README-ru from oralux
+
+	* Add README-br, README-es, README-fr, and README-ru from oralux
 
 2005-08-21 Michael P. GOrse <mgorse@alum.wpi.edu>
 
