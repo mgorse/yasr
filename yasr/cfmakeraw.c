@@ -21,7 +21,7 @@
  * It is based on the Linux manpage.
  */
 
-#ifndef HAVE_CFMAKEMAW
+#ifndef HAVE_CFMAKERAW
 
 #include <termios.h>
 
