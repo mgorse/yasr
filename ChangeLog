@@ -1,3 +1,16 @@
+2007-01-12  gettextize  <bug-gnu-gettext@gnu.org>
+
+	* m4/gettext.m4: Upgrade to gettext-0.16.1.
+	* m4/iconv.m4: Upgrade to gettext-0.16.1.
+	* m4/lib-ld.m4: Upgrade to gettext-0.16.1.
+	* m4/lib-link.m4: Upgrade to gettext-0.16.1.
+	* m4/lib-prefix.m4: Upgrade to gettext-0.16.1.
+	* m4/nls.m4: New file, from gettext-0.16.1.
+	* m4/po.m4: New file, from gettext-0.16.1.
+	* m4/progtest.m4: Upgrade to gettext-0.16.1.
+	* m4/Makefile.am (EXTRA_DIST): Add the new files.
+	* configure.in (AM_GNU_GETTEXT_VERSION): Bump to 0.16.1.
+
 2006-04-25 Francisco Javier Dorado <javier@tiflolinux.org>
 
 	* yasr/tts.c: Set BNS unspeakable to non-NULL string.
