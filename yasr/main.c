@@ -117,7 +117,7 @@ static void child()
   }
   else
   {
-    (void) execl(usershell, arg, 0);
+    (void) execl(usershell, arg, (void *) 0);
   }
   perror("execl");
   exit(1);
@@ -1383,7 +1383,8 @@ static Win *wininit(int nr, int nc)
   win = (Win *) calloc(sizeof(Win), 1);
   if (!win)
   {
-    fprintf(stderr, "wininit: cannot allocate %ld bytes\n", sizeof(Win));
+    fprintf(stderr, "wininit: cannot allocate %lu bytes\n",
+	    (unsigned long) sizeof(Win));
     exit(1);
   }
   win->rows = nr;
