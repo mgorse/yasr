@@ -1,3 +1,8 @@
+2007-01-13 Dmitriyi Paduchikh <dpaduch@k66.ru>
+
+	yasr/* cfmakeraw.c: Fix typo.
+	* yasr/main.c: Fix some types to avoid compiler warnings.
+
 2007-01-12  gettextize  <bug-gnu-gettext@gnu.org>
 
 	* m4/gettext.m4: Upgrade to gettext-0.16.1.
