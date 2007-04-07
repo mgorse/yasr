@@ -1,6 +1,10 @@
+2007-04-06 Michael P. Gorse <mgorse@alum.wpi.edu>
+
+	* yasr/tts.c: remove dict memset to prevent erasing on synth reinit
+
 2007-01-13 Dmitriyi Paduchikh <dpaduch@k66.ru>
 
-	yasr/* cfmakeraw.c: Fix typo.
+	* yasr/* cfmakeraw.c: Fix typo.
 	* yasr/main.c: Fix some types to avoid compiler warnings.
 
 2007-01-12  gettextize  <bug-gnu-gettext@gnu.org>

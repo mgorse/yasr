@@ -495,7 +495,6 @@ int tts_init( int first_call)
   tts.pid = 0;
   tts.reinit = !first_call; 
 
-  (void) memset(dict, 0, sizeof(dict));
   (void) signal(SIGALRM, &tts_obufout);
 
 #ifdef TTSLOG
