@@ -46,6 +46,8 @@ static Tts_synth synth[] = {
    "",
    "\003\")\n"}, /* festival */
   {"", "%s\r\n", "\033", "%c\r", NULL, TRUE, "@", ""},	/* Ciber232 */
+/* speech dispatcher (note: various things handled with custom code) */
+  {NULL, NULL, "CANCEL SELF\r\n", NULL, NULL, FALSE, "", "quit\r\n"},
 };
 
 static char *dict[256];
@@ -109,6 +111,16 @@ void tts_flush()
  
 }
 
+static void tts_wait(int usecs)
+{
+  char buf[100];
+
+  if (usecs != -1 && !readable(tts.fd, usecs)) return;
+  while (readable(tts.fd, 0))
+  {
+    read(tts.fd, buf, sizeof(buf));
+  }
+}
 
 void tts_silence()
 {
@@ -290,6 +302,21 @@ void tts_out(unsigned char *buf, int len)
 
   if (!len) return;
   opt_queue_empty(0);
+  if (tts.synth == TTS_SPEECHD)
+  {
+    char *q;
+    tts_send("SPEAK\r\n", 7);
+    tts_wait(50000);
+    if (buf[0] == '.' && buf[1] == '\r') tts_send(".", 1);
+    for (p = (char *)buf; (q = strstr(p + 1, "\r.\r")) && q < (char *)buf+len; p = q)
+    {
+      tts_send(p, q - p);
+    }
+    tts_send(p, (long)buf + len - (long)p);
+    tts_send("\r\n.\r\n", 5);
+    tts_wait(50000);
+    return;
+  }
   p = synth[tts.synth].say;
   opt_queue_empty(0);
   while (*p)
@@ -371,6 +398,12 @@ void tts_saychar(unsigned char ch)
   if (!ch)
   {
     ch = 32;
+  }
+  if (tts.synth == TTS_SPEECHD)
+  {
+    if (ch == 32) tts_send("CHAR space\r\n", 12);
+    else tts_printf("CHAR %c\r\n", ch);
+    return;
   }
   if (unspeakable(ch) && dict[ch])
   {
@@ -581,7 +614,15 @@ int tts_init( int first_call)
       perror("forkpty");
     }
   }
-  tts_send(synth[tts.synth].init, strlen(synth[tts.synth].init));
+  if (tts.synth == TTS_SPEECHD)
+  {
+    char buf[200];
+    char *logname = getenv("LOGNAME");
+    if (logname == NULL) logname = getlogin();
+    snprintf(buf, sizeof(buf), "SET self CLIENT_NAME %s:yasr:tts\r\n", logname);
+    tts_send(buf, strlen(buf));
+  }
+  else tts_send(synth[tts.synth].init, strlen(synth[tts.synth].init));
 
   /* init is now finished */
   tts.reinit = 0;
@@ -673,8 +714,7 @@ void tts_charoff()
 }
 
 
-#if DEBUG
-void tts_printf(char *str, ...)
+void tts_printf(const char *str, ...)
 {
   char buf[200];
   va_list args;
@@ -683,4 +723,3 @@ void tts_printf(char *str, ...)
   vsprintf(buf, str, args);
   tts_say(buf);
 }
-#endif

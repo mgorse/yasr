@@ -255,6 +255,7 @@ extern void uinit();
 
 /* tts.c prototypes */
 extern void tts_charoff();
+extern void tts_printf(const char *str, ...);
 extern void tts_charon();
 extern void tts_addchr(char ch);
 extern void tts_out(unsigned char *ibuf, int len);

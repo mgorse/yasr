@@ -739,7 +739,7 @@ void opt_init()
 {
   opq.len = opq.lastlen = 0;
   opt_add(&ui.curtrack, 0, N_("cursor tracking"), OT_ENUM, 3, N_("off"), N_("arrow keys"), N_("full"));
-  opt_add(&tts.synth, 0, N_("synthesizer"), OT_ENUM, 8, N_("speakout"), N_("dectalk"), N_("Emacspeak server"), N_("doubletalk"), N_("bns"), N_("apollo"), N_("festival"), N_("Ciber232"));
+  opt_add(&tts.synth, 0, N_("synthesizer"), OT_ENUM, 9, N_("speakout"), N_("dectalk"), N_("Emacspeak server"), N_("doubletalk"), N_("bns"), N_("apollo"), N_("festival"), N_("Ciber232"), N_("speech dispatcher"));
   opt_add(tts.port, 0, N_("synthesizer port"), OT_STR);
   opt_add(&ui.kbsay, 0, N_("key echo"), OT_ENUM, 3, N_("off"), N_("keys"), N_("words"));
   opt_add(usershell, 0, N_("shell"), OT_STR);
