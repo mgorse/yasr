@@ -402,7 +402,7 @@ void tts_saychar(unsigned char ch)
   if (tts.synth == TTS_SPEECHD)
   {
     if (ch == 32) tts_send("CHAR space\r\n", 12);
-    else tts_printf("CHAR %c\r\n", ch);
+    else tts_printf_ll("CHAR %c\r\n", ch);
     return;
   }
   if (unspeakable(ch) && dict[ch])
@@ -714,12 +714,12 @@ void tts_charoff()
 }
 
 
-void tts_printf(const char *str, ...)
+void tts_printf_ll(const char *str, ...)
 {
   char buf[200];
   va_list args;
 
   va_start(args, str);
   vsprintf(buf, str, args);
-  tts_say(buf);
+  tts_send(buf, strlen(buf));
 }

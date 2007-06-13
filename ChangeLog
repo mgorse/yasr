@@ -1,3 +1,8 @@
+2007-06-13  Michael P. Gorse <mgorse@alum.wpi.edu>
+
+	* yasr/tts.c, yasr/tts.h: Rename tts_printf to tts_printf_ll and
+	have it call tts_send instead of tts_say
+
 2007-05-22  gettextize  <bug-gnu-gettext@gnu.org>
 
 	* yasr.conf: Add sample synth definition for Speech Dispatcher.
@@ -18,7 +23,7 @@
 	* m4/Makefile.am (EXTRA_DIST): Add the new files.
 	* Makefile.am (EXTRA_DIST): Add config.rpath.
 
-2007-04-06 Michael P. Gorse <mgorse@alum.wpi.edu>
+2007-04-06Michael P. Gorse <mgorse@alum.wpi.edu>
 
 	* yasr/tts.c: remove dict memset to prevent erasing on synth reinit
 
