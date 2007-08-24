@@ -117,7 +117,7 @@ enum mpunct
     PUNCT_ALL
 };
 
-#define OPT_STR_SIZE 80
+#define OPT_STR_SIZE 256
 
 typedef struct Tts Tts;
 struct Tts
@@ -171,6 +171,7 @@ struct Ui
     int revmode;
     int silent;
     int rc_detached;
+  int split_caps;
     Keymap keymap;
 };
 
@@ -204,7 +205,6 @@ extern int cl_synthport;
 
 extern Opt opt[];
 extern int synthopt;
-extern int sighit;
 extern char *conffile;
 extern unsigned char buf[256];
 extern int kbuf[100];
@@ -326,7 +326,7 @@ extern int forkpty(int *, char *, struct termios *, struct winsize *);
 #define cblank(r, c)  ((win->row[r][c] & 0xdf) == 0)
 #define ttssend(x)    if (x) tts_send(x, strlen(x))
 
-#define NUMOPTS 52
+#define NUMOPTS 53
 
 /* Option types */
 #define OT_INT      0x00

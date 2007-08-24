@@ -1,3 +1,10 @@
+2007-08-24 Michael P. Gorse <mgorse@alum.wpi.edu>
+
+	* yasr/main.c, yasr/yasr.h: Remove sighit variable in favor of
+	checking for EINTR after select call.
+	* yasr/yasr.h: Increase OPT_STR_SIZE to 256
+	* yasr/yasr.h, yasr/option.c, yasr/tts.c: Add "split caps" option
+
 2007-06-13  Michael P. Gorse <mgorse@alum.wpi.edu>
 
 	* yasr/tts.c, yasr/tts.h: Rename tts_printf to tts_printf_ll and
