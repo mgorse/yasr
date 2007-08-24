@@ -51,7 +51,6 @@ int kbuf[100];
 int kbuflen = 0;
 static unsigned char okbuf[100];
 static int okbuflen = 0;
-int sighit = 0;
 static int oldcr = 0, oldcc = 0, oldch = 0;
 char voices[TTS_SYNTH_COUNT][64];
 static int shell = 0;
@@ -1249,19 +1248,22 @@ static void parent()
   utmpconv((char *) (buf + 128), (char *) (buf + 192), cpid);
   maxfd = (master > tts.fd ? master : tts.fd) + 1;
 
-  FD_ZERO(&rf);
   for (;;)
   {
+    int result;
+    FD_ZERO(&rf);
     FD_SET(master, &rf);
     FD_SET(0, &rf);
     FD_SET(tts.fd, &rf);
-    (void) select(maxfd, &rf, NULL, NULL, NULL);
-
-/* tbc - can we replace use of sighit by checking the select return val? */
-    if (sighit)
+    result = select(maxfd, &rf, NULL, NULL, NULL);
+    if (result == -1)
     {
-      sighit = 0;
-      continue;
+      if (errno == EINTR) continue;
+      else
+      {
+	perror("select");
+	break;
+      }
     }
     if (FD_ISSET(0, &rf))
     {
