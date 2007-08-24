@@ -180,7 +180,6 @@ static int ofd;
     opt_queue_empty(2);
   }
   oldoflag = tts.oflag;
-  sighit = 1;
   while (tts.obufhead < tts.obuftail)
   {
     len = strlen(tts.obuf + tts.obufhead);
@@ -354,6 +353,10 @@ void tts_out(unsigned char *buf, int len)
 	}
 	else
 	{
+	  if (ui.split_caps && i > 0 && islower(buf[i-1]) && isupper(buf[i]))
+	  {
+	    obuf[obo++] = ' ';
+	  }
 	  obuf[obo++] = buf[i];
 	}
 	if (obo > (sizeof(obuf) / sizeof(obuf[0])) - 6)
@@ -619,7 +622,7 @@ int tts_init( int first_call)
     char buf[200];
     char *logname = getenv("LOGNAME");
     if (logname == NULL) logname = getlogin();
-    snprintf(buf, sizeof(buf), "SET self CLIENT_NAME %s:yasr:tts\r\n", logname);
+    tts_printf_ll("SET self CLIENT_NAME %s:yasr:tts\r\n", logname);
     tts_send(buf, strlen(buf));
   }
   else tts_send(synth[tts.synth].init, strlen(synth[tts.synth].init));
