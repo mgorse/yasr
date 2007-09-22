@@ -1,3 +1,7 @@
+2007-09-21 Michael P. Gorse <mgorse@alum.wpi.edu>
+
+	* yasr/main.c: Add defensive code to get_tts_input to stop lockup
+
 2007-08-24 Michael P. Gorse <mgorse@alum.wpi.edu>
 
 	* yasr/main.c, yasr/yasr.h: Remove sighit variable in favor of

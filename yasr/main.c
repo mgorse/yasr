@@ -1229,6 +1229,7 @@ static void getoutput()
 
 static void get_tts_input()
 {
+  if (!readable(tts.fd, 1)) return;
   (void) read(tts.fd, buf, 100);
 }
 
