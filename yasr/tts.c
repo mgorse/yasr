@@ -305,7 +305,6 @@ void tts_out(unsigned char *buf, int len)
   {
     char *q;
     tts_send("SPEAK\r\n", 7);
-    tts_wait(50000);
     if (buf[0] == '.' && buf[1] == '\r') tts_send(".", 1);
     for (p = (char *)buf; (q = strstr(p + 1, "\r.\r")) && q < (char *)buf+len; p = q)
     {
@@ -313,7 +312,6 @@ void tts_out(unsigned char *buf, int len)
     }
     tts_send(p, (long)buf + len - (long)p);
     tts_send("\r\n.\r\n", 5);
-    tts_wait(50000);
     return;
   }
   p = synth[tts.synth].say;

@@ -1,3 +1,7 @@
+2007-09-22 Michael P. Gorse <mgorse@alum.wpi.edu>
+
+	* yasr/tts.c: remove 50ms delays when sending to Speech Dispatcher
+
 2007-09-21 Michael P. Gorse <mgorse@alum.wpi.edu>
 
 	* yasr/main.c: Add defensive code to get_tts_input to stop lockup
