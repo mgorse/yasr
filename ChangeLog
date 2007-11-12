@@ -1,3 +1,7 @@
+2007-11-12 Michael P. Gorse <mgorse@alum.wpi.edu>
+
+	* yasr/tts.c: For DEC-talk, enable IEXTEN, IXON, and IXOFF
+
 2007-09-22 Michael P. Gorse <mgorse@alum.wpi.edu>
 
 	* yasr/tts.c: remove 50ms delays when sending to Speech Dispatcher

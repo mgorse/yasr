@@ -566,6 +566,9 @@ int tts_init( int first_call)
     {
       /* When sending a ^C, make sure we send a ^C and not a break */
       cfmakeraw(&t);
+      /* following two lines match the Emacspeak server */
+      t.c_iflag |= IXON|IXOFF;
+      t.c_lflag |= IEXTEN;
       /* When the DEC-talk powers on, it sends several ^A's.  Discard them */
       tcflush(tts.fd, TCIFLUSH);
     }
