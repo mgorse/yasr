@@ -1,6 +1,7 @@
 2007-11-12 Michael P. Gorse <mgorse@alum.wpi.edu>
 
 	* yasr/tts.c: For DEC-talk, enable IEXTEN, IXON, and IXOFF
+	* Release v0.6.8
 
 2007-09-22 Michael P. Gorse <mgorse@alum.wpi.edu>
 
@@ -110,8 +111,9 @@ tts.c: in synth[], use TRUE/FALSE where appropriate rather than 1/0
 tts.c: add support for xml escaping
 
 2005-06-05 Gilles Casse <gcasse@oralux.org>:
-main.c: Fix "say word" option
-Restart an external speech server upon reinitialization
+
+	 * main.c: Fix "say word" option
+	* tts.c: Restart an external speech server upon reinitialization
 
 2005-01-28 Rich Burridge <rich.burridge@sun.com>:
 Increase size of voices array by 1
