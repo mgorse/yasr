@@ -1,5 +1,6 @@
 2007-11-12 Michael P. Gorse <mgorse@alum.wpi.edu>
 
+	* Makefile.am: Add README translations
 	* yasr/tts.c: For DEC-talk, enable IEXTEN, IXON, and IXOFF
 	* Release v0.6.8
 

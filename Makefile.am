@@ -18,6 +18,11 @@ EXTRA_DIST = config.rpath  \
 	autogen.sh \
 	depcomp \
 	BUGS \
-	CREDITS
+	CREDITS \
+	README-br \
+	README-de \
+	README-es \
+	README-fr \
+	README-ru
 
 ACLOCAL_AMFLAGS = -I m4
