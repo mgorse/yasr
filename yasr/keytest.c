@@ -49,6 +49,10 @@ int main(int argc, char *argv[])
     {
       val = (val << 8) + buf[2];
     }
+    if (len > 3)
+    {
+      val = (val << 8) + buf[3];
+    }
     if (val == 81 || val == 113)
     {
       break;

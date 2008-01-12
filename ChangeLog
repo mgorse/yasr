@@ -1,3 +1,15 @@
+2008-01-12 Michael P. Gorse <mgorse@alum.wpi.edu>
+
+	* yasr/keytest.c: Support sequences of 4 values
+
+2007-12-30  gettextize  <bug-gnu-gettext@gnu.org>
+
+	* m4/gettext.m4: Upgrade to gettext-0.17.
+	* m4/iconv.m4: Upgrade to gettext-0.17.
+	* m4/lib-link.m4: Upgrade to gettext-0.17.
+	* m4/po.m4: Upgrade to gettext-0.17.
+	* configure.in (AM_GNU_GETTEXT_VERSION): Bump to 0.17.
+
 2007-11-12 Michael P. Gorse <mgorse@alum.wpi.edu>
 
 	* Makefile.am: Add README translations
