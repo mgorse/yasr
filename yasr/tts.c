@@ -624,7 +624,6 @@ int tts_init( int first_call)
     char *logname = getenv("LOGNAME");
     if (logname == NULL) logname = getlogin();
     tts_printf_ll("SET self CLIENT_NAME %s:yasr:tts\r\n", logname);
-    tts_send(buf, strlen(buf));
   }
   else tts_send(synth[tts.synth].init, strlen(synth[tts.synth].init));
 
