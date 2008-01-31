@@ -1,3 +1,12 @@
+2008-01-31 C.M. Brannon <cmbrannon@cox.net>
+
+	* yasr/options.c, yasr/yasr.h: Add Speech-Dispatcher options.
+	* yasr/tts.c: Remove vestigial tts_send for SPeech-DIspatcher on init
+
+2008-01-31 Michael P. Gorse <mgorse@alum.wpi.edu>
+
+	* yasr.conf: Add speech-dispatcher options.
+
 2008-01-12 Michael P. Gorse <mgorse@alum.wpi.edu>
 
 	* yasr/keytest.c: Support sequences of 4 values

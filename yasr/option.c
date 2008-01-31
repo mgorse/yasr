@@ -817,4 +817,14 @@ void opt_init()
   opt_add((void *) 28, -1, N_("caseonwarning"), OT_INT | OT_SYNTH, 0, 1, 7, "@n%d");
   opt_add((void *) 32, -1, N_("deviceonwarning"), OT_INT | OT_SYNTH, 0, 1, 7, "@t%d");
 
+/* Speech Dispatcher settings  (first index ?52?)*/
+  opt_add((void *) 4, -1, N_("rate"), OT_INT | OT_SYNTH, -100, 100, 8, "SET SELF RATE %d\r\n");
+  opt_add((void *) 8, -1, N_("pitch"), OT_INT | OT_SYNTH, -100, 100, 8, "SET SELF PITCH %d\r\n");
+  opt_add((void *) 12, -1, N_("volume"), OT_INT | OT_SYNTH, -100, 100, 8, "SET SELF VOLUME %d\r\n");
+/* Language shouldn't be an enumeration!  Fix me! */
+/* Available languages: English, Spanish, and Latin. */
+  opt_add((void *) 16, -1, N_("language"), OT_ENUM | OT_SYNTH, 3, N_("en"), N_("es"), N_("la"), 8, "SET SELF LANGUAGE %s\r\n");
+/* Output module shouldn't be an enumeration, either. */
+  opt_add((void *) 20, -1, N_("output module"), OT_ENUM | OT_SYNTH, 3, N_("espeak"), N_("flite"), N_("ibmtts"), 8, "SET SELF OUTPUT_MODULE %s\r\n");
+  opt_add((void *) 0, -1, N_("punctuation"), OT_ENUM | OT_SYNTH, 3, N_("none"), N_("some"), N_("all"), 8, "SET SELF PUNCTUATION %s\r\n");
 }
