@@ -1,14 +1,14 @@
-# yasr i18n template
-# Copyright (C) 2008 Michael P. Gorse
-# This file is distributed under the same license as the yasr package.
-# Michael P. Gorse <mgorse@alum.wpi.edu>, 2008.
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR Michael P. Gorse
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: yasr 0.6.8\n"
 "Report-Msgid-Bugs-To: mgorse@alum.wpi.edu\n"
-"POT-Creation-Date: 2007-11-12 20:16-0500\n"
+"POT-Creation-Date: 2008-02-02 08:08-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -223,16 +223,17 @@ msgstr ""
 
 #: yasr/option.c:762 yasr/option.c:773 yasr/option.c:779 yasr/option.c:783
 #: yasr/option.c:791 yasr/option.c:798 yasr/option.c:808 yasr/option.c:811
+#: yasr/option.c:821
 msgid "rate"
 msgstr ""
 
 #: yasr/option.c:763 yasr/option.c:784 yasr/option.c:792 yasr/option.c:799
-#: yasr/option.c:813
+#: yasr/option.c:813 yasr/option.c:822
 msgid "pitch"
 msgstr ""
 
 #: yasr/option.c:764 yasr/option.c:774 yasr/option.c:785 yasr/option.c:793
-#: yasr/option.c:804 yasr/option.c:812
+#: yasr/option.c:804 yasr/option.c:812 yasr/option.c:823
 msgid "volume"
 msgstr ""
 
@@ -310,19 +311,22 @@ msgid "val"
 msgstr ""
 
 #: yasr/option.c:776 yasr/option.c:780 yasr/option.c:788 yasr/option.c:794
-#: yasr/option.c:797
+#: yasr/option.c:797 yasr/option.c:829
 msgid "punctuation"
 msgstr ""
 
 #: yasr/option.c:776 yasr/option.c:780 yasr/option.c:788 yasr/option.c:794
+#: yasr/option.c:829
 msgid "some"
 msgstr ""
 
 #: yasr/option.c:776 yasr/option.c:780 yasr/option.c:788 yasr/option.c:794
+#: yasr/option.c:829
 msgid "none"
 msgstr ""
 
 #: yasr/option.c:776 yasr/option.c:780 yasr/option.c:788 yasr/option.c:794
+#: yasr/option.c:829
 msgid "all"
 msgstr ""
 
@@ -394,11 +398,43 @@ msgstr ""
 msgid "deviceonwarning"
 msgstr ""
 
+#: yasr/option.c:826
+msgid "language"
+msgstr ""
+
+#: yasr/option.c:826
+msgid "en"
+msgstr ""
+
+#: yasr/option.c:826
+msgid "es"
+msgstr ""
+
+#: yasr/option.c:826
+msgid "la"
+msgstr ""
+
+#: yasr/option.c:828
+msgid "output module"
+msgstr ""
+
+#: yasr/option.c:828
+msgid "espeak"
+msgstr ""
+
+#: yasr/option.c:828
+msgid "flite"
+msgstr ""
+
+#: yasr/option.c:828
+msgid "ibmtts"
+msgstr ""
+
 #: yasr/tts.c:465
 msgid "cap"
 msgstr ""
 
-#: yasr/tts.c:669
+#: yasr/tts.c:668
 msgid "Synthesizer reinitialized."
 msgstr ""
 

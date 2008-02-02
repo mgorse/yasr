@@ -1,3 +1,8 @@
+2008-02-02 Michael P. Gorse <mgorse@alum.wpi.edu>
+
+	* yasr/tts.c: Ifdef out unused tts_wait
+	* configure.in: Up version to 0.6.9
+
 2008-02-01 C.M. Brannon <cmbrannon@cox.net>
 
 	* configure.in, yasr/Makefile.am: Define PACKAGE_DATA_DIR in AM_CPPFLAGS,
