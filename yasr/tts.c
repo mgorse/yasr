@@ -111,6 +111,7 @@ void tts_flush()
  
 }
 
+#if 0
 static void tts_wait(int usecs)
 {
   char buf[100];
@@ -121,6 +122,7 @@ static void tts_wait(int usecs)
     read(tts.fd, buf, sizeof(buf));
   }
 }
+#endif
 
 void tts_silence()
 {
