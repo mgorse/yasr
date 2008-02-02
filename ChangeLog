@@ -1,3 +1,10 @@
+2008-02-01 C.M. Brannon <cmbrannon@cox.net>
+
+	* configure.in, yasr/Makefile.am: Define PACKAGE_DATA_DIR in AM_CPPFLAGS,
+	 rather than in config.h.  Reason: variables like ${datadir}
+	 are not expanded.
+	PACKAGE_LOCALE_DIR removed altogether, since it is not used.
+
 2008-01-31 C.M. Brannon <cmbrannon@cox.net>
 
 	* yasr/options.c, yasr/yasr.h: Add Speech-Dispatcher options.
