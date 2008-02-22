@@ -1,3 +1,8 @@
+2008-02-21 C.M. Brannon <cmbrannon@cox.net>
+
+	* yasr/options.c, yasr/yasr.h: Remove the language and output module
+	options.  Let Speech Dispatcher use its own defaults.
+
 2008-02-02 Michael P. Gorse <mgorse@alum.wpi.edu>
 
 	* yasr/tts.c: Ifdef out unused tts_wait

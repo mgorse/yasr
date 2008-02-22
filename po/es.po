@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: yasr 0.6.7\n"
 "Report-Msgid-Bugs-To: mgorse@alum.wpi.edu\n"
-"POT-Creation-Date: 2008-02-02 08:08-0500\n"
+"POT-Creation-Date: 2008-02-02 08:11-0500\n"
 "PO-Revision-Date: 2005-03-09 02:07+0100\n"
 "Last-Translator:  <javier@dorado.hopto.org>\n"
 "Language-Team: Spanish <es@li.org>\n"
@@ -432,11 +432,11 @@ msgstr ""
 msgid "ibmtts"
 msgstr ""
 
-#: yasr/tts.c:465
+#: yasr/tts.c:467
 msgid "cap"
 msgstr ""
 
-#: yasr/tts.c:668
+#: yasr/tts.c:670
 #, fuzzy
 msgid "Synthesizer reinitialized."
 msgstr "Puerto del sintetizador"
