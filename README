@@ -8,10 +8,10 @@ the user be able to access the tts device).  Yasr is developed under
 GNU/Linux, but I have attempted to port it to FreeBSD, and it should 
 work on similar Unix-like operating systems with minor tweaking.
 
-Yasr is still being developed, but I think it's becoming fairly usable, 
-as long as you have a Speak-out anyway.  Yasr also attempts to directly support
-the DEC-Talk, DoubleTalk, Braille 'n Speak, and Apollo, but work is needed to
-get these to work well.  It can also be used with Emacspeak servers, however.
+By default, yasr will attempt to communicate with a synthesizer via
+speech-dispatcher (using a client name of "yasr"), but it can also talk
+to Emacspeak servers or directly to a few synthesizers.  See yasr.conf
+for a list of possible settings.
 
 To install, see the INSTALL file.
 

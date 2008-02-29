@@ -29,11 +29,10 @@ should be on the screen by looking at the codes and text sent to the
 screen. It only requires that the user be able to access the text to speech
 (TTS) device.
 .LP
-.I yasr
-was originally designed in conjunction with a Speak-out TTS device.
-Yasr also attempts to support DEC-Talk, DoubleTalk, Apollo, and ViaVoice 
-Outloud,  but more work is needed to get these to work fully. It may be able 
-to work with Emacspeak servers, however.
+.I By default, yasr will attempt to communicate with a synthesizer via
+speech-dispatcher (using a client name of "yasr"), but it can also talk
+to Emacspeak servers or directly to a few synthesizers.  See yasr.conf
+for a list of possible settings.
 .LP
 Currently
 .I yasr

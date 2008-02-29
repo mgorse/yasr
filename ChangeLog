@@ -1,3 +1,7 @@
+2008-02-29 Michael P. GOrse <mgorse@alum.wpi.edu>
+
+	* README, yasr/yasr.1: update description of speech support.
+
 2008-02-21 C.M. Brannon <cmbrannon@cox.net>
 
 	* yasr/options.c, yasr/yasr.h: Remove the language and output module
