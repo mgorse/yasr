@@ -20,7 +20,10 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-
+#ifdef ENABLE_NLS
+#include <iconv.h>
+#include <langinfo.h>
+#endif
 #ifndef TRUE
 #define TRUE 1
 #endif
@@ -104,7 +107,7 @@ void tts_flush()
 {
   if (tts.outlen)
   {
-    speak(tts.buf, tts.outlen);
+    w_speak(tts.buf, tts.outlen);
   }
   
   tts.outlen = 0;
@@ -293,6 +296,171 @@ void tts_end()
   tts_send(synth[tts.synth].end, strlen(synth[tts.synth].end));
 }
 
+#ifdef ENABLE_NLS
+
+int is_unicode(unsigned char *buf,int len)
+{
+	int n;
+	while (len) {
+		if (!(*buf & 0x80)) {
+			buf++;
+			len--;
+			continue;
+		}
+		if (((*buf) & 0xe0)==0xc0) n=1;
+		else if (((*buf) & 0xf0)==0xe0) n=2;
+		else if (((*buf) & 0xf8)==0xf0) n=3;
+		else if (((*buf) & 0xfc)==0xf8) n=4;
+		else if (((*buf) & 0xfe)==0xfc) n=5;
+		else return 0;
+		buf++;len--;
+		while (n--) {
+			if (!len) return 0;
+			if (((*buf) & 0xc0)!=0x80) return 0;
+			len--;
+			buf++;
+		}
+	}
+	return 1;
+}
+
+void tts_send_iso(char *buf,int len)
+{
+  char outbuf[1024],*o;
+  iconv_t cd;
+  size_t l1,l2;
+  if (is_unicode(buf,len)) {
+    tts_send(buf,len);
+    return;
+  }
+  l1=len;
+  cd=iconv_open("UTF-8",nl_langinfo(CODESET));
+  if (cd == (iconv_t) -1) return;
+  while (l1) {
+    l2=1024;
+    o=outbuf;
+    iconv(cd,&buf,&l1,&o,&l2);
+    if (l2 == 1024) break;
+    tts_send(outbuf,o-outbuf);
+  }
+  iconv_close(cd);
+}
+
+#else
+
+#define tts_send_iso tts_send
+
+#endif
+
+
+/* simple conversion from wchar-t to utf-8
+   used by w_speak()
+*/
+
+void tts_out_w(wchar_t *buf,int len)
+{
+  char obuf[1024];
+  int obo = 0;
+  char *p;
+  int i;
+  int xml = 0; /* what's this? */
+    
+  if (!len) return;
+  opt_queue_empty(0);
+  if (tts.synth == TTS_SPEECHD)
+  {
+    tts_send("SPEAK\r\n", 7);
+    if (*buf=='.' && len>1 && buf[1] == '\r') {
+       tts_send(".",1);
+    }
+    while (len>0) {
+      if (len>=3 && buf[0]=='\r' && buf[1]=='.' && buf[2]=='\r') {
+        len-=3;
+        buf+=3;
+        continue;
+      }
+      if (*buf<0x80) {
+        obuf[obo++]=*buf;
+      } else if (*buf<0x800) {
+        obuf[obo++]=0xc0 | (*buf >> 6);
+        obuf[obo++]=0x80 | (*buf & 0x3f);
+      }
+      else if (*buf < 0x10000) {
+        obuf[obo++]=0xe0 | (*buf >> 12);
+        obuf[obo++]=0x80 | ((*buf >>6) & 0x3f);
+        obuf[obo++]=0x80 | (*buf & 0x3f);
+      } else obuf[obo++]=' ';
+      if (obo>=1020) {
+        tts_send(obuf,obo);
+        obo=0;
+      }
+      buf++;
+      len--;
+    }
+    if (obo) tts_send(obuf,obo);
+    tts_send("\r\n.\r\n", 5);
+    return;
+  }
+  /* for other synthesizers we assume they works internally in
+     ISO-8859-1 */
+  p = synth[tts.synth].say;
+  opt_queue_empty(0);
+  while (*p)
+  {
+    if (*p == '%')
+    {
+      p++;
+      for (i = 0; i < len; i++)
+      {
+	if (buf[i] > 255 || unspeakable((unsigned char)buf[i]))
+	{
+	  if (obo > 0 && obuf[obo - 1] != ' ')
+	  {
+	    obuf[obo++] = ' ';
+	    tts_send(obuf, obo);
+	    obo = 0;
+	  }
+	  else if (buf[i]<256 && dict[buf[i]])
+	  {
+	    (void) strcpy(obuf + obo, dict[buf[i]]);
+	    obo = strlen(obuf);
+	  }
+	  obuf[obo++] = 32;
+	}
+	else if (xml)
+	{
+	  switch (buf[i])
+	  {
+	  /* For some reason, &lt; does not work for me with Voxeo */
+	  case '<': strcpy(obuf + obo, " less than "); obo += 11; break;
+	  case '>': strcpy(obuf + obo, "&gt;"); obo += 4; break;
+	  case '&': strcpy(obuf + obo, "&amp;"); obo += 5; break;
+	  default: obuf[obo++] = buf[i]; break;
+	  }
+	}
+	else
+	{
+	  if (ui.split_caps && i > 0 && iswlower(buf[i-1]) && iswupper(buf[i]))
+	  {
+	    obuf[obo++] = ' ';
+	  }
+	  obuf[obo++] = buf[i];
+	}
+	if (obo > (sizeof(obuf) / sizeof(obuf[0])) - 6)
+	{
+	  tts_send(obuf, obo);
+	  obo = 0;
+	}
+      }
+    }
+    else
+    {
+      obuf[obo++] = *p;
+    }
+    p++;
+  }
+  tts_send(obuf, obo);
+}
 void tts_out(unsigned char *buf, int len)
 {
   char obuf[1024];
@@ -310,9 +478,9 @@ void tts_out(unsigned char *buf, int len)
     if (buf[0] == '.' && buf[1] == '\r') tts_send(".", 1);
     for (p = (char *)buf; (q = strstr(p + 1, "\r.\r")) && q < (char *)buf+len; p = q)
     {
-      tts_send(p, q - p);
+      tts_send_iso(p, q - p);
     }
-    tts_send(p, (long)buf + len - (long)p);
+    tts_send_iso(p, (long)buf + len - (long)p);
     tts_send("\r\n.\r\n", 5);
     return;
   }
@@ -392,8 +560,7 @@ void tts_say_printf(char *fmt, ...)
   va_end(arg);
 }
 
-
-void tts_saychar(unsigned char ch)
+void tts_saychar(wchar_t ch)
 {
   int i, j = 0;
   int stack[10];
@@ -404,11 +571,30 @@ void tts_saychar(unsigned char ch)
   }
   if (tts.synth == TTS_SPEECHD)
   {
-    if (ch == 32) tts_send("CHAR space\r\n", 12);
+    if (ch == 32 || ch == 160) tts_send("CHAR space\r\n", 12);
+#ifndef ENABLE_NLS
     else tts_printf_ll("CHAR %c\r\n", ch);
+#else
+    else if (ch < 0x80) {
+      tts_printf_ll("CHAR %c\r\n", ch);
+    }
+    else {
+      char buf[8],*cin,*cout;
+      size_t l1,l2;
+      iconv_t cd;
+      cd=iconv_open("UTF-8","WCHAR_T");
+      if (cd == (iconv_t) -1) return;
+      l1=sizeof(wchar_t);l2=7;
+      cin=(char *)&ch;cout=buf;
+      iconv(cd,&cin,&l1,&cout,&l2);
+      iconv_close(cd);
+      *cout=0;
+      tts_printf_ll("CHAR %s\r\n", buf);
+    }
+#endif    
     return;
   }
-  if (unspeakable(ch) && dict[ch])
+  if (unspeakable(ch) && ch < 128 && dict[ch])
   {
     tts_say(dict[ch]);
     return;
@@ -454,22 +640,37 @@ static char *ph_alph[] = {
   "yankee", "zulu"
 };
 
-
-void tts_sayphonetic(unsigned char ch)
+char *get_alph(wchar_t ch)
 {
-  if (!isalpha(ch))
+	char *c,buf[8];
+	if (!iswalpha(ch)) return NULL;
+	ch=towlower(ch);
+	c=NULL;
+	if (ch>='a' && ch<='z') c=ph_alph[ch-'a'];
+	if (tts.synth != TTS_SPEECHD) return c;
+	if (c) return _(c);
+	sprintf(buf,"#%x",(unsigned int)ch);
+	c=_(buf);
+	if (!c || *c=='#') return NULL;
+	return c;
+}
+
+void tts_sayphonetic(wchar_t ch)
+{
+  char *c;
+  c=get_alph(ch);
+  if (!c)
   {
     tts_saychar(ch);
     return;
   }
-  if (isupper(ch))
-  {
-    tts_say(_("cap"));
-  } else
-  {
-    ch = toupper(ch);
+  if (iswupper(ch)) {
+	char buf[64];
+	sprintf(buf,"%s %s",_("cap"),c);
+	tts_say(buf);
+	return;
   }
-  tts_say(ph_alph[--ch & 0x3f]);
+  tts_say(c);
 }
 
 static int open_tcp(char *port)
@@ -642,7 +843,7 @@ int tts_reinit2()
   return (0);
 }
 
-void tts_addchr(char ch)
+void tts_addchr(wchar_t ch)
 {
   tts.buf[tts.outlen++] = ch;
   if (tts.outlen > 250)

@@ -114,27 +114,29 @@ void ui_sayword(int cr, int cc)
   chartype *c;
   int cp;
   int i = 0;
+  wchar_t word_buf[256];
 
   c = win->row[cr] + cc;
   cp = cc;
-  while (cp && (*c & 0xff) > 32)
+  while (cp && c->wchar > 32)
   {
     c--;
     cp--;
   }
-  if ((*c & 0xff) <= 32)
+  if (c->wchar <= 32)
   {
     c++;
     cp++;
   }
-  while (cp < win->cols && (*c & 0xff) > 32)
+  while (cp < win->cols && c->wchar > 32)
   {
     cp++;
-    buf[i++] = realchar(*c++);
+    word_buf[i++] = realchar(c->wchar);
+    c++;
   }
   if (i)
   {
-    speak((char *) buf, i);
+    w_speak(word_buf, i);
   }
 }
 
@@ -284,7 +286,7 @@ void rev_word(int *argp)
 
 static void ui_sayphonetic(int row, int col)
 {
-  tts_sayphonetic((char) win->row[row][col]);
+  tts_sayphonetic(win->row[row][col].wchar);
 }
 
 
@@ -394,14 +396,19 @@ int ui_build_str(int ch)
   }
 }
 
-
+int s_strlen(unsigned short *c)
+{
+	int i;
+	for (i=0;c[i];i++);
+	return i;
+}
 static int rev_searchline(int l, int c1, int c2, int reverse)
 {
   int i, j, len;
   int a, b, step;
   chartype *cp;
 
-  len = strlen(rev.findbuf);
+  len = s_strlen(rev.findbuf);
   if (c2 == -1)
   {
     c2 = win->cols - len;
@@ -426,7 +433,7 @@ static int rev_searchline(int l, int c1, int c2, int reverse)
     for (j = 0; j < len; j++)
     {
       if (i + j < win->cols &&
-	  toupper(realchar(*(cp + j))) != toupper(rev.findbuf[j]))
+	  towupper(realchar((cp[j].wchar))) != towupper(rev.findbuf[j]))
       {
 	break;
       }
@@ -550,7 +557,8 @@ static int rev_find_aux(int ch)
   {
     return (1);
   }
-  rev.findbuf[rev.findbuflen++] = (char) ch;
+  tts_saychar(ch);
+  rev.findbuf[rev.findbuflen++] = ch;
 
   return (1);
 }
@@ -617,7 +625,7 @@ void rev_tocol(int *argp)
     c = 0;
     for (i = 0; i <= win->cols; i++)
     {
-      if (win->row[rev.cr][i] > ' ')
+      if (win->row[rev.cr][i].wchar > ' ')
       {
 	c = i;
       }
@@ -699,7 +707,7 @@ static int line_is_blank(int row, int c1, int c2)
   rptr = win->row[row] + c1;
   for (i = 0; i < len; i++)
   {
-    if (!y_isblank(*rptr++))
+    if (!y_isblank((rptr++)->wchar))
       return 0;
   }
   return 1;
@@ -845,7 +853,7 @@ int ui_keypress(int key)
 
 void ui_saychar(int row, int col)
 {
-  tts_saychar((char) win->row[row][col]);
+  tts_saychar(win->row[row][col].wchar);
 }
 
 
@@ -860,7 +868,7 @@ void ui_saylinepart(int row, int c1, int c2, int say_blank)
   int len;
   chartype *rptr;
   int i;
-
+  wchar_t line_buf[256];
   if (c2 == -1)
   {
     c2 = win->cols;
@@ -869,8 +877,8 @@ void ui_saylinepart(int row, int c1, int c2, int say_blank)
   rptr = win->row[row] + c1;
   for (i = 0; i < len; i++)
   {
-    buf[i] = realchar(*(rptr++));
-    if (buf[i] != 32)
+    line_buf[i] = realchar((rptr++)->wchar);
+    if (line_buf[i] != 32)
       blank = 0;
   }
   if (blank)
@@ -881,7 +889,7 @@ void ui_saylinepart(int row, int c1, int c2, int say_blank)
     }
     return;
   }
-  speak((char *) buf, len);
+  w_speak(line_buf, len);
 }
 
 void ui_sayline(int row, int say_blank)
@@ -1041,5 +1049,5 @@ void ui_opt_set(int *argp)
     cr = win->cr;
     cc = win->cc;
   }
-  tts_say_printf("%d", win->row[cr][cc] & 0xff);
+  tts_say_printf("%d", win->row[cr][cc].wchar);
 }

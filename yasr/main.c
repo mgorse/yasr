@@ -32,12 +32,15 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/wait.h>
-
+#include <langinfo.h>
+#include <iconv.h>
+iconv_t ih_inp;
 static int cpid;
-static int size;
+static int size,wsize;
 static int master, slave;
 char *conffile = NULL;
 unsigned char buf[256];
+wchar_t wide_buf[256];
 char usershell[OPT_STR_SIZE];
 static struct termios t;
 Win *win;
@@ -49,7 +52,7 @@ Uirev rev;
 static int speaking = 1;
 int kbuf[100];
 int kbuflen = 0;
-static unsigned char okbuf[100];
+static wchar_t okbuf[100];
 static int okbuflen = 0;
 static int oldcr = 0, oldcc = 0, oldch = 0;
 char voices[TTS_SYNTH_COUNT][64];
@@ -64,7 +67,6 @@ static Win *wininit(int, int);
 static void win_end(Win *);
 
 extern char **environ;
-
 
 #define PARM1 (parm[0] ? parm[0] : 1)
 #define PARM2 (parm[1] ? parm[1] : 1)
@@ -266,6 +268,7 @@ static int is_char(int ch)
 static int is_separator(int ch)
 {
   int result=0;
+  return !iswalnum(ch);
   if ((ch != ch % 0xFF) || isspace(ch))
   {
     result=1;
@@ -281,17 +284,31 @@ static int is_separator(int ch)
   return result;
 }
 
-
-
-
-static void getinput()
+/*
+  I assume the buffer contains single (may be multibyte)
+  character or control sequence
+ * MPG: This code is wrong (ie, 1bxx can be U+1bxx or a control char, and
+ * these cannot be distinguished by this code).  Key really should be a
+ * struct.  Re-working this could be part of a larger re-working of
+ * keybindings to make their names more intuitive in yasr.conf.
+*/
+static int getkey_buf()
 {
+  char *b1,*b2;
+  size_t s1,s2;
+  wchar_t ch;
   int key;
+  int result;
 
-  size = read(0, buf, 255);
-  if (size <= 0)
-  {
-    finish(0);
+  s1=size;
+  s2=sizeof(wchar_t);
+  b1=buf;
+  b2=(char *)&ch;
+  iconv(ih_inp,NULL,NULL,NULL,NULL);
+  result = iconv(ih_inp,&b1,&s1,&b2,&s2);
+  if (result == -1) perror("iconv");
+  if (result != -1) {
+    if (!s1) return ch;
   }
   key = (int) buf[0];
   if (size > 1)
@@ -315,6 +332,19 @@ static void getinput()
 #ifndef __linux__
   if (key >= 0x80 && key <= 0xff) key += 0x1a80;
 #endif
+  return key;
+}
+
+static void getinput()
+{
+  int key;
+
+  size = read(0, buf, 255);
+  if (size <= 0)
+  {
+    finish(0);
+  }
+  key = getkey_buf();
   if (key == ui.disable)
   {
     if (ui.disabled)
@@ -351,7 +381,7 @@ static void getinput()
   }
   if (ui.kbsay == 2 && is_separator(key))
   {
-    tts_out(okbuf, okbuflen);
+    tts_out_w(okbuf, okbuflen);
     okbuflen = tts.oflag = 0;
   }
   if (!ui_keypress(key))
@@ -458,7 +488,8 @@ int readable(int fd, int wait)
   return (FD_ISSET(fd, &fds));
 }
 
-static char *gulp(unsigned char *buf, int *size, unsigned char *cp, unsigned char **ep)
+#if 0
+static char *oldgulp(unsigned char *buf, int *size, unsigned char *cp, unsigned char **ep)
 {
   int os = *size;
   int n;
@@ -484,6 +515,68 @@ static char *gulp(unsigned char *buf, int *size, unsigned char *cp, unsigned cha
   *size += read(master, buf + *size, 255 - *size);
   buf[*size] = '\0';
   return ((char *) (buf + os));
+}
+
+#endif
+
+/*!
+function reads portion of data into buf and converts
+to wide string, leaving 'leave' character in wide_buf;
+*/
+static int bytes_left;
+static char *bytes_left_start;
+static void read_buf(int leave)
+{
+  char *b1,*b2;
+  size_t s1,s2;
+  if (bytes_left) {
+    memcpy(buf,bytes_left_start,bytes_left);
+  }
+  size=read(master,buf+bytes_left,255-bytes_left-leave);
+  if (size<0)
+  {
+    perror("read");
+    exit(1);
+  }
+  write(1,buf+bytes_left,size);
+  size+=bytes_left;
+  buf[size]=0;
+  bytes_left=0;
+  b1=(char *)buf;
+  b2=(char *)(wide_buf+leave);
+  if (leave) memcpy(wide_buf,wide_buf+wsize-leave,sizeof(wchar_t)*(wsize-leave));
+  s1=size;
+  s2=(255-leave)*sizeof(wchar_t);
+  while (s1>0)
+    {
+    
+    iconv(ih_inp,NULL,NULL,NULL,NULL);
+    if (iconv(ih_inp,&b1,&s1,&b2,&s2) == (size_t)-1)
+    {
+      if (errno ==EINVAL) /* incomplete sequence at end of buffer */
+      {
+	break;
+      }
+      /* invalid multibyte sequence - should we ignore or insert
+         some character meaning 'invalid'? */
+      b1++;
+      s1--;
+    }
+  }
+  bytes_left=s1;
+  bytes_left_start=b1;
+  wsize=(wchar_t*)b2 - wide_buf;
+  wide_buf[wsize]=0;
+}
+static wchar_t *gulp(wchar_t *cp, wchar_t **ep)
+{
+  int leave;
+  if (!ep) leave=0;
+  else leave=wsize-(*ep-wide_buf);
+  if (!readable(master, 1000000)) return NULL;
+  read_buf(leave);
+  if (ep) *ep=wide_buf;
+  return wide_buf;
 }
 
 static void kbsay()
@@ -514,25 +607,34 @@ static void kbsay()
 }
 
 #define MIN(a, b) ((a)>(b)? (b): (a))
+static long strwtol(wchar_t **p)
+{
+  long t=0;
+  while (iswdigit(**p))
+  {
+    t=10*t + *(*p)++ - '0';
+  }
+  return t;
+}
 
-static void win_csi(char *buf, unsigned char **pp, int *size)
+static void win_csi(wchar_t **pp)
 {
   int parm[16], numparms = 0;
   int ignore = 0;
-  char *p;
+  wchar_t *p;
   int i;
   int x;
 
-  p = (char *) *pp;
+  p = *pp;
   if (*p == '[')
     p++;
   if (*p == '?')
     p++;
-  while (!*p || isdigit((int) *p) || *p == ';')
+  while (!*p || iswdigit((int) *p) || *p == ';')
   {
     if (!*p)
     {
-      if (!(p = gulp((unsigned char *) buf, size, (unsigned char *) p, pp)))
+      if (!(p = gulp(p, pp)))
       {
 	return;
       }
@@ -542,7 +644,7 @@ static void win_csi(char *buf, unsigned char **pp, int *size)
       p++;
     }
   }
-  p = (char *) *pp;
+  p = *pp;
   if (*p == '[')
   {
     ignore = 1;
@@ -553,17 +655,13 @@ static void win_csi(char *buf, unsigned char **pp, int *size)
     p++;
   }
   (void) memset(&parm, 0, sizeof(int) * 16);
-  while (numparms < 16 && (*p == ';' || isdigit((int) *p)))
+  while (numparms < 16 && (*p == ';' || iswdigit((int) *p)))
   {
-    parm[numparms++] = atoi(p);
-    while (isdigit((int) *p))
-    {
-      p++;
-    }
+    parm[numparms++] = strwtol(&p);
     if (*p == ';') p++; else break;	/* tbd -- is this redundant? */
   }
 
-  *pp = (unsigned char *) p + 1;
+  *pp = p + 1;
   if (ignore)
   {
     return;
@@ -814,7 +912,7 @@ static void win_csi(char *buf, unsigned char **pp, int *size)
   else if (win->cc < 0) win->cc = 0;
 }
 
-static void win_addchr(char ch, int tflag)
+static void win_addchr(wchar_t ch, int tflag)
 {
   if (win->cc == win->cols)
   {
@@ -826,7 +924,8 @@ static void win_addchr(char ch, int tflag)
   {
     (void) memmove(win->row[win->cr] + win->cc + 1, win->row[win->cr] + win->cc, (win->cols - win->cc - 1) * CHARSIZE);
   }
-  win->row[win->cr][win->cc++] = (win->attr << 8) + ch;
+  win->row[win->cr][win->cc].attr = win->attr;
+  win->row[win->cr][win->cc++].wchar = ch;
   if (tflag)
   {
     if (ui.silent != 1)
@@ -836,17 +935,10 @@ static void win_addchr(char ch, int tflag)
   }
 }
 
-char realchar(chartype ch)
+wchar_t realchar(wchar_t ch)
 {
-  char r;
-
-  r = ch & 0xff;
-  if (!r)
-  {
-    r = 32;
-  }
-
-  return (r);
+  if (!ch) return 32;
+  return ch;
 }
 
 /* bol -- beginning of line? */
@@ -858,7 +950,7 @@ static int bol(int cr, int cc)
   rptr = win->row[cr];
   for (i = 0; i < cc; i++)
   {
-    if (y_isblank(rptr[i]))
+    if (y_isblank(rptr[i].wchar))
     {
       return (0);
     }
@@ -877,7 +969,7 @@ static int eol(int cr, int cc)
   rptr = win->row[cr];
   for (i = cc + 1; i < win->cols; i++)
   {
-    if (y_isblank(rptr[i]))
+    if (y_isblank(rptr[i].wchar))
     {
       return (0);
     }
@@ -895,13 +987,13 @@ static int firstword(int cr, int cc)
 
   rptr = win->row[cr];
   i = cc;
-  while (i && !y_isblank(rptr[i]))
+  while (i && !y_isblank(rptr[i].wchar))
   {
     i--;
   }
   for (; i; i--)
   {
-    if (!y_isblank(rptr[i]))
+    if (!y_isblank(rptr[i].wchar))
     {
       return (0);
     }
@@ -918,17 +1010,17 @@ static int firstword(int cr, int cc)
   int i = 0;
 
   rptr = win->row[cr];
-  if (y_isblank(rptr[i]))
+  if (y_isblank(rptr[i].wchar))
   {
     i++;
   }
-  while (i < win->cols && !y_isblank(rptr[i]))
+  while (i < win->cols && !y_isblank(rptr[i].wchar))
   {
     i++;
   }
   while (i < win->cols)
   {
-    if (!y_isblank(rptr[i++]))
+    if (!y_isblank(rptr[i++].wchar))
     {
       return (0);
     }
@@ -939,20 +1031,13 @@ static int firstword(int cr, int cc)
 
 static void getoutput()
 {
-  char ch = 0;
-  unsigned char *p;
+  wchar_t ch = 0;
+  wchar_t *p;
   int i;
   int chr = 0;
   static int stathit = 0, oldoflag = 0;
 
-  size = read(master, buf, 255);
-  if (size < 0)
-  {
-    perror("read");
-    exit(1);
-  }
-  buf[size] = 0;
-
+  read_buf(0);
 #ifdef TERMTEST
   (void) printf("size=%d buf=%s\n", size, buf);
 #endif
@@ -961,10 +1046,9 @@ static void getoutput()
   {
     finish(0);
   }
-  (void) write(1, buf, size);
-  p = buf;
+  p = wide_buf;
 
-  while (p - buf < size)
+  while (p - wide_buf < wsize)
   {
     switch (ch = *p++)
     {
@@ -1021,7 +1105,7 @@ static void getoutput()
       break;			/* may need to change in the future */
 
     case 27:
-      if (!*p && !(p = (unsigned char *) gulp(buf, &size, p, NULL)))
+      if (!*p && !(p = gulp(p, NULL)))
       {
 	return;
       }
@@ -1046,7 +1130,7 @@ static void getoutput()
 	wincpy(&win, winsave);
 	break;
       case '[':
-	win_csi((char *) buf, &p, &size);
+	win_csi(&p);
 	break;
       }
       break;
@@ -1069,7 +1153,7 @@ static void getoutput()
 	}
       }
 #endif
-      if (ch == (char)kbuf[0] && win->cr == oldcr && win->cc == oldcc && kbuflen)
+      if (ch == kbuf[0] && win->cr == oldcr && win->cc == oldcc && kbuflen)
       {
 /* this character was (probably) echoed as a result of a keystroke */
 	kbsay();
@@ -1118,7 +1202,7 @@ static void getoutput()
     tts.oflag = stathit = 0;
     oldcr = win->cr;
     oldcc = win->cc;
-    oldch = win->row[win->cr][win->cc];
+    oldch = win->row[win->cr][win->cc].wchar;
     return;
   }
   stathit = tts.outlen = 0;
@@ -1131,7 +1215,7 @@ static void getoutput()
     switch (win->cc - oldcc)
     {
     case 1:			/* cursor moved right one character */
-      if ((realchar(win->row[win->cr][win->cc - 1]) == kbuf[0] &&
+      if ((realchar(win->row[win->cr][win->cc - 1].wchar) == kbuf[0] &&
 	   realchar(oldch) != kbuf[0]) ||
 	  ((y_isblank(oldch) && kbuf[0] == 32)))
       {
@@ -1224,7 +1308,7 @@ static void getoutput()
   }
   oldcr = win->cr;
   oldcc = win->cc;
-  oldch = win->row[win->cr][win->cc];
+  oldch = win->row[win->cr][win->cc].wchar;
 }
 
 static void get_tts_input()
@@ -1292,6 +1376,7 @@ int isctty()
 }
 #endif
 
+char charmap[64]="ASCII";
 int main(int argc, char *argv[])
 {
   struct winsize winsz = { 0, 0 };
@@ -1302,6 +1387,14 @@ int main(int argc, char *argv[])
   setlocale(LC_ALL, "");
   bindtextdomain(PACKAGE, LOCALEDIR);
   textdomain(PACKAGE);
+  strcpy(charmap,nl_langinfo(CODESET));
+  ih_inp=iconv_open("WCHAR_T",charmap);
+  if (ih_inp==(iconv_t)-1) {
+  	fprintf(stderr,"Codeset %s not supported\n",charmap);
+	exit(1);
+  }
+  
+  	
 #endif
 
   if (argv[0][0] == '-') shell = 1;
@@ -1414,6 +1507,62 @@ static Win *wininit(int nr, int nc)
   return (win);
 }
 
+
+void w_speak(wchar_t *ibuf,int len)
+{
+  char obuf[1024];
+  int olen;
+  wchar_t *wstart;
+  int lc=0, nc=0;
+  int len1;
+  int i;
+  
+  if (!len) len=wcslen(ibuf);
+  len1 = len-1;
+  wstart=ibuf;
+  olen=0;
+  for (i = 0; i < len; i++)
+  {
+    if (ibuf[i] == lc && ++nc == ui.minrc - 1)
+    {
+      olen -= nc;
+      if (olen)
+      {
+	tts_out_w(wstart, olen);
+      }
+      olen = 0;
+      while (i < len1 && ibuf[i + 1] == lc)
+      {
+	i++;
+	nc++;
+      }
+      tts_saychar(lc);
+      tts_out((unsigned char *) obuf, sprintf(obuf, "%s %d %s\r",_("repeats"), nc + 1,_("times")));
+      nc = 0;
+    }
+	else
+    {
+      if (!olen) wstart=ibuf+i;
+      olen++;
+      if (ibuf[i] != lc)
+      {
+	nc = 0;
+      }
+      if (!iswalnum(ibuf[i]) &&
+	  ibuf[i] != 32 && ibuf[i] != '=' && ibuf[i] >= 0)
+      {
+	lc = ibuf[i];
+      }
+      else lc = 0;
+    }
+  }
+  if (olen)
+  {
+    tts_out_w(wstart,olen);
+  }
+}
+
+#if 0
 void speak(char *ibuf, int len)
 {
   char obuf[1024];
@@ -1468,3 +1617,4 @@ void speak(char *ibuf, int len)
     tts_out((unsigned char *) obuf, olen);
   }
 }
+#endif

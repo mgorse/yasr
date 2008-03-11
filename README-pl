@@ -1,0 +1,98 @@
+YASR ("Yet Another Screen Reader") jest moj± prób± stworzenia lekkiego,
+przeno¶nego screenreadera. Dzia³a poprzez otwarcie shella w
+pseudoterminalu i przechwytywanie ca³ego wej¶cia/wyj¶cia u¿ytkownika,
+utrzymuj±c wewnêtrzny obraz tego, co powinno byæ wy¶wietlone na ekranie
+obserwuj±c kody i teksty wysy³ane na ekran. Nie u¿ywa ¿adnych
+"linuksizmów" typu /dev/vcsa0 i nie musi byæ suidowany na roota (jedynym
+wymaganiem jest dostêp u¿ytkownika do syntezatora). Yasr jest tworzony
+na licencji GNU/Linux, lecz podejmowa³em próby portowania go na FreeBSD
+i powinien on dzia³aæ na uniksopodobnych systemach po ma³ych
+przeróbkach.
+
+Domy¶lnie Yasr próbuje komunikowaæ siê z syntezatorem poprzez
+speech-dispatchera (u¿ywaj±c nazwy klienta "yasr"), lecz mo¿e on równie¿
+wspó³pracowaæ z serwerami Emacspeak lub bezpo¶rednio z niektórymi
+syntezatorami. Szczegó³y w pliku yasr.conf.
+
+Instrukcja instalacji - patrz plik INSTALL.
+
+Domy¶lnie plik yasr.conf bêdzie skopiowany do /usr/local/share/yasr.
+Je¶li potrzebujesz w³asnego pliku konfiguracyjnego ze swoimi opcjami,
+powiniene¶ skopiowaæ ten plik do katalogu domowego jako .yasr.conf i
+dokonaæ poprawek w tym pliku. ~/.yasr.conf jest sprawdzany jako
+pierwszy. Ten plik zawiera wszystkie definicje klawiszy oraz opcje,
+które mog± byæ zmieniane poprzez modyfikacjê pliku. Wiêkszo¶æ opcji mo¿e
+byæ równie¿ ustawiana bezpo¶rednio z poziomu programu.
+
+Aktualnie yasr ma dwa zestawy map klawiatury, jedn± do "trybu
+przegl±dania" (tzn. przegl±dania zawarto¶ci ekranu) i jedn± dla trybu
+standardowego. Klawisze zdefiniowane dla trybu standardowego dzia³aj±
+równie¿ w trybie przegl±dania, jednak w tym trybie klawisze zdefiniowane
+dla trybu przegl±dania sprawdzane s± jako pierwsze. Poni¿ej znajduje siê
+lista klawiszy wraz z przypisanymi im domy¶lnie funkcjami. Klawisze
+poprzedzone [n] mog± byæ opcjonalnie poprzedzone cyfr±.
+
+-- Tryb przegl±dania --
+
+spacja: Podaje pozycjê kursora przegl±du.
+^: Skacze do pocz±tku linii i czyta s³owo.
+$: Skacze do ostatniego znaku linii i czyta s³owo.
+[n]b: Czyta poprzedni znak.
+[n]c: Czyta znak.
+[n]d: Czyta nastêpny znak.
+e: Czyta od pozycji kursora do koñca ekranu.
+f: Wyszukuje tekst na ekranie.
+<: Szuka od kursora do góry ekranu u¿ywaj±c wprowadzonego uprzednio
+   tekstu.
+>: Szuka od kursora do koñca ekranu u¿ywaj±c wprowadzonego uprzednio
+   tekstu.
+[n]k: Przechodzi do poprzedniej linii i czyta liniê (jak strza³ka w
+   górê).
+[n]l: Czyta bie¿±c± liniê.
+[n]m: Przechodzi do nastêpnej linii i czyta liniê (jak strza³ka w dó³).
+n: Przekazuje nastêpny klawisz do aplikacji.
+t: Czyta od pocz±tku ekranu do pozycji kursora.
+w: Czyta ca³y ekran.
+z: Skacze do pocz±tku poprzedniego s³owa i czyta s³owo.
+x: Skacze do pocz±tku nastêpnego s³owa i czyta s³owo.
+[n]strza³ka w górê: Przechodzi do poprzedniej linii i czyta liniê.
+[n]strza³ka w dó³: Przechodzi do nastêpnej linii i czyta liniê.
+[n]strza³ka w lewo: Cofa do poprzedniego znaku i czyta znak.
+[n]strza³ka w prawo: Przechodzi do nastêpnego znaku i czyta znak.
+(: Przechodzi do przedniego akapitu.
+): Przechodzi do nastêpnego akapitu.
+alt-i: Reinicjalizuje syntezator.
+`: Czyta kod ASCII bie¿±cego znaku.
+
+-- tryb standardowy (dzia³a równie¿ w trybie przegl±dania) --
+
+ctrl-a: Podaje pozycjê kursora aplikacji.
+ctrl-l: Czyta liniê.
+ctrl-n: Przekazuje nastêpny klawisz do aplikacji.
+ctrl-x: Opró¿nia bufor mowy.
+alt-b: Czyta poprzedni znak.
+alt-c: Czyta bie¿±cy znak.
+alt-d: Czyta s³owo.
+alt-e: Czyta od kursora do koñca ekranu.
+alt-k: Czyta poprzedni± liniê.
+alt-l: Czyta liniê.
+alt-m: Czyta nastêpn± liniê.
+alt-r: Prze³±cza tryb przegl±dania.
+alt-t: Czyta od pocz±tku ekranu do kursora.
+alt-w: Czyta ca³y ekran.
+alt-x: Wy³±cza mowê a¿ do naci¶niêcia dowolnego klawisza (np.
+       wci¶niêcie ponowne w³±cza mowê).
+ctrl-alt-k: Asystent ustawieñ klawiatury. Pozwala na przenoszenie,
+       kopiowanie lub usuwanie kombinacji klawiszy.
+ctrl-alt-o: Menu opcji.
+ctrl-alt-s: Zapis konfiguracji na dysk.
+alt-enter: Zawiesza yasr. Yasr nic nie mówi i ignoruje w tym stanie
+       wszystkie kombinacje klawiszy.
+       Naci¶nij jeszcze raz dla uaktywnienia.
+       Uwaga: ten klawisz jest zdefiniowany w sekcji [options] jako
+       "DisableKey".
+
+Sugestie, patche itd. mile widziane.
+
+   -Michael P. Gorse <mgorse@users.sourceforge.net>
+   

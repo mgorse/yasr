@@ -13,7 +13,7 @@ m4 \
 pkgdata_DATA = \
 	yasr.conf
 
-EXTRA_DIST = config.rpath  \
+EXTRA_DIST = config.rpath  config.rpath  \
 	$(pkgdata_DATA) \
 	autogen.sh \
 	depcomp \

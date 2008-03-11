@@ -54,10 +54,14 @@
 #endif
 
 #include <errno.h>
-
+#include <wchar.h>
+#include <wctype.h>
 #include "tts.h"
 
-typedef short chartype;
+typedef struct {
+  unsigned short attr;
+  unsigned short wchar;
+} chartype;
 
 typedef unsigned char uchar;
 
@@ -128,7 +132,7 @@ struct Tts
     int obufhead, obuflen, obuftail;
     int oflag;			/* set to 1 every time tts_send is called */
     int outlen;
-    char buf[256];
+    wchar_t buf[256];
     int synth;
     pid_t pid;
     char port[OPT_STR_SIZE];
@@ -145,7 +149,7 @@ struct Uirev
     int meta;
     int repeat;
     int udmode;
-    char findbuf[200];
+    unsigned short findbuf[200];
     int findbuflen;
     int used;
     Keymap keymap;
@@ -213,7 +217,7 @@ extern char usershell[OPT_STR_SIZE];
 extern char ttsbuf[80];
 extern char voices[TTS_SYNTH_COUNT][64];
 extern int special;
-
+extern char charmap[];
 extern Func funcs[];
 
 /* ui.c prototypes */
@@ -257,11 +261,12 @@ extern void uinit();
 extern void tts_charoff();
 extern void tts_printf_ll(const char *str, ...);
 extern void tts_charon();
-extern void tts_addchr(char ch);
+extern void tts_addchr(wchar_t ch);
 extern void tts_out(unsigned char *ibuf, int len);
+extern void tts_out_w(wchar_t *ibuf, int len);
 extern void tts_say(char *buf);
-extern void tts_saychar(unsigned char ch);
-extern void tts_sayphonetic(unsigned char ch);
+extern void tts_saychar(wchar_t ch);
+extern void tts_sayphonetic(wchar_t ch);
 extern void tts_send(char *buf, int len);
 extern void tts_flush();
 extern void tts_silence();
@@ -278,9 +283,10 @@ extern void dict_write(FILE * fp);
 extern void readconf();
 
 /* main.c prototypes */
-void speak(char *ibuf, int len);
-extern char realchar(chartype ch);
-int readable(int fd, int wait);
+extern void speak(char *ibuf, int len);
+extern void w_speak(wchar_t *ibuf, int len);
+extern wchar_t realchar(wchar_t ch);
+extern int readable(int fd, int wait);
 
 /* debug.c prototypes */
 extern void open_debug(char *);
@@ -323,7 +329,7 @@ extern int forkpty(int *, char *, struct termios *, struct winsize *);
 /* tbc - Would it be more efficient to ensure that "blank" grids always held
    ascii 0x20 rather than ascii 0x00? */
 #define y_isblank(ch) ((ch & 0xdf) == 0)
-#define cblank(r, c)  ((win->row[r][c] & 0xdf) == 0)
+#define cblank(r, c)  ((win->row[r][c].wchar & 0xdf) == 0)
 #define ttssend(x)    if (x) tts_send(x, strlen(x))
 
 #define NUMOPTS 57
