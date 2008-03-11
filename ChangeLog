@@ -1,3 +1,9 @@
+2008-03-11 Michael P. Gorse <mgorse@alum.wpi.edu>
+
+	* main.c: Remove perror that I'd added.
+	* ui.c (rev_find_aux): Only echo keys if key echo on (word echo still
+	tbd)
+
 2008-03-11 Bohdan R. Rau <ethanak@polip.com>
 
 	* README-pl: Added.
