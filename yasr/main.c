@@ -306,7 +306,6 @@ static int getkey_buf()
   b2=(char *)&ch;
   iconv(ih_inp,NULL,NULL,NULL,NULL);
   result = iconv(ih_inp,&b1,&s1,&b2,&s2);
-  if (result == -1) perror("iconv");
   if (result != -1) {
     if (!s1) return ch;
   }
