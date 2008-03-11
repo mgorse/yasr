@@ -557,7 +557,8 @@ static int rev_find_aux(int ch)
   {
     return (1);
   }
-  tts_saychar(ch);
+  /* tbd - support word echo */
+  if (ui.kbsay != 0) tts_saychar(ch);
   rev.findbuf[rev.findbuflen++] = ch;
 
   return (1);
