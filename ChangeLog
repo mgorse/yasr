@@ -1,3 +1,7 @@
+2009-08-19 William Hubbs <william@gentoo.org>
+
+	* yasr/yasr.h: Remove openpty and forkpty prototypes (gcc 4.3 compat)
+
 2008-03-11 Michael P. Gorse <mgorse@alum.wpi.edu>
 
 	* main.c: Remove perror that I'd added.
