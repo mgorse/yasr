@@ -199,6 +199,7 @@ static int ofd;
     tts.obufhead += len2;
     if (len2 < len)
     {
+      tts_checkreset();
       tts.oflag = oldoflag;
       (void) signal(SIGALRM, &tts_obufout);
       alarm(1);
@@ -843,6 +844,23 @@ int tts_reinit2()
   return (0);
 }
 
+void tts_checkreset()
+{
+  int status;
+
+  /*If we don't have a child, do nothing*/
+  if (tts.pid <= 0)
+    return;
+
+  status = kill(tts.pid, 0);
+  if (!status)
+    return; /*There's a process, it's good*/
+
+  /*There's no process, so let's fork a new synth engine*/
+  close(tts.fd);
+  tts_init(FALSE);
+}
+ 
 void tts_addchr(wchar_t ch)
 {
   tts.buf[tts.outlen++] = ch;
