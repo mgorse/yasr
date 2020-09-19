@@ -916,7 +916,7 @@ void ui_silence(int *argp)
 
 static void ui_saypos(int row, int col)
 {
-  char buf[20];
+  char buf[40];
 
   (void) sprintf(buf, "c%dl%d", col + 1, row + 1);
   tts_say(buf);

@@ -83,7 +83,7 @@ static void child()
 {
   char arg[20];
   char *cp;
-  char envstr[40];
+  char envstr[512];
 
   (void) login_tty(slave);
   if (!geteuid())

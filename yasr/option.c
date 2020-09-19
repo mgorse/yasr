@@ -518,7 +518,7 @@ int optmenu(int ch)
     {
       if ((opt[i].type & 0x3f) == OT_TREE &&
 	  opt[i].v.submenu == opt[curopt].tree &&
-	  (!opt[i].type & OT_SYNTH ||
+	  (!(opt[i].type & OT_SYNTH) ||
 	   opt[i].synth == tts.synth || opt[i].synth == -1))
       {
 	curopt = i;

@@ -276,6 +276,7 @@ extern void tts_reinit(int *argp);
 extern int tts_reinit2();
 extern void tts_say_printf(char *fmt, ...);
 extern void tts_initsynth(int *argp);
+extern void tts_checkreset();
 extern int dict_read(char *buf);
 extern void dict_write(FILE * fp);
 

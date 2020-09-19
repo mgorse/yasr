@@ -330,7 +330,7 @@ void tts_send_iso(char *buf,int len)
   char outbuf[1024],*o;
   iconv_t cd;
   size_t l1,l2;
-  if (is_unicode(buf,len)) {
+  if (is_unicode((unsigned char *)buf, len)) {
     tts_send(buf,len);
     return;
   }
@@ -824,7 +824,6 @@ int tts_init( int first_call)
   }
   if (tts.synth == TTS_SPEECHD)
   {
-    char buf[200];
     char *logname = getenv("LOGNAME");
     if (logname == NULL) logname = getlogin();
     tts_printf_ll("SET self CLIENT_NAME %s:yasr:tts\r\n", logname);
