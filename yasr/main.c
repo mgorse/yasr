@@ -884,7 +884,7 @@ static void win_csi(wchar_t **pp)
     break;
 
   case 'r':
-    win_scrollmin = (parm[0] ? parm[0] - 1 : 0);
+    win_scrollmin = (parm[0] ? MIN(parm[0], win->rows) - 1 : 0);
     win_scrollmax = parm[1] ? MIN(parm[1], win->rows) - 1 : win->rows - 1;
     break;
 
