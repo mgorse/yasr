@@ -200,7 +200,7 @@ static void utmpconv(char *s, char *d, int pid)
     {
       break;
     }
-    if (!strcmp(u.ut_line, rs))
+    if (!strncmp(u.ut_line, rs, sizeof(u.ut_line)))
     {
       (void) strcpy(u.ut_line, rd);
       (void) fsetpos(fp, &fpos);
@@ -302,7 +302,7 @@ static int getkey_buf()
 
   s1=size;
   s2=sizeof(wchar_t);
-  b1=buf;
+  b1 = (char *)buf;
   b2=(char *)&ch;
   iconv(ih_inp,NULL,NULL,NULL,NULL);
   result = iconv(ih_inp,&b1,&s1,&b2,&s2);
