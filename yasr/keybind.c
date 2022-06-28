@@ -102,10 +102,12 @@ void kb_del(Keymap * map, int key)
     return;
   }
   kp = map->kb + v;
-  tmpk = kp;
-  while ((tmpk = tmpk->next) != NULL)
+  tmpk = kp->next;
+  while (tmpk)
   {
+    Keybind *next = tmpk->next;
     free(tmpk);
+    tmpk = next;
   }
   (void) memmove(kp, kp + 1, (map->numkeys - v - 1) * sizeof(Keybind));
 }
