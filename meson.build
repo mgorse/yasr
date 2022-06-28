@@ -43,6 +43,7 @@ endif
 configure_file(output: 'config.h', configuration: conf)
 
 subdir('yasr')
+subdir('tools')
 
 if xgettext.found()
   subdir('po')

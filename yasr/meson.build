@@ -16,17 +16,9 @@ yasr_headers = [
   'yasr.h'
 ]
 
-keytest_sources = [
-	'keytest.c'
-]
-
 executable('yasr',
   yasr_sources,
   dependencies: openpty_dep,
   install: true)
-
-executable('keytest',
-  keytest_sources,
-  install: false)
 
 install_man('yasr.1')
