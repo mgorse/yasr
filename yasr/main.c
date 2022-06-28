@@ -1384,8 +1384,8 @@ int main(int argc, char *argv[])
   /* initialize gettext */
 #ifdef ENABLE_NLS
   setlocale(LC_ALL, "");
-  bindtextdomain(PACKAGE, LOCALEDIR);
-  textdomain(PACKAGE);
+  bindtextdomain(GETTEXT_PACKAGE, LOCALEDIR);
+  textdomain(GETTEXT_PACKAGE);
   strcpy(charmap,nl_langinfo(CODESET));
   ih_inp=iconv_open("WCHAR_T",charmap);
   if (ih_inp==(iconv_t)-1) {
