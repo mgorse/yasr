@@ -262,6 +262,7 @@ tts_addbuf (char *buf, int len, int len2)
 }
 
 
+/* Low-level function to send data to the synthesizer. */
 void
 tts_send (char *buf, int len)
 {
@@ -297,6 +298,8 @@ tts_send (char *buf, int len)
 }
 
 
+/* Returns TRUE if the given character can't be sent directly to the
+ * synthesizer */
 static int
 unspeakable (unsigned char ch)
 {
@@ -393,10 +396,10 @@ tts_send_iso (char *buf, int len)
 #endif
 
 
-/* simple conversion from wchar-t to utf-8
-   used by w_speak()
-*/
-
+/* High level function to speak the given string of wide characters, first
+ * converting to UTF-8.
+ * TODO: this duplicates code from tts_out. Probably better to simply convert
+ * to UTF-8 and have tts_out do the work from there. */
 void
 tts_out_w (wchar_t *buf, int len)
 {
@@ -527,6 +530,7 @@ tts_out_w (wchar_t *buf, int len)
   tts_send (obuf, obo);
 }
 
+/* High level function to speak the given text. Takes a buffer and a length. */
 void
 tts_out (unsigned char *buf, int len)
 {
@@ -625,6 +629,7 @@ tts_out (unsigned char *buf, int len)
   tts_send (obuf, obo);
 }
 
+/* High level function to speak the given text. */
 void
 tts_say (char *buf)
 {
@@ -644,6 +649,7 @@ tts_say_printf (char *fmt, ...)
   va_end (arg);
 }
 
+/* Speaks a description for the given wide character. */
 void
 tts_saychar (wchar_t ch)
 {
@@ -948,6 +954,8 @@ tts_reinit2 ()
   return (0);
 }
 
+/* Reinitializes the speech synthesizer if the synthesizer process has died.
+ * If the synthesizer process is still alive, then do nothing. */
 void
 tts_checkreset ()
 {
@@ -966,6 +974,8 @@ tts_checkreset ()
   tts_init (FALSE);
 }
 
+/* Adds the given wide character to the buffer of characters to be sent to the
+ * synthesizer. If the buffer is full, then flush it. */
 void
 tts_addchr (wchar_t ch)
 {

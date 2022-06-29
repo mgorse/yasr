@@ -20,6 +20,11 @@
 
 static void ui_saypos (int, int);
 
+/* Manage the function that will be called when a key is pressed.
+ * If a non-NULL function pointer is passed, then add the function to the
+ * stack, and call it with a value of 0, which we use as a special value to
+ * tell the function to initialize any data that it needs.
+ * If NULL is passed, then pop the current function from the stack. */
 void
 ui_funcman (int (*f) (int))
 {
@@ -39,6 +44,7 @@ ui_funcman (int (*f) (int))
 }
 
 
+/* read top to cursor */
  /*ARGSUSED*/ void
 rev_rttc (int *argp)
 {
@@ -63,6 +69,7 @@ rev_rttc (int *argp)
 }
 
 
+/* read cursor to bottom */
  /*ARGSUSED*/ void
 rev_rctb (int *argp)
 {
@@ -385,6 +392,9 @@ ui_ennum (int ch)
   return (2);
 }
 
+/* Add the given character to the input buffer. Also handles aborting if
+ * escape is pressed, or executing if enter is pressed. Used, for instance,
+ * for find in flat review. */
 int
 ui_build_str (int ch)
 {
@@ -419,6 +429,7 @@ ui_build_str (int ch)
   }
 }
 
+/* TODO: Can this be replaced by wcslen? */
 int
 s_strlen (unsigned short *c)
 {
@@ -952,6 +963,7 @@ ui_sayline (int row, int say_blank)
   ui_saylinepart (row, 0, win->cols, say_blank);
 }
 
+/* Say the position of the screen cursor */
  /*ARGSUSED*/ void
 ui_curpos (int *argp)
 {
@@ -970,6 +982,7 @@ ui_silence (int *argp)
 }
 
 
+/* Speak the given cursor position */
 static void
 ui_saypos (int row, int col)
 {
@@ -1003,6 +1016,7 @@ ui_optmenu (int *argp)
 }
 
 
+/* TODO: This seems to duplicate ui_build_str? */
 int
 ui_addstr (int ch)
 {
@@ -1030,6 +1044,7 @@ ui_addstr (int ch)
 }
 
 
+/* Cycle the value of an option. Used for key bindings */
 void
 ui_opt_set (int *argp)
 {
@@ -1062,6 +1077,8 @@ ui_opt_set (int *argp)
 }
 
 
+/* Move the review cursor to the beginning of the line, and say the word
+ * there */
  /*ARGSUSED*/ void
 ui_bol (int *argp)
 {
@@ -1083,6 +1100,7 @@ ui_bol (int *argp)
 }
 
 
+/* Move the review cursor to the end of the line, and say the word there */
  /*ARGSUSED*/ void
 ui_eol (int *argp)
 {
@@ -1100,6 +1118,7 @@ ui_eol (int *argp)
 }
 
 
+/* Say the character at the cursor */
  /*ARGSUSED*/ void
 ui_sayascii (int *argp)
 {
