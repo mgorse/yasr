@@ -92,7 +92,6 @@ kb_search (Keymap * map, int k)
 }
 
 
-#ifdef USE_KBWIZ
 void
 kb_del (Keymap * map, int key)
 {
@@ -114,13 +113,11 @@ kb_del (Keymap * map, int key)
   }
   (void) memmove (kp, kp + 1, (map->numkeys - v - 1) * sizeof (Keybind));
 }
-#endif /*USE_KBWIZ */
 
 
  /*ARGSUSED*/ int
 kbwiz (int key)
 {
-#ifdef USE_KBWIZ
   static int state = 0;
   static Keymap *map;
   static int sourcekey;
@@ -222,9 +219,3 @@ kbwiz (int key)
   }
   return (1);
 }
-#else
-  tts_say (_("Not available."));
-  ui_funcman (0);
-  return (1);
-}
-#endif
