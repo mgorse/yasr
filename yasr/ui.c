@@ -599,7 +599,7 @@ rev_find_aux (int ch)
   {
     return (1);
   }
-  /* tbd - support word echo */
+  /* TODO: - support word echo */
   if (ui.kbsay != 0)
     tts_saychar (ch);
   rev.findbuf[rev.findbuflen++] = ch;

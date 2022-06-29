@@ -45,7 +45,7 @@ char usershell[OPT_STR_SIZE];
 static struct termios t;
 Win *win;
 static Win *winsave;
-static int win_scrollmin, win_scrollmax;	/* tbd -- move these back into Win */
+static int win_scrollmin, win_scrollmax;	/* TODO: move these back into Win */
 Tts tts;
 Ui ui;
 Uirev rev;
@@ -707,7 +707,7 @@ win_csi (wchar_t **pp)
     if (*p == ';')
       p++;
     else
-      break;			/* tbd -- is this redundant? */
+      break;			/* TODO: is this redundant? */
   }
 
   *pp = p + 1;

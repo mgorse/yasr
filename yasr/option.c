@@ -271,7 +271,8 @@ opt_synth_update (int num, int optval)
 	case '?':		/* hard-coded special handling */
 	  switch (num)
 	  {
-	  case 32:		/* bns punctuation: tbd - rework using : form */
+	  case 32:		/* bns punctuation */
+	    /* TODO: - rework using : form */
 	    switch (*(short *) opt_ptr (num))
 	    {
 	    case 0:
@@ -301,7 +302,7 @@ opt_synth_update (int num, int optval)
 	    p2++;
 	  break;
 	default:
-	  /* tbd - error */
+	  /* TODO: - error */
 	  break;
 	}
 	break;
@@ -582,7 +583,7 @@ optmenu (int ch)
       opt_say (curopt, 1);
       break;
 
-    case OT_STR:		/* tbd -- allow the user to enter a string here */
+    case OT_STR:		/* TODO: allow the user to enter a string */
       break;
 
     case OT_TREE:
@@ -787,7 +788,7 @@ opt_init ()
 	   N_("words"));
   opt_add (usershell, 0, N_("shell"), OT_STR);
 
-/* tbd - The following is a bad hack that I use to play Angband.  It should
+/* TODO: The following is a bad hack that I use to play Angband.  It should
  * be replaced with a more general facility for defining screen windows.
  */
   opt_add (&special, 255, "special", OT_ENUM, 2, "off", "on");
@@ -795,7 +796,7 @@ opt_init ()
   opt_add (&rev.udmode, 0, N_("up and down arrows"), OT_ENUM, 3,
 	   N_("speak line"), N_("speak character"), N_("speak word"));
 
-/* tbd - allow the user to enter 0x to indicate a Hex number, somehow */
+/* TODO: allow the user to enter 0x to indicate a Hex number, somehow */
   opt_add (&ui.disable, 255, N_("DisableKey"), OT_INT, 0, 0x7fffffff);
 
   opt_add (&ui.split_caps, 0, "Split caps", OT_ENUM, 2, "off", "on");

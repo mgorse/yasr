@@ -44,11 +44,11 @@ serial_name (int port)
 #elif defined(__OpenBSD__)
   (void) sprintf (newname, "/dev/tty0%d", port);
 #elif defined(__FreeBSD__)
-  (void) sprintf (newname, "/dev/cuaa%d", port);	/* tbd - is this right? */
+  (void) sprintf (newname, "/dev/cuaa%d", port);	/* TODO: is this right? */
 #elif defined(__NetBSD__)
   (void) sprintf (newname, "/dev/tty0%d", port);
 #elif defined(sun)
-  (void) sprintf (newname, "/dev/cua/%c", (char) port + 65);	/*tbd- is this right? */
+  (void) sprintf (newname, "/dev/cua/%c", (char) port + 65);	/*TODO: is this right? */
 #else
   return (NULL);		/* Unsupported os. */
 #endif
