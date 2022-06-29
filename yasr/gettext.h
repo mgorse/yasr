@@ -23,19 +23,19 @@
 #if ENABLE_NLS
 
 /* Get declarations of GNU message catalog functions.  */
-# include <libintl.h>
+#include <libintl.h>
 
 /* You can set the DEFAULT_TEXT_DOMAIN macro to specify the domain used by
    the gettext() and ngettext() macros.  This is an alternative to calling
    textdomain(), and is useful for libraries.  */
-# ifdef DEFAULT_TEXT_DOMAIN
-#  undef gettext
-#  define gettext(Msgid) \
+#ifdef DEFAULT_TEXT_DOMAIN
+#undef gettext
+#define gettext(Msgid) \
      dgettext (DEFAULT_TEXT_DOMAIN, Msgid)
-#  undef ngettext
-#  define ngettext(Msgid1, Msgid2, N) \
+#undef ngettext
+#define ngettext(Msgid1, Msgid2, N) \
      dngettext (DEFAULT_TEXT_DOMAIN, Msgid1, Msgid2, N)
-# endif
+#endif
 
 #else
 
@@ -46,17 +46,17 @@
    and also including <libintl.h> would fail on SunOS 4, whereas <locale.h>
    is OK.  */
 #if defined(__sun)
-# include <locale.h>
+#include <locale.h>
 #endif
 
 /* Many header files from the libstdc++ coming with g++ 3.3 or newer include
    <libintl.h>, which chokes if dcgettext is defined as a macro.  So include
    it now, to make later inclusions of <libintl.h> a NOP.  */
 #if defined(__cplusplus) && defined(__GNUG__) && (__GNUC__ >= 3)
-# include <cstdlib>
-# if (__GLIBC__ >= 2) || _GLIBCXX_HAVE_LIBINTL_H
-#  include <libintl.h>
-# endif
+#include <cstdlib>
+#if (__GLIBC__ >= 2) || _GLIBCXX_HAVE_LIBINTL_H
+#include <libintl.h>
+#endif
 #endif
 
 /* Disabled NLS.
@@ -64,18 +64,18 @@
    for invalid uses of the value returned from these functions.
    On pre-ANSI systems without 'const', the config.h file is supposed to
    contain "#define const".  */
-# define gettext(Msgid) ((const char *) (Msgid))
-# define dgettext(Domainname, Msgid) ((const char *) (Msgid))
-# define dcgettext(Domainname, Msgid, Category) ((const char *) (Msgid))
-# define ngettext(Msgid1, Msgid2, N) \
+#define gettext(Msgid) ((const char *) (Msgid))
+#define dgettext(Domainname, Msgid) ((const char *) (Msgid))
+#define dcgettext(Domainname, Msgid, Category) ((const char *) (Msgid))
+#define ngettext(Msgid1, Msgid2, N) \
     ((N) == 1 ? (const char *) (Msgid1) : (const char *) (Msgid2))
-# define dngettext(Domainname, Msgid1, Msgid2, N) \
+#define dngettext(Domainname, Msgid1, Msgid2, N) \
     ((N) == 1 ? (const char *) (Msgid1) : (const char *) (Msgid2))
-# define dcngettext(Domainname, Msgid1, Msgid2, N, Category) \
+#define dcngettext(Domainname, Msgid1, Msgid2, N, Category) \
     ((N) == 1 ? (const char *) (Msgid1) : (const char *) (Msgid2))
-# define textdomain(Domainname) ((const char *) (Domainname))
-# define bindtextdomain(Domainname, Dirname) ((const char *) (Dirname))
-# define bind_textdomain_codeset(Domainname, Codeset) ((const char *) (Codeset))
+#define textdomain(Domainname) ((const char *) (Domainname))
+#define bindtextdomain(Domainname, Dirname) ((const char *) (Dirname))
+#define bind_textdomain_codeset(Domainname, Codeset) ((const char *) (Codeset))
 
 #endif
 
@@ -96,10 +96,10 @@
    short and rarely need to change.
    The letter 'p' stands for 'particular' or 'special'.  */
 #ifdef DEFAULT_TEXT_DOMAIN
-# define pgettext(Msgctxt, Msgid) \
+#define pgettext(Msgctxt, Msgid) \
    pgettext_aux (DEFAULT_TEXT_DOMAIN, Msgctxt GETTEXT_CONTEXT_GLUE Msgid, Msgid, LC_MESSAGES)
 #else
-# define pgettext(Msgctxt, Msgid) \
+#define pgettext(Msgctxt, Msgid) \
    pgettext_aux (NULL, Msgctxt GETTEXT_CONTEXT_GLUE Msgid, Msgid, LC_MESSAGES)
 #endif
 #define dpgettext(Domainname, Msgctxt, Msgid) \
@@ -107,10 +107,10 @@
 #define dcpgettext(Domainname, Msgctxt, Msgid, Category) \
   pgettext_aux (Domainname, Msgctxt GETTEXT_CONTEXT_GLUE Msgid, Msgid, Category)
 #ifdef DEFAULT_TEXT_DOMAIN
-# define npgettext(Msgctxt, Msgid, MsgidPlural, N) \
+#define npgettext(Msgctxt, Msgid, MsgidPlural, N) \
    npgettext_aux (DEFAULT_TEXT_DOMAIN, Msgctxt GETTEXT_CONTEXT_GLUE Msgid, Msgid, MsgidPlural, N, LC_MESSAGES)
 #else
-# define npgettext(Msgctxt, Msgid, MsgidPlural, N) \
+#define npgettext(Msgctxt, Msgid, MsgidPlural, N) \
    npgettext_aux (NULL, Msgctxt GETTEXT_CONTEXT_GLUE Msgid, Msgid, MsgidPlural, N, LC_MESSAGES)
 #endif
 #define dnpgettext(Domainname, Msgctxt, Msgid, MsgidPlural, N) \
@@ -127,8 +127,7 @@ inline
 #endif
 static const char *
 pgettext_aux (const char *domain,
-	      const char *msg_ctxt_id, const char *msgid,
-	      int category)
+	      const char *msg_ctxt_id, const char *msgid, int category)
 {
   const char *translation = dcgettext (domain, msg_ctxt_id, category);
   if (translation == msg_ctxt_id)
@@ -147,8 +146,7 @@ inline
 static const char *
 npgettext_aux (const char *domain,
 	       const char *msg_ctxt_id, const char *msgid,
-	       const char *msgid_plural, unsigned long int n,
-	       int category)
+	       const char *msgid_plural, unsigned long int n, int category)
 {
   const char *translation =
     dcngettext (domain, msg_ctxt_id, msgid_plural, n, category);
@@ -185,8 +183,7 @@ inline
 #endif
 static const char *
 dcpgettext_expr (const char *domain,
-		 const char *msgctxt, const char *msgid,
-		 int category)
+		 const char *msgctxt, const char *msgid, int category)
 {
   size_t msgctxt_len = strlen (msgctxt) + 1;
   size_t msgid_len = strlen (msgid) + 1;
@@ -197,22 +194,21 @@ dcpgettext_expr (const char *domain,
   char buf[1024];
   char *msg_ctxt_id =
     (msgctxt_len + msgid_len <= sizeof (buf)
-     ? buf
-     : (char *) malloc (msgctxt_len + msgid_len));
+     ? buf : (char *) malloc (msgctxt_len + msgid_len));
   if (msg_ctxt_id != NULL)
 #endif
-    {
-      memcpy (msg_ctxt_id, msgctxt, msgctxt_len - 1);
-      msg_ctxt_id[msgctxt_len - 1] = '\004';
-      memcpy (msg_ctxt_id + msgctxt_len, msgid, msgid_len);
-      translation = dcgettext (domain, msg_ctxt_id, category);
+  {
+    memcpy (msg_ctxt_id, msgctxt, msgctxt_len - 1);
+    msg_ctxt_id[msgctxt_len - 1] = '\004';
+    memcpy (msg_ctxt_id + msgctxt_len, msgid, msgid_len);
+    translation = dcgettext (domain, msg_ctxt_id, category);
 #if !_LIBGETTEXT_HAVE_VARIABLE_SIZE_ARRAYS
-      if (msg_ctxt_id != buf)
-	free (msg_ctxt_id);
+    if (msg_ctxt_id != buf)
+      free (msg_ctxt_id);
 #endif
-      if (translation != msg_ctxt_id)
-	return translation;
-    }
+    if (translation != msg_ctxt_id)
+      return translation;
+  }
   return msgid;
 }
 
@@ -231,8 +227,7 @@ inline
 static const char *
 dcnpgettext_expr (const char *domain,
 		  const char *msgctxt, const char *msgid,
-		  const char *msgid_plural, unsigned long int n,
-		  int category)
+		  const char *msgid_plural, unsigned long int n, int category)
 {
   size_t msgctxt_len = strlen (msgctxt) + 1;
   size_t msgid_len = strlen (msgid) + 1;
@@ -243,22 +238,21 @@ dcnpgettext_expr (const char *domain,
   char buf[1024];
   char *msg_ctxt_id =
     (msgctxt_len + msgid_len <= sizeof (buf)
-     ? buf
-     : (char *) malloc (msgctxt_len + msgid_len));
+     ? buf : (char *) malloc (msgctxt_len + msgid_len));
   if (msg_ctxt_id != NULL)
 #endif
-    {
-      memcpy (msg_ctxt_id, msgctxt, msgctxt_len - 1);
-      msg_ctxt_id[msgctxt_len - 1] = '\004';
-      memcpy (msg_ctxt_id + msgctxt_len, msgid, msgid_len);
-      translation = dcngettext (domain, msg_ctxt_id, msgid_plural, n, category);
+  {
+    memcpy (msg_ctxt_id, msgctxt, msgctxt_len - 1);
+    msg_ctxt_id[msgctxt_len - 1] = '\004';
+    memcpy (msg_ctxt_id + msgctxt_len, msgid, msgid_len);
+    translation = dcngettext (domain, msg_ctxt_id, msgid_plural, n, category);
 #if !_LIBGETTEXT_HAVE_VARIABLE_SIZE_ARRAYS
-      if (msg_ctxt_id != buf)
-	free (msg_ctxt_id);
+    if (msg_ctxt_id != buf)
+      free (msg_ctxt_id);
 #endif
-      if (!(translation == msg_ctxt_id || translation == msgid_plural))
-	return translation;
-    }
+    if (!(translation == msg_ctxt_id || translation == msgid_plural))
+      return translation;
+  }
   return (n == 1 ? msgid : msgid_plural);
 }
 

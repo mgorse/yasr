@@ -42,21 +42,23 @@
 #endif
 
 int
-login_tty(int fd)
+login_tty (int fd)
 {
-    (void) setsid();
+  (void) setsid ();
 #ifdef TIOCSCTTY
-    if (ioctl(fd, TIOCSCTTY, (char *) NULL) == -1) {
-        return(-1);
-    }
+  if (ioctl (fd, TIOCSCTTY, (char *) NULL) == -1)
+  {
+    return (-1);
+  }
 #endif
 
-    (void) dup2(fd, 0);
-    (void) dup2(fd, 1);
-    (void) dup2(fd, 2);
-    if (fd > 2) {
-        (void) close(fd);
-    }
+  (void) dup2 (fd, 0);
+  (void) dup2 (fd, 1);
+  (void) dup2 (fd, 2);
+  if (fd > 2)
+  {
+    (void) close (fd);
+  }
 
-    return(0);
+  return (0);
 }

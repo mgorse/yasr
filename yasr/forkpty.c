@@ -27,24 +27,24 @@
 #include <unistd.h>
 
 int
-forkpty(int *master, char *name, struct termios *term, struct winsize *winsz)
+forkpty (int *master, char *name, struct termios *term, struct winsize *winsz)
 {
   int slave;
   int pid;
 
-  if (openpty(master, &slave, name, term, winsz) == -1)
+  if (openpty (master, &slave, name, term, winsz) == -1)
   {
     return (-1);
   }
-  if ((pid = fork()))
+  if ((pid = fork ()))
   {
     return (pid);
   }
 
   /* child -- set up tty */
-  (void) dup2(slave, 0);
-  (void) dup2(slave, 1);
-  (void) dup2(slave, 2);
+  (void) dup2 (slave, 0);
+  (void) dup2 (slave, 1);
+  (void) dup2 (slave, 2);
 
   return (pid);
 }

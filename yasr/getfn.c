@@ -27,27 +27,28 @@
 
 static char newname[40];
 
-static char *serial_name(int port)
+static char *
+serial_name (int port)
 {
 #if defined(__linux__)
   int fd;
 
   /* Try devfs name first */
-  (void) sprintf(newname, "/dev/tts/%d", port);
-  if ((fd = open(newname, O_RDONLY)) > 0)
+  (void) sprintf (newname, "/dev/tts/%d", port);
+  if ((fd = open (newname, O_RDONLY)) > 0)
   {
-    close(fd);
+    close (fd);
     return (newname);
   }
-  (void) sprintf(newname, "/dev/ttyS%d", port);
+  (void) sprintf (newname, "/dev/ttyS%d", port);
 #elif defined(__OpenBSD__)
-  (void) sprintf(newname, "/dev/tty0%d", port);
+  (void) sprintf (newname, "/dev/tty0%d", port);
 #elif defined(__FreeBSD__)
-  (void) sprintf(newname, "/dev/cuaa%d", port);	/* tbd - is this right? */
+  (void) sprintf (newname, "/dev/cuaa%d", port);	/* tbd - is this right? */
 #elif defined(__NetBSD__)
-  (void) sprintf(newname, "/dev/tty0%d", port);
+  (void) sprintf (newname, "/dev/tty0%d", port);
 #elif defined(sun)
-  (void) sprintf(newname, "/dev/cua/%c", (char) port + 65);	/*tbd- is this right? */
+  (void) sprintf (newname, "/dev/cua/%c", (char) port + 65);	/*tbd- is this right? */
 #else
   return (NULL);		/* Unsupported os. */
 #endif
@@ -55,22 +56,23 @@ static char *serial_name(int port)
 }
 
 
- /*ARGSUSED*/ static char *parallel_name(int port)
+ /*ARGSUSED*/ static char *
+parallel_name (int port)
 {
 #if defined(__linux__)
   int fd;
 
   /* Try devfs name first */
-  (void) sprintf(newname, "/dev/printers/%d", port);
-  if ((fd = open(newname, O_RDONLY)) > 0)
+  (void) sprintf (newname, "/dev/printers/%d", port);
+  if ((fd = open (newname, O_RDONLY)) > 0)
   {
-    close(fd);
+    close (fd);
     return (newname);
   }
-  (void) sprintf(newname, "/dev/lp%d", port);
+  (void) sprintf (newname, "/dev/lp%d", port);
   return (newname);
 #elif defined(__OpenBSD__)
-  (void) sprintf(newname, "/dev/lpt%d", port);
+  (void) sprintf (newname, "/dev/lpt%d", port);
   return (newname);
 #else
   return (NULL);		/* Unsupported os */
@@ -78,9 +80,10 @@ static char *serial_name(int port)
 }
 
 
-char *getfn(char *name)
+char *
+getfn (char *name)
 {
-  if (!isdigit((int) name[1]) || name[2])
+  if (!isdigit ((int) name[1]) || name[2])
   {
     return name;
   }
@@ -88,11 +91,11 @@ char *getfn(char *name)
   {
   case 'S':
   case 's':
-    return (serial_name(name[1] - 48));
+    return (serial_name (name[1] - 48));
 
   case 'L':
   case 'l':
-    return (parallel_name(name[1] - 48));
+    return (parallel_name (name[1] - 48));
 
   default:
     return (name);

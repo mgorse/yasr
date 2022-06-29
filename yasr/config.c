@@ -19,7 +19,7 @@
 #include "yasr.h"
 #include <sys/param.h>
 
-static void conf_write(int *);
+static void conf_write (int *);
 
 Func funcs[] = {
   {&rev_line, "say line"},	/* 0 */
@@ -54,7 +54,8 @@ Func funcs[] = {
 };
 
 
-void readconf()
+void
+readconf ()
 {
   FILE *fp;
   int args, arg[16], *argp;
@@ -62,25 +63,26 @@ void readconf()
   char *home, *ptr, *s;
   char confname[MAXPATHLEN];
 
-  if ((home = getenv("HOME")) != NULL)
+  if ((home = getenv ("HOME")) != NULL)
   {
-    (void) strcpy((char *) buf, home);
-    (void) strcat((char *) buf, "/.yasr.conf");
+    (void) strcpy ((char *) buf, home);
+    (void) strcat ((char *) buf, "/.yasr.conf");
   }
-  (void) sprintf(confname, "%s/yasr.conf", PACKAGE_DATA_DIR);
+  (void) sprintf (confname, "%s/yasr.conf", PACKAGE_DATA_DIR);
 
-  if (!(fp = fopen(conffile, "r")) &&
-      !(fp = fopen((char *) buf, "r")) && !(fp = fopen(confname, "r")))
+  if (!(fp = fopen (conffile, "r")) &&
+      !(fp = fopen ((char *) buf, "r")) && !(fp = fopen (confname, "r")))
   {
-    (void) printf("yasr: unable to find %s or ~/.yasr.conf or %s.\n", conffile, confname);
-    exit(1);
+    (void) printf ("yasr: unable to find %s or ~/.yasr.conf or %s.\n",
+		   conffile, confname);
+    exit (1);
   }
 
   for (;;)
   {
     ln++;
-    (void) fgets((char *) buf, 200, fp);
-    if (feof(fp))
+    (void) fgets ((char *) buf, 200, fp);
+    if (feof (fp))
     {
       break;
     }
@@ -93,38 +95,38 @@ void readconf()
     {
       continue;
     }
-    buf[strlen((char *) buf) - 1] = 0;
-    if (buf[strlen((char *) buf) - 1] == '\r')
+    buf[strlen ((char *) buf) - 1] = 0;
+    if (buf[strlen ((char *) buf) - 1] == '\r')
     {
-      buf[strlen((char *) buf) - 1] = 0;
+      buf[strlen ((char *) buf) - 1] = 0;
     }
-    if (!strlen(ptr))
+    if (!strlen (ptr))
     {
       continue;
     }
-    if (!strcasecmp(ptr, "[reviewkeys]"))
+    if (!strcasecmp (ptr, "[reviewkeys]"))
     {
       mode = 1;
     }
-    else if (!strcasecmp(ptr, "[normalkeys]"))
+    else if (!strcasecmp (ptr, "[normalkeys]"))
     {
       mode = 2;
     }
-    else if (!strcasecmp((char *) buf, "[options]"))
+    else if (!strcasecmp ((char *) buf, "[options]"))
     {
       mode = 3;
     }
-    else if (!strcasecmp((char *) buf, "[dict]"))
+    else if (!strcasecmp ((char *) buf, "[dict]"))
     {
       mode = 4;
     }
     else if (buf[0] == '[')
     {
       mode = 0;
-      buf[strlen((char *) buf) - 1] = '\0';
+      buf[strlen ((char *) buf) - 1] = '\0';
       for (i = 0; i <= opt[synthopt].v.enum_max; i++)
       {
-	if (!strcasecmp((char *) buf + 1, opt[synthopt].arg[i]))
+	if (!strcasecmp ((char *) buf + 1, opt[synthopt].arg[i]))
 	{
 	  mode = -i - 1;
 	}
@@ -136,15 +138,16 @@ void readconf()
       {
       case 1:
       case 2:			/* keybind */
-	key = strtol(ptr, &s, 0);
+	key = strtol (ptr, &s, 0);
 	s++;
-	ptr = strtok(s, ":");
-	if (atoi(s)) i = atoi(s);
+	ptr = strtok (s, ":");
+	if (atoi (s))
+	  i = atoi (s);
 	else
 	{
 	  for (i = 0; funcs[i].desc; i++)
 	  {
-	    if (!strcasecmp(s, funcs[i].desc))
+	    if (!strcasecmp (s, funcs[i].desc))
 	    {
 	      break;
 	    }
@@ -152,55 +155,57 @@ void readconf()
 	}
 	if (!funcs[i].desc)
 	{
-	  printf("Syntax error on line %d of configuration file.\n", ln);
-	  exit(1);
+	  printf ("Syntax error on line %d of configuration file.\n", ln);
+	  exit (1);
 	}
 	args = 0;
-	while ((ptr = strtok(NULL, ":")))
+	while ((ptr = strtok (NULL, ":")))
 	{
 	  /* tbc -- is allowing numbers okay? */
-	  arg[args++] = atoi(ptr);
+	  arg[args++] = atoi (ptr);
 	}
 	if (args)
 	{
-	  argp = (int *) malloc(args * sizeof(int));
-	  (void) memcpy(argp, arg, args * sizeof(int));
+	  argp = (int *) malloc (args * sizeof (int));
+	  (void) memcpy (argp, arg, args * sizeof (int));
 	}
-	else argp = NULL;
+	else
+	  argp = NULL;
 	if (mode == 1)
 	{
-	  (void) kb_add(&rev.keymap, key, i, args, argp, 2);
+	  (void) kb_add (&rev.keymap, key, i, args, argp, 2);
 	}
 	else
 	{
-	  (void) kb_add(&ui.keymap, key, i, args, argp, 2);
+	  (void) kb_add (&ui.keymap, key, i, args, argp, 2);
 	}
 	break;
 
       case 4:
-	(void) dict_read((char *) buf);
+	(void) dict_read ((char *) buf);
 	break;
 
       default:			/* option */
-	if (opt_read((char *) buf, mode < 0 ? -mode - 1 : 0))
+	if (opt_read ((char *) buf, mode < 0 ? -mode - 1 : 0))
 	{
 	  printf
 	    ("Error on line %d of configuration file: invalid option\n", ln);
-	  exit(1);
+	  exit (1);
 	}
-	if (!strcasecmp((char *) buf, "synthesizer port"))
+	if (!strcasecmp ((char *) buf, "synthesizer port"))
 	{
-	  (void) tts_init(1);
+	  (void) tts_init (1);
 	}
 	break;
       }
     }
   }
-  (void) fclose(fp);
+  (void) fclose (fp);
 }
 
 
-static void kb_write(FILE * fp, Keymap * map)
+static void
+kb_write (FILE * fp, Keymap * map)
 {
   int i, j;
   int *argp;
@@ -209,39 +214,40 @@ static void kb_write(FILE * fp, Keymap * map)
 
   for (i = 0, kb = map->kb; i < map->numkeys; i++, kb++)
   {
-    (void) sprintf((char *) buf, "0x%x:%s", kb->key, funcs[kb->index].desc);
+    (void) sprintf ((char *) buf, "0x%x:%s", kb->key, funcs[kb->index].desc);
     argp = kb->argp;
     for (j = 0; j < kb->numargs; j++)
     {
-      (void) sprintf(tmpstr, ":%d", *(argp++));
-      (void) strcat((char *) buf, tmpstr);
+      (void) sprintf (tmpstr, ":%d", *(argp++));
+      (void) strcat ((char *) buf, tmpstr);
     }
-    (void) fprintf(fp, "%s\n", buf);
+    (void) fprintf (fp, "%s\n", buf);
   }
 }
 
 
- /*ARGSUSED*/ static void conf_write(int *argp)
+ /*ARGSUSED*/ static void
+conf_write (int *argp)
 {
   FILE *fp;
   char filename[200];
 
-  (void) strcpy(filename, getenv("HOME"));
-  (void) strcat(filename, "/.yasr.conf");
-  fp = fopen(filename, "w");
+  (void) strcpy (filename, getenv ("HOME"));
+  (void) strcat (filename, "/.yasr.conf");
+  fp = fopen (filename, "w");
   if (!fp)
   {
-    tts_say_printf("Unable to write configuration file %s.", filename);
+    tts_say_printf ("Unable to write configuration file %s.", filename);
     return;
   }
-  (void) fprintf(fp, "[normalkeys]\n");
-  kb_write(fp, &ui.keymap);
-  (void) fprintf(fp, "[reviewkeys]\n");
-  kb_write(fp, &rev.keymap);
-  (void) fprintf(fp, "[options]\n");
-  opt_write(fp);
-  (void) fprintf(fp, "[dict]\n");
-  dict_write(fp);
-  (void) fclose(fp);
-  tts_say_printf("Configuration saved to %s.", filename);
+  (void) fprintf (fp, "[normalkeys]\n");
+  kb_write (fp, &ui.keymap);
+  (void) fprintf (fp, "[reviewkeys]\n");
+  kb_write (fp, &rev.keymap);
+  (void) fprintf (fp, "[options]\n");
+  opt_write (fp);
+  (void) fprintf (fp, "[dict]\n");
+  dict_write (fp);
+  (void) fclose (fp);
+  tts_say_printf ("Configuration saved to %s.", filename);
 }

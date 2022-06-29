@@ -25,7 +25,8 @@
 
 #include <termios.h>
 
-void cfmakeraw(struct termios *t)
+void
+cfmakeraw (struct termios *t)
 {
   t->c_iflag &=
     ~(IGNBRK | BRKINT | PARMRK | ISTRIP | INLCR | IGNCR | ICRNL | IXON);

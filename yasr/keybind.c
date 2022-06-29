@@ -18,12 +18,13 @@
 
 #include "yasr.h"
 
-int kb_add(Keymap * map, int k, int i, int na, int *a, int flag)
+int
+kb_add (Keymap * map, int k, int i, int na, int *a, int flag)
 {
   int v = 0;
   Keybind *kp, *tmpk;
 
-  if ((v = kb_search(map, k)) == -1)
+  if ((v = kb_search (map, k)) == -1)
   {
     v = map->numkeys;
   }
@@ -37,8 +38,8 @@ int kb_add(Keymap * map, int k, int i, int na, int *a, int flag)
 
     case 1:			/* add at the beginning */
       tmpk = kp->next;
-      kp->next = malloc(sizeof(Keybind));
-      (void) memcpy(kp->next, kp, sizeof(Keybind));
+      kp->next = malloc (sizeof (Keybind));
+      (void) memcpy (kp->next, kp, sizeof (Keybind));
       kp->next->next = tmpk;
       kp->index = i;
       kp->argp = a;
@@ -51,7 +52,7 @@ int kb_add(Keymap * map, int k, int i, int na, int *a, int flag)
       {
 	tmpk = tmpk->next;
       }
-      tmpk->next = malloc(sizeof(Keybind));
+      tmpk->next = malloc (sizeof (Keybind));
       tmpk = tmpk->next;
       tmpk->key = k;
       tmpk->index = i;
@@ -62,7 +63,7 @@ int kb_add(Keymap * map, int k, int i, int na, int *a, int flag)
   }
   if (++(map->numkeys) % 32 == 1)
   {
-    map->kb = realloc(map->kb, (map->numkeys + 31) * sizeof(Keybind));
+    map->kb = realloc (map->kb, (map->numkeys + 31) * sizeof (Keybind));
     kp = map->kb + v;
   }
   kp->key = k;
@@ -74,7 +75,8 @@ int kb_add(Keymap * map, int k, int i, int na, int *a, int flag)
 }
 
 
-int kb_search(Keymap * map, int k)
+int
+kb_search (Keymap * map, int k)
 {
   int v;
 
@@ -91,12 +93,13 @@ int kb_search(Keymap * map, int k)
 
 
 #ifdef USE_KBWIZ
-void kb_del(Keymap * map, int key)
+void
+kb_del (Keymap * map, int key)
 {
   int v;
   Keybind *kp, *tmpk;
 
-  v = kb_search(map, key);
+  v = kb_search (map, key);
   if (v == -1)
   {
     return;
@@ -106,15 +109,16 @@ void kb_del(Keymap * map, int key)
   while (tmpk)
   {
     Keybind *next = tmpk->next;
-    free(tmpk);
+    free (tmpk);
     tmpk = next;
   }
-  (void) memmove(kp, kp + 1, (map->numkeys - v - 1) * sizeof(Keybind));
+  (void) memmove (kp, kp + 1, (map->numkeys - v - 1) * sizeof (Keybind));
 }
 #endif /*USE_KBWIZ */
 
 
- /*ARGSUSED*/ int kbwiz(int key)
+ /*ARGSUSED*/ int
+kbwiz (int key)
 {
 #ifdef USE_KBWIZ
   static int state = 0;
@@ -127,11 +131,12 @@ void kb_del(Keymap * map, int key)
     if (ui.revmode)
     {
       map = &rev.keymap;
-      tts_say(_("Editing review keymap. Enter command."));
-    } else
+      tts_say (_("Editing review keymap. Enter command."));
+    }
+    else
     {
       map = &ui.keymap;
-      tts_say(_("Editing normal keymap. Enter command."));
+      tts_say (_("Editing normal keymap. Enter command."));
     }
     return (1);
   }
@@ -144,24 +149,24 @@ void kb_del(Keymap * map, int key)
     case 'c':
     case 'C':
       state = 1;
-      tts_say(_("Copy which key?"));
+      tts_say (_("Copy which key?"));
       break;
     case 'd':
     case 'D':
       state = 3;
-      tts_say(_("Delete which key?"));
+      tts_say (_("Delete which key?"));
       break;
     case 'm':
     case 'M':
       state = 5;
-      tts_say(_("Move which key?"));
+      tts_say (_("Move which key?"));
       break;
     case 27:
-      tts_say(_("Exiting keyboard wizard."));
-      ui_funcman(0);
+      tts_say (_("Exiting keyboard wizard."));
+      ui_funcman (0);
       break;
     default:
-      tts_say(_("c to copy, d to delete, m to move."));
+      tts_say (_("c to copy, d to delete, m to move."));
       break;
     }
     break;
@@ -172,45 +177,45 @@ void kb_del(Keymap * map, int key)
     if (key == 27)
     {
       state = 0;
-      tts_say(_("Command aborted."));
+      tts_say (_("Command aborted."));
       break;
     }
-    if (kb_search(map, key) == -1)
+    if (kb_search (map, key) == -1)
     {
-      tts_say(_("Key not defined."));
+      tts_say (_("Key not defined."));
       break;
     }
     if (state == 3)
     {
-      kb_del(map, key);
+      kb_del (map, key);
       state = 0;
-      tts_say(_("Key deleted."));
+      tts_say (_("Key deleted."));
     }
     else
     {
       state++;
-      tts_say(_("To which key?"));
+      tts_say (_("To which key?"));
       sourcekey = key;
     }
     break;
   case 2:
   case 6:
-    if (kb_search(map, key) != -1)
+    if (kb_search (map, key) != -1)
     {
-      tts_say(_("Keystroke already defined. Aborting."));
+      tts_say (_("Keystroke already defined. Aborting."));
       state = 0;
       break;
     }
-    kb = map->kb + kb_search(map, sourcekey);
-    (void) kb_add(map, key, kb->index, kb->numargs, kb->argp, 0);
+    kb = map->kb + kb_search (map, sourcekey);
+    (void) kb_add (map, key, kb->index, kb->numargs, kb->argp, 0);
     if (state == 6)
     {
-      kb_del(map, sourcekey);
-      tts_say(_("key moved."));
+      kb_del (map, sourcekey);
+      tts_say (_("key moved."));
     }
     else
     {
-      tts_say(_("Key copied."));
+      tts_say (_("Key copied."));
     }
     state = 0;
     break;
@@ -218,8 +223,8 @@ void kb_del(Keymap * map, int key)
   return (1);
 }
 #else
-  tts_say(_("Not available."));
-  ui_funcman(0);
+  tts_say (_("Not available."));
+  ui_funcman (0);
   return (1);
 }
 #endif

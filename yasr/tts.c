@@ -47,7 +47,7 @@ static Tts_synth synth[] = {
    NULL,
    TRUE,
    "",
-   "\003\")\n"}, /* festival */
+   "\003\")\n"},		/* festival */
   {"", "%s\r\n", "\033", "%c\r", NULL, TRUE, "@", ""},	/* Ciber232 */
 /* speech dispatcher (note: various things handled with custom code) */
   {NULL, NULL, "CANCEL SELF\r\n", NULL, NULL, FALSE, "", "quit\r\n"},
@@ -57,31 +57,34 @@ static char *dict[256];
 static int tts_flushed = 0;
 
 
-int dict_read(char *buf)
+int
+dict_read (char *buf)
 {
   int c;
   char *p;
 
-  if (isdigit((int) buf[0]))
+  if (isdigit ((int) buf[0]))
   {
-    c = strtol(buf, &p, 0);
+    c = strtol (buf, &p, 0);
     if (c > 255)
     {
       return (1);
     }
     p++;
-  } else
+  }
+  else
   {
     c = buf[0];
     p = buf + 2;
   }
-  dict[c] = strdup(p);
+  dict[c] = strdup (p);
 
   return (0);
 }
 
 
-void dict_write(FILE * fp)
+void
+dict_write (FILE * fp)
 {
   int i;
 
@@ -91,10 +94,11 @@ void dict_write(FILE * fp)
     {
       if (i > 31 && i < 127 && i != 35 && i != 91)
       {
-	(void) fprintf(fp, "%c=%s\n", i, dict[i]);
-      } else
+	(void) fprintf (fp, "%c=%s\n", i, dict[i]);
+      }
+      else
       {
-	(void) fprintf(fp, "0x%.2x=%s\n", i, dict[i]);
+	(void) fprintf (fp, "0x%.2x=%s\n", i, dict[i]);
       }
     }
   }
@@ -103,31 +107,35 @@ void dict_write(FILE * fp)
 
 /* Search for a program on the path */
 
-void tts_flush()
+void
+tts_flush ()
 {
   if (tts.outlen)
   {
-    w_speak(tts.buf, tts.outlen);
+    w_speak (tts.buf, tts.outlen);
   }
-  
+
   tts.outlen = 0;
- 
+
 }
 
 #if 0
-static void tts_wait(int usecs)
+static void
+tts_wait (int usecs)
 {
   char buf[100];
 
-  if (usecs != -1 && !readable(tts.fd, usecs)) return;
-  while (readable(tts.fd, 0))
+  if (usecs != -1 && !readable (tts.fd, usecs))
+    return;
+  while (readable (tts.fd, 0))
   {
-    read(tts.fd, buf, sizeof(buf));
+    read (tts.fd, buf, sizeof (buf));
   }
 }
 #endif
 
-void tts_silence()
+void
+tts_silence ()
 {
   char tmp[1] = { 0 };
 
@@ -135,10 +143,10 @@ void tts_silence()
   {
     return;
   }
-  (void) tcflush(tts.fd, TCOFLUSH);
+  (void) tcflush (tts.fd, TCOFLUSH);
   tts.obufhead = tts.obuftail = tts.flood = 0;
-  opt_queue_empty(1);
-  tts_send(synth[tts.synth].flush, strlen(synth[tts.synth].flush));
+  opt_queue_empty (1);
+  tts_send (synth[tts.synth].flush, strlen (synth[tts.synth].flush));
   tts.oflag = 0;
   tts_flushed = 1;
 
@@ -146,25 +154,28 @@ void tts_silence()
   {
     do
     {
-      if (!readable(tts.fd, 50000)) break;
-      if (read(tts.fd, tmp, 1) == -1)
+      if (!readable (tts.fd, 50000))
+	break;
+      if (read (tts.fd, tmp, 1) == -1)
       {
-	perror("tts_silence");
+	perror ("tts_silence");
 	break;
       }
-    } while (tmp[0] != 1 && tmp[0] != 0);
+    }
+    while (tmp[0] != 1 && tmp[0] != 0);
     /* Following is a hack; without it, [:sa c] could have been sent and
        lost by the DEC-talk if a silence happens immediately after it */
-    tts_send("[:sa c]", 7);
-    tts.oflag = 0;	/* pretend we didn't just do that */
+    tts_send ("[:sa c]", 7);
+    tts.oflag = 0;		/* pretend we didn't just do that */
   }
 }
 
 
-static void tts_obufpack()
+static void
+tts_obufpack ()
 {
-  (void) memmove(tts.obuf, tts.obuf + tts.obufhead,
-		 tts.obuftail - tts.obufhead);
+  (void) memmove (tts.obuf, tts.obuf + tts.obufhead,
+		  tts.obuftail - tts.obufhead);
   tts.obuftail -= tts.obufhead;
   tts.obufhead = 0;
 }
@@ -175,34 +186,35 @@ static int ofd;
 #endif
 
 
- /*ARGSUSED*/ static void tts_obufout(int x)
+ /*ARGSUSED*/ static void
+tts_obufout (int x)
 {
   int len, len2;
   int oldoflag;
 
   if (!tts.flood)
   {
-    opt_queue_empty(2);
+    opt_queue_empty (2);
   }
   oldoflag = tts.oflag;
   while (tts.obufhead < tts.obuftail)
   {
-    len = strlen(tts.obuf + tts.obufhead);
+    len = strlen (tts.obuf + tts.obufhead);
     if (len > 1024)
     {
       len = 1024;
     }
-    len2 = write(tts.fd, tts.obuf + tts.obufhead, len);
+    len2 = write (tts.fd, tts.obuf + tts.obufhead, len);
 #ifdef TTSLOG
-    (void) write(ofd, tts.obuf + tts.obufhead, len2);
+    (void) write (ofd, tts.obuf + tts.obufhead, len2);
 #endif
     tts.obufhead += len2;
     if (len2 < len)
     {
-      tts_checkreset();
+      tts_checkreset ();
       tts.oflag = oldoflag;
-      (void) signal(SIGALRM, &tts_obufout);
-      alarm(1);
+      (void) signal (SIGALRM, &tts_obufout);
+      alarm (1);
       return;
     }
     while (tts.obufhead < tts.obuftail && !tts.obuf[tts.obufhead])
@@ -212,11 +224,12 @@ static int ofd;
   }
   tts.flood = 0;
   tts.oflag = oldoflag;
-  (void) signal(SIGALRM, &tts_obufout);
+  (void) signal (SIGALRM, &tts_obufout);
 }
 
 
-static void tts_addbuf(char *buf, int len, int len2)
+static void
+tts_addbuf (char *buf, int len, int len2)
 {
   char *ptr;
 
@@ -224,7 +237,8 @@ static void tts_addbuf(char *buf, int len, int len2)
   if (len2 == -1)
   {
     ptr = buf;
-  } else
+  }
+  else
   {
     ptr = buf + len2;
     len -= len2;
@@ -234,20 +248,22 @@ static void tts_addbuf(char *buf, int len, int len2)
     if ((tts.obuftail - tts.obufhead) + len > tts.obuflen)
     {
       tts.obuflen += 1024 + len - (len % 1024);
-      tts.obuf = realloc(tts.obuf, tts.obuflen);
-    } else
+      tts.obuf = realloc (tts.obuf, tts.obuflen);
+    }
+    else
     {
-      tts_obufpack();
+      tts_obufpack ();
     }
   }
-  (void) memcpy(tts.obuf + tts.obuftail, ptr, len);
+  (void) memcpy (tts.obuf + tts.obuftail, ptr, len);
   tts.obuftail += len;
   tts.obuf[tts.obuftail++] = 0;
-  (void) alarm(1);
+  (void) alarm (1);
 }
 
 
-void tts_send(char *buf, int len)
+void
+tts_send (char *buf, int len)
 {
   int len2;
 
@@ -262,89 +278,112 @@ void tts_send(char *buf, int len)
 #ifndef SILENT
   if (!tts.flood)
   {
-    len2 = write(tts.fd, buf, len);
+    len2 = write (tts.fd, buf, len);
 
 #ifdef TTSLOG
-    (void) write(ofd, buf, len2);
+    (void) write (ofd, buf, len2);
 #endif
 
     if (len2 < len)
     {
-      tts_addbuf(buf, len, len2);
+      tts_addbuf (buf, len, len2);
     }
-  } else
-    tts_addbuf(buf, len, 0);
+  }
+  else
+    tts_addbuf (buf, len, 0);
 #endif
 
   tts.oflag = 1;
 }
 
 
-static int unspeakable(unsigned char ch)
+static int
+unspeakable (unsigned char ch)
 {
   char *p = synth[tts.synth].unspeakable;
 
-  if (ch < 32) return 1;
+  if (ch < 32)
+    return 1;
   while (*p)
   {
-    if (*p++ == ch) return 1;
+    if (*p++ == ch)
+      return 1;
   }
   return (0);
 }
 
-void tts_end()
+void
+tts_end ()
 {
-  tts_send(synth[tts.synth].end, strlen(synth[tts.synth].end));
+  tts_send (synth[tts.synth].end, strlen (synth[tts.synth].end));
 }
 
 #ifdef ENABLE_NLS
 
-int is_unicode(unsigned char *buf,int len)
+int
+is_unicode (unsigned char *buf, int len)
 {
-	int n;
-	while (len) {
-		if (!(*buf & 0x80)) {
-			buf++;
-			len--;
-			continue;
-		}
-		if (((*buf) & 0xe0)==0xc0) n=1;
-		else if (((*buf) & 0xf0)==0xe0) n=2;
-		else if (((*buf) & 0xf8)==0xf0) n=3;
-		else if (((*buf) & 0xfc)==0xf8) n=4;
-		else if (((*buf) & 0xfe)==0xfc) n=5;
-		else return 0;
-		buf++;len--;
-		while (n--) {
-			if (!len) return 0;
-			if (((*buf) & 0xc0)!=0x80) return 0;
-			len--;
-			buf++;
-		}
-	}
-	return 1;
+  int n;
+  while (len)
+  {
+    if (!(*buf & 0x80))
+    {
+      buf++;
+      len--;
+      continue;
+    }
+    if (((*buf) & 0xe0) == 0xc0)
+      n = 1;
+    else if (((*buf) & 0xf0) == 0xe0)
+      n = 2;
+    else if (((*buf) & 0xf8) == 0xf0)
+      n = 3;
+    else if (((*buf) & 0xfc) == 0xf8)
+      n = 4;
+    else if (((*buf) & 0xfe) == 0xfc)
+      n = 5;
+    else
+      return 0;
+    buf++;
+    len--;
+    while (n--)
+    {
+      if (!len)
+	return 0;
+      if (((*buf) & 0xc0) != 0x80)
+	return 0;
+      len--;
+      buf++;
+    }
+  }
+  return 1;
 }
 
-void tts_send_iso(char *buf,int len)
+void
+tts_send_iso (char *buf, int len)
 {
-  char outbuf[1024],*o;
+  char outbuf[1024], *o;
   iconv_t cd;
-  size_t l1,l2;
-  if (is_unicode((unsigned char *)buf, len)) {
-    tts_send(buf,len);
+  size_t l1, l2;
+  if (is_unicode ((unsigned char *) buf, len))
+  {
+    tts_send (buf, len);
     return;
   }
-  l1=len;
-  cd=iconv_open("UTF-8",nl_langinfo(CODESET));
-  if (cd == (iconv_t) -1) return;
-  while (l1) {
-    l2=1024;
-    o=outbuf;
-    iconv(cd,&buf,&l1,&o,&l2);
-    if (l2 == 1024) break;
-    tts_send(outbuf,o-outbuf);
+  l1 = len;
+  cd = iconv_open ("UTF-8", nl_langinfo (CODESET));
+  if (cd == (iconv_t) - 1)
+    return;
+  while (l1)
+  {
+    l2 = 1024;
+    o = outbuf;
+    iconv (cd, &buf, &l1, &o, &l2);
+    if (l2 == 1024)
+      break;
+    tts_send (outbuf, o - outbuf);
   }
-  iconv_close(cd);
+  iconv_close (cd);
 }
 
 #else
@@ -358,54 +397,67 @@ void tts_send_iso(char *buf,int len)
    used by w_speak()
 */
 
-void tts_out_w(wchar_t *buf,int len)
+void
+tts_out_w (wchar_t *buf, int len)
 {
   char obuf[1024];
   int obo = 0;
   char *p;
   int i;
-  int xml = 0; /* what's this? */
-    
-  if (!len) return;
-  opt_queue_empty(0);
+  int xml = 0;			/* what's this? */
+
+  if (!len)
+    return;
+  opt_queue_empty (0);
   if (tts.synth == TTS_SPEECHD)
   {
-    tts_send("SPEAK\r\n", 7);
-    if (*buf=='.' && len>1 && buf[1] == '\r') {
-       tts_send(".",1);
+    tts_send ("SPEAK\r\n", 7);
+    if (*buf == '.' && len > 1 && buf[1] == '\r')
+    {
+      tts_send (".", 1);
     }
-    while (len>0) {
-      if (len>=3 && buf[0]=='\r' && buf[1]=='.' && buf[2]=='\r') {
-        len-=3;
-        buf+=3;
-        continue;
+    while (len > 0)
+    {
+      if (len >= 3 && buf[0] == '\r' && buf[1] == '.' && buf[2] == '\r')
+      {
+	len -= 3;
+	buf += 3;
+	continue;
       }
-      if (*buf<0x80) {
-        obuf[obo++]=*buf;
-      } else if (*buf<0x800) {
-        obuf[obo++]=0xc0 | (*buf >> 6);
-        obuf[obo++]=0x80 | (*buf & 0x3f);
+      if (*buf < 0x80)
+      {
+	obuf[obo++] = *buf;
       }
-      else if (*buf < 0x10000) {
-        obuf[obo++]=0xe0 | (*buf >> 12);
-        obuf[obo++]=0x80 | ((*buf >>6) & 0x3f);
-        obuf[obo++]=0x80 | (*buf & 0x3f);
-      } else obuf[obo++]=' ';
-      if (obo>=1020) {
-        tts_send(obuf,obo);
-        obo=0;
+      else if (*buf < 0x800)
+      {
+	obuf[obo++] = 0xc0 | (*buf >> 6);
+	obuf[obo++] = 0x80 | (*buf & 0x3f);
+      }
+      else if (*buf < 0x10000)
+      {
+	obuf[obo++] = 0xe0 | (*buf >> 12);
+	obuf[obo++] = 0x80 | ((*buf >> 6) & 0x3f);
+	obuf[obo++] = 0x80 | (*buf & 0x3f);
+      }
+      else
+	obuf[obo++] = ' ';
+      if (obo >= 1020)
+      {
+	tts_send (obuf, obo);
+	obo = 0;
       }
       buf++;
       len--;
     }
-    if (obo) tts_send(obuf,obo);
-    tts_send("\r\n.\r\n", 5);
+    if (obo)
+      tts_send (obuf, obo);
+    tts_send ("\r\n.\r\n", 5);
     return;
   }
   /* for other synthesizers we assume they works internally in
      ISO-8859-1 */
   p = synth[tts.synth].say;
-  opt_queue_empty(0);
+  opt_queue_empty (0);
   while (*p)
   {
     if (*p == '%')
@@ -413,18 +465,18 @@ void tts_out_w(wchar_t *buf,int len)
       p++;
       for (i = 0; i < len; i++)
       {
-	if (buf[i] > 255 || unspeakable((unsigned char)buf[i]))
+	if (buf[i] > 255 || unspeakable ((unsigned char) buf[i]))
 	{
 	  if (obo > 0 && obuf[obo - 1] != ' ')
 	  {
 	    obuf[obo++] = ' ';
-	    tts_send(obuf, obo);
+	    tts_send (obuf, obo);
 	    obo = 0;
 	  }
-	  else if (buf[i]<256 && dict[buf[i]])
+	  else if (buf[i] < 256 && dict[buf[i]])
 	  {
-	    (void) strcpy(obuf + obo, dict[buf[i]]);
-	    obo = strlen(obuf);
+	    (void) strcpy (obuf + obo, dict[buf[i]]);
+	    obo = strlen (obuf);
 	  }
 	  obuf[obo++] = 32;
 	}
@@ -432,24 +484,36 @@ void tts_out_w(wchar_t *buf,int len)
 	{
 	  switch (buf[i])
 	  {
-	  /* For some reason, &lt; does not work for me with Voxeo */
-	  case '<': strcpy(obuf + obo, " less than "); obo += 11; break;
-	  case '>': strcpy(obuf + obo, "&gt;"); obo += 4; break;
-	  case '&': strcpy(obuf + obo, "&amp;"); obo += 5; break;
-	  default: obuf[obo++] = buf[i]; break;
+	    /* For some reason, &lt; does not work for me with Voxeo */
+	  case '<':
+	    strcpy (obuf + obo, " less than ");
+	    obo += 11;
+	    break;
+	  case '>':
+	    strcpy (obuf + obo, "&gt;");
+	    obo += 4;
+	    break;
+	  case '&':
+	    strcpy (obuf + obo, "&amp;");
+	    obo += 5;
+	    break;
+	  default:
+	    obuf[obo++] = buf[i];
+	    break;
 	  }
 	}
 	else
 	{
-	  if (ui.split_caps && i > 0 && iswlower(buf[i-1]) && iswupper(buf[i]))
+	  if (ui.split_caps && i > 0 && iswlower (buf[i - 1])
+	      && iswupper (buf[i]))
 	  {
 	    obuf[obo++] = ' ';
 	  }
 	  obuf[obo++] = buf[i];
 	}
-	if (obo > (sizeof(obuf) / sizeof(obuf[0])) - 6)
+	if (obo > (sizeof (obuf) / sizeof (obuf[0])) - 6)
 	{
-	  tts_send(obuf, obo);
+	  tts_send (obuf, obo);
 	  obo = 0;
 	}
       }
@@ -460,33 +524,38 @@ void tts_out_w(wchar_t *buf,int len)
     }
     p++;
   }
-  tts_send(obuf, obo);
+  tts_send (obuf, obo);
 }
-void tts_out(unsigned char *buf, int len)
+
+void
+tts_out (unsigned char *buf, int len)
 {
   char obuf[1024];
   char *p;
-  int obo = 0;	/* current offset into obuf */
+  int obo = 0;			/* current offset into obuf */
   int i;
   int xml = 0;
 
-  if (!len) return;
-  opt_queue_empty(0);
+  if (!len)
+    return;
+  opt_queue_empty (0);
   if (tts.synth == TTS_SPEECHD)
   {
     char *q;
-    tts_send("SPEAK\r\n", 7);
-    if (buf[0] == '.' && buf[1] == '\r') tts_send(".", 1);
-    for (p = (char *)buf; (q = strstr(p + 1, "\r.\r")) && q < (char *)buf+len; p = q)
+    tts_send ("SPEAK\r\n", 7);
+    if (buf[0] == '.' && buf[1] == '\r')
+      tts_send (".", 1);
+    for (p = (char *) buf;
+	 (q = strstr (p + 1, "\r.\r")) && q < (char *) buf + len; p = q)
     {
-      tts_send_iso(p, q - p);
+      tts_send_iso (p, q - p);
     }
-    tts_send_iso(p, (long)buf + len - (long)p);
-    tts_send("\r\n.\r\n", 5);
+    tts_send_iso (p, (long) buf + len - (long) p);
+    tts_send ("\r\n.\r\n", 5);
     return;
   }
   p = synth[tts.synth].say;
-  opt_queue_empty(0);
+  opt_queue_empty (0);
   while (*p)
   {
     if (*p == '%')
@@ -494,18 +563,18 @@ void tts_out(unsigned char *buf, int len)
       p++;
       for (i = 0; i < len; i++)
       {
-	if (unspeakable((unsigned char)buf[i]))
+	if (unspeakable ((unsigned char) buf[i]))
 	{
 	  if (obo > 0 && obuf[obo - 1] != ' ')
 	  {
 	    obuf[obo++] = ' ';
-	    tts_send(obuf, obo);
+	    tts_send (obuf, obo);
 	    obo = 0;
 	  }
 	  if (dict[buf[i]])
 	  {
-	    (void) strcpy(obuf + obo, dict[buf[i]]);
-	    obo = strlen(obuf);
+	    (void) strcpy (obuf + obo, dict[buf[i]]);
+	    obo = strlen (obuf);
 	  }
 	  obuf[obo++] = 32;
 	}
@@ -513,24 +582,36 @@ void tts_out(unsigned char *buf, int len)
 	{
 	  switch (buf[i])
 	  {
-	  /* For some reason, &lt; does not work for me with Voxeo */
-	  case '<': strcpy(obuf + obo, " less than "); obo += 11; break;
-	  case '>': strcpy(obuf + obo, "&gt;"); obo += 4; break;
-	  case '&': strcpy(obuf + obo, "&amp;"); obo += 5; break;
-	  default: obuf[obo++] = buf[i]; break;
+	    /* For some reason, &lt; does not work for me with Voxeo */
+	  case '<':
+	    strcpy (obuf + obo, " less than ");
+	    obo += 11;
+	    break;
+	  case '>':
+	    strcpy (obuf + obo, "&gt;");
+	    obo += 4;
+	    break;
+	  case '&':
+	    strcpy (obuf + obo, "&amp;");
+	    obo += 5;
+	    break;
+	  default:
+	    obuf[obo++] = buf[i];
+	    break;
 	  }
 	}
 	else
 	{
-	  if (ui.split_caps && i > 0 && islower(buf[i-1]) && isupper(buf[i]))
+	  if (ui.split_caps && i > 0 && islower (buf[i - 1])
+	      && isupper (buf[i]))
 	  {
 	    obuf[obo++] = ' ';
 	  }
 	  obuf[obo++] = buf[i];
 	}
-	if (obo > (sizeof(obuf) / sizeof(obuf[0])) - 6)
+	if (obo > (sizeof (obuf) / sizeof (obuf[0])) - 6)
 	{
-	  tts_send(obuf, obo);
+	  tts_send (obuf, obo);
 	  obo = 0;
 	}
       }
@@ -541,27 +622,30 @@ void tts_out(unsigned char *buf, int len)
     }
     p++;
   }
-  tts_send(obuf, obo);
+  tts_send (obuf, obo);
 }
 
-void tts_say(char *buf)
+void
+tts_say (char *buf)
 {
-  tts_out((unsigned char *) buf, strlen(buf));
+  tts_out ((unsigned char *) buf, strlen (buf));
 }
 
 
-void tts_say_printf(char *fmt, ...)
+void
+tts_say_printf (char *fmt, ...)
 {
   va_list arg;
   char buf[200];
 
-  va_start(arg, fmt);
-  (void) vsnprintf(buf, sizeof(buf), fmt, arg);
-  tts_say(buf);
-  va_end(arg);
+  va_start (arg, fmt);
+  (void) vsnprintf (buf, sizeof (buf), fmt, arg);
+  tts_say (buf);
+  va_end (arg);
 }
 
-void tts_saychar(wchar_t ch)
+void
+tts_saychar (wchar_t ch)
 {
   int i, j = 0;
   int stack[10];
@@ -572,62 +656,70 @@ void tts_saychar(wchar_t ch)
   }
   if (tts.synth == TTS_SPEECHD)
   {
-    if (ch == 32 || ch == 160) tts_send("CHAR space\r\n", 12);
+    if (ch == 32 || ch == 160)
+      tts_send ("CHAR space\r\n", 12);
 #ifndef ENABLE_NLS
-    else tts_printf_ll("CHAR %c\r\n", ch);
+    else
+      tts_printf_ll ("CHAR %c\r\n", ch);
 #else
-    else if (ch < 0x80) {
-      tts_printf_ll("CHAR %c\r\n", ch);
+    else if (ch < 0x80)
+    {
+      tts_printf_ll ("CHAR %c\r\n", ch);
     }
-    else {
-      char buf[8],*cin,*cout;
-      size_t l1,l2;
+    else
+    {
+      char buf[8], *cin, *cout;
+      size_t l1, l2;
       iconv_t cd;
-      cd=iconv_open("UTF-8","WCHAR_T");
-      if (cd == (iconv_t) -1) return;
-      l1=sizeof(wchar_t);l2=7;
-      cin=(char *)&ch;cout=buf;
-      iconv(cd,&cin,&l1,&cout,&l2);
-      iconv_close(cd);
-      *cout=0;
-      tts_printf_ll("CHAR %s\r\n", buf);
+      cd = iconv_open ("UTF-8", "WCHAR_T");
+      if (cd == (iconv_t) - 1)
+	return;
+      l1 = sizeof (wchar_t);
+      l2 = 7;
+      cin = (char *) &ch;
+      cout = buf;
+      iconv (cd, &cin, &l1, &cout, &l2);
+      iconv_close (cd);
+      *cout = 0;
+      tts_printf_ll ("CHAR %s\r\n", buf);
     }
-#endif    
+#endif
     return;
   }
-  if (unspeakable(ch) && ch < 128 && dict[ch])
+  if (unspeakable (ch) && ch < 128 && dict[ch])
   {
-    tts_say(dict[ch]);
+    tts_say (dict[ch]);
     return;
   }
   if (!synth[tts.synth].charoff)
   {				/* assume on string does everything */
-    (void) sprintf(ttsbuf, synth[tts.synth].charon, ch);
-    tts_send(ttsbuf, strlen(ttsbuf));
+    (void) sprintf (ttsbuf, synth[tts.synth].charon, ch);
+    tts_send (ttsbuf, strlen (ttsbuf));
     return;
   }
 
   for (i = 0; i < NUMOPTS; i++)
   {
-    if ((opt[i].type & 0x3f) != OT_TREE && !opt[i].ptr && opt[i].synth == tts.synth)
+    if ((opt[i].type & 0x3f) != OT_TREE && !opt[i].ptr
+	&& opt[i].synth == tts.synth)
     {
       stack[j++] = i;
-      stack[j++] = opt_getval(i, 0);
-      opt_set(i, &opt[i].v.enum_max);
+      stack[j++] = opt_getval (i, 0);
+      opt_set (i, &opt[i].v.enum_max);
     }
   }
   ttsbuf[1] = 0;
-  opt_queue_empty(3);
+  opt_queue_empty (3);
   ttsbuf[0] = ch;
-  tts_send(ttsbuf, 1);
+  tts_send (ttsbuf, 1);
   if (synth[tts.synth].saychar_needs_flush)
   {
-    tts_send(synth[tts.synth].say + 2, strlen(synth[tts.synth].say) - 2);
+    tts_send (synth[tts.synth].say + 2, strlen (synth[tts.synth].say) - 2);
   }
   while (j)
   {
     j -= 2;
-    opt_set(stack[j], stack + j + 1);
+    opt_set (stack[j], stack + j + 1);
   }
 }
 
@@ -641,40 +733,49 @@ static char *ph_alph[] = {
   "yankee", "zulu"
 };
 
-char *get_alph(wchar_t ch)
+char *
+get_alph (wchar_t ch)
 {
-	char *c,buf[8];
-	if (!iswalpha(ch)) return NULL;
-	ch=towlower(ch);
-	c=NULL;
-	if (ch>='a' && ch<='z') c=ph_alph[ch-'a'];
-	if (tts.synth != TTS_SPEECHD) return c;
-	if (c) return _(c);
-	sprintf(buf,"#%x",(unsigned int)ch);
-	c=_(buf);
-	if (!c || *c=='#') return NULL;
-	return c;
+  char *c, buf[8];
+  if (!iswalpha (ch))
+    return NULL;
+  ch = towlower (ch);
+  c = NULL;
+  if (ch >= 'a' && ch <= 'z')
+    c = ph_alph[ch - 'a'];
+  if (tts.synth != TTS_SPEECHD)
+    return c;
+  if (c)
+    return _(c);
+  sprintf (buf, "#%x", (unsigned int) ch);
+  c = _(buf);
+  if (!c || *c == '#')
+    return NULL;
+  return c;
 }
 
-void tts_sayphonetic(wchar_t ch)
+void
+tts_sayphonetic (wchar_t ch)
 {
   char *c;
-  c=get_alph(ch);
+  c = get_alph (ch);
   if (!c)
   {
-    tts_saychar(ch);
+    tts_saychar (ch);
     return;
   }
-  if (iswupper(ch)) {
-	char buf[64];
-	sprintf(buf,"%s %s",_("cap"),c);
-	tts_say(buf);
-	return;
+  if (iswupper (ch))
+  {
+    char buf[64];
+    sprintf (buf, "%s %s", _("cap"), c);
+    tts_say (buf);
+    return;
   }
-  tts_say(c);
+  tts_say (c);
 }
 
-static int open_tcp(char *port)
+static int
+open_tcp (char *port)
 {
   char host[1024];
   int portnum;
@@ -683,44 +784,45 @@ static int open_tcp(char *port)
   char *p;
   int len;
 
-  p = strstr(port, ":");
-  portnum = atoi(p + 1);
+  p = strstr (port, ":");
+  portnum = atoi (p + 1);
   len = p - port;
   if (len > 1023)
   {
-    fprintf(stderr, "synthesizer port too long\n");
-    exit(1);
+    fprintf (stderr, "synthesizer port too long\n");
+    exit (1);
   }
-  memcpy(host, port, len);
+  memcpy (host, port, len);
   host[len] = '\0';
-  if ((fd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
+  if ((fd = socket (AF_INET, SOCK_STREAM, 0)) < 0)
   {
-    perror("socket");
-    exit(1);
+    perror ("socket");
+    exit (1);
   }
-  memset(&servaddr, 0, sizeof(servaddr));
+  memset (&servaddr, 0, sizeof (servaddr));
   servaddr.sin_family = AF_INET;
-  servaddr.sin_port = htons(portnum);
+  servaddr.sin_port = htons (portnum);
 
 #ifdef HAVE_INET_PTON
-  if (inet_pton(AF_INET, host, &servaddr.sin_addr) <= 0)
+  if (inet_pton (AF_INET, host, &servaddr.sin_addr) <= 0)
   {
-    perror("inet_pton");
-    exit(1);
+    perror ("inet_pton");
+    exit (1);
   }
 #else
-  servaddr.sin_addr.s_addr = inet_addr(host);
+  servaddr.sin_addr.s_addr = inet_addr (host);
 #endif
 
-  if (connect(fd, (struct sockaddr *) &servaddr, sizeof(servaddr)) < 0)
+  if (connect (fd, (struct sockaddr *) &servaddr, sizeof (servaddr)) < 0)
   {
-    perror("connect");
-    exit(1);
+    perror ("connect");
+    exit (1);
   }
   return fd;
 }
 
-int tts_init( int first_call)
+int
+tts_init (int first_call)
 {
   struct termios t;
   char *arg[8];
@@ -729,22 +831,22 @@ int tts_init( int first_call)
   int mode = O_RDWR | O_NONBLOCK;
   char buf[100];
 
-  portname = getfn(tts.port);
+  portname = getfn (tts.port);
   tts.pid = 0;
-  tts.reinit = !first_call; 
+  tts.reinit = !first_call;
 
-  (void) signal(SIGALRM, &tts_obufout);
+  (void) signal (SIGALRM, &tts_obufout);
 
 #ifdef TTSLOG
-  ofd = open("tts.log", O_WRONLY | O_CREAT);
+  ofd = open ("tts.log", O_WRONLY | O_CREAT);
   if (ofd == -1)
   {
-    perror("open");
+    perror ("open");
   }
 #endif
-  if (first_call && tts.port[0] != '|' && strstr(tts.port, ":"))
+  if (first_call && tts.port[0] != '|' && strstr (tts.port, ":"))
   {
-    tts.fd = open_tcp(tts.port);
+    tts.fd = open_tcp (tts.port);
   }
   else if (tts.port[0] != '|')
   {
@@ -758,37 +860,37 @@ int tts_init( int first_call)
     }
     if (first_call)
     {
-      tts.fd = open(portname, mode);
+      tts.fd = open (portname, mode);
     }
     if (tts.fd == -1)
     {
-      perror("tts");
-      exit(1);
+      perror ("tts");
+      exit (1);
     }
-    (void) tcgetattr(tts.fd, &t);
+    (void) tcgetattr (tts.fd, &t);
     if (tts.synth == TTS_DECTALK)
     {
       /* When sending a ^C, make sure we send a ^C and not a break */
-      cfmakeraw(&t);
+      cfmakeraw (&t);
       /* following two lines match the Emacspeak server */
-      t.c_iflag |= IXON|IXOFF;
+      t.c_iflag |= IXON | IXOFF;
       t.c_lflag |= IEXTEN;
       /* When the DEC-talk powers on, it sends several ^A's.  Discard them */
-      tcflush(tts.fd, TCIFLUSH);
+      tcflush (tts.fd, TCIFLUSH);
     }
     t.c_cflag |= CRTSCTS | CLOCAL;
     t.c_cc[VMIN] = 0;
     t.c_cc[VTIME] = 10;
-    cfsetospeed(&t, B9600);
-    (void) tcsetattr(tts.fd, 0, &t);
+    cfsetospeed (&t, B9600);
+    (void) tcsetattr (tts.fd, 0, &t);
   }
   else
   {				/* a pipe */
-    (void) strcpy(buf, tts.port + 1);
-    arg[i = 0] = strtok(buf, " ");
+    (void) strcpy (buf, tts.port + 1);
+    arg[i = 0] = strtok (buf, " ");
     while (i < 7)
     {
-      if (!(arg[++i] = strtok(NULL, " ")))
+      if (!(arg[++i] = strtok (NULL, " ")))
       {
 	break;
       }
@@ -796,81 +898,87 @@ int tts_init( int first_call)
 
     if (first_call)
     {
-      if (openpty(&tts.fd, &tts.fd_slave, NULL, NULL, NULL) == -1)
+      if (openpty (&tts.fd, &tts.fd_slave, NULL, NULL, NULL) == -1)
       {
-	perror("openpty");
-	exit(1);
+	perror ("openpty");
+	exit (1);
       }
-    } 
+    }
 
-    if (!(tts.pid = fork()))
+    if (!(tts.pid = fork ()))
     {
       /* child -- set up tty */
-      (void) dup2(tts.fd_slave, 0);
-      (void) dup2(tts.fd_slave, 1);
-      (void) dup2(tts.fd_slave, 2);
+      (void) dup2 (tts.fd_slave, 0);
+      (void) dup2 (tts.fd_slave, 1);
+      (void) dup2 (tts.fd_slave, 2);
       /* tts.fd_slave is not closed */
     }
     if (!tts.pid)
     {
-      (void) execvp(arg[0], arg);
-      perror("execpv");
+      (void) execvp (arg[0], arg);
+      perror ("execpv");
     }
-    (void) usleep(10000);
+    (void) usleep (10000);
     if (tts.pid == -1)
     {
-      perror("forkpty");
+      perror ("forkpty");
     }
   }
   if (tts.synth == TTS_SPEECHD)
   {
-    char *logname = getenv("LOGNAME");
-    if (logname == NULL) logname = getlogin();
-    tts_printf_ll("SET self CLIENT_NAME %s:yasr:tts\r\n", logname);
+    char *logname = getenv ("LOGNAME");
+    if (logname == NULL)
+      logname = getlogin ();
+    tts_printf_ll ("SET self CLIENT_NAME %s:yasr:tts\r\n", logname);
   }
-  else tts_send(synth[tts.synth].init, strlen(synth[tts.synth].init));
+  else
+    tts_send (synth[tts.synth].init, strlen (synth[tts.synth].init));
 
   /* init is now finished */
   tts.reinit = 0;
-  
+
   return (0);
 }
 
-int tts_reinit2()
+int
+tts_reinit2 ()
 {
-  tts_init(0);
-  tts_initsynth(NULL);
+  tts_init (0);
+  tts_initsynth (NULL);
   return (0);
 }
 
-void tts_checkreset()
+void
+tts_checkreset ()
 {
   int status;
 
-  /*If we don't have a child, do nothing*/
+  /*If we don't have a child, do nothing */
   if (tts.pid <= 0)
     return;
 
-  status = kill(tts.pid, 0);
+  status = kill (tts.pid, 0);
   if (!status)
-    return; /*There's a process, it's good*/
+    return;			/*There's a process, it's good */
 
-  /*There's no process, so let's fork a new synth engine*/
-  close(tts.fd);
-  tts_init(FALSE);
+  /*There's no process, so let's fork a new synth engine */
+  close (tts.fd);
+  tts_init (FALSE);
 }
- 
-void tts_addchr(wchar_t ch)
+
+void
+tts_addchr (wchar_t ch)
 {
   tts.buf[tts.outlen++] = ch;
   if (tts.outlen > 250)
   {
-    tts_flush();
+    tts_flush ();
   }
 }
 
 
- /*ARGSUSED*/ void tts_initsynth(int *argp)
+ /*ARGSUSED*/ void
+tts_initsynth (int *argp)
 {
   int i, v;
 
@@ -879,37 +987,38 @@ void tts_addchr(wchar_t ch)
     if ((opt[i].type & 0x40) &&
 	opt[i].synth == tts.synth && (opt[i].type & 0x3f) != 0x03)
     {
-      v = opt_getval(i, 0);
-      opt_set(i, &v);
+      v = opt_getval (i, 0);
+      opt_set (i, &v);
     }
   }
   if (!ui.silent)
   {
-    tts_say(_("Synthesizer reinitialized."));
+    tts_say (_("Synthesizer reinitialized."));
   }
 }
 
 
 
- /*ARGSUSED*/ void tts_reinit(int *argp)
+ /*ARGSUSED*/ void
+tts_reinit (int *argp)
 {
-  int pid=tts.pid;
+  int pid = tts.pid;
 
-  if (pid==0)
+  if (pid == 0)
   {
-      return;
+    return;
   }
-  
-  tts.reinit=1; /* Start reinit */
 
-  tts_silence();
-  usleep(500000);
+  tts.reinit = 1;		/* Start reinit */
 
-  if (kill (pid, SIGTERM)!=0)
+  tts_silence ();
+  usleep (500000);
+
+  if (kill (pid, SIGTERM) != 0)
   {
-    if (errno==ESRCH)
+    if (errno == ESRCH)
     {
-      tts_reinit2();
+      tts_reinit2 ();
     }
     else
     {
@@ -918,31 +1027,34 @@ void tts_addchr(wchar_t ch)
   }
 
   /* wait init completion (tts.fd must be available) */
-  while(tts.reinit)
+  while (tts.reinit)
   {
-      usleep(100000);
+    usleep (100000);
   }
 }
 
 
-void tts_charon()
+void
+tts_charon ()
 {
-  ttssend(synth[tts.synth].charon);
+  ttssend (synth[tts.synth].charon);
 }
 
 
-void tts_charoff()
+void
+tts_charoff ()
 {
-  ttssend(synth[tts.synth].charoff);
+  ttssend (synth[tts.synth].charoff);
 }
 
 
-void tts_printf_ll(const char *str, ...)
+void
+tts_printf_ll (const char *str, ...)
 {
   char buf[200];
   va_list args;
 
-  va_start(args, str);
-  vsprintf(buf, str, args);
-  tts_send(buf, strlen(buf));
+  va_start (args, str);
+  vsprintf (buf, str, args);
+  tts_send (buf, strlen (buf));
 }

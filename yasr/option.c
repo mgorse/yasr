@@ -36,7 +36,8 @@ typedef struct
 static Optqueue opq;
 
 
-static int options_are_equal(int i, int j)
+static int
+options_are_equal (int i, int j)
 {
   if (i == j)
   {
@@ -52,15 +53,17 @@ static int options_are_equal(int i, int j)
   return (0);
 }
 
-static void opt_queue_add(int num, ...)
+static void
+opt_queue_add (int num, ...)
 {
   int i;
   va_list args;
 
-  va_start(args, num);
+  va_start (args, num);
   for (i = 0; i < opq.len; i++)
   {
-    if (options_are_equal(i, num)) break;
+    if (options_are_equal (i, num))
+      break;
   }
   if (i == 10)
   {
@@ -71,13 +74,15 @@ static void opt_queue_add(int num, ...)
     opq.opt[i] = num;
     if ((opt[num].type & 0x3f) == OT_FLOAT)
     {
-      opq.v[i].val_float = va_arg(args, double);
+      opq.v[i].val_float = va_arg (args, double);
     }
-    else opq.v[i].val = va_arg(args, int);
-    if (i == opq.len) opq.len++;
-    (void) alarm(1);
+    else
+      opq.v[i].val = va_arg (args, int);
+    if (i == opq.len)
+      opq.len++;
+    (void) alarm (1);
   }
-  va_end(args);
+  va_end (args);
 }
 
 
@@ -86,13 +91,14 @@ static int curopt;
 int synthopt;
 
 
-void opt_add(void *ptr, int tree, char *name, int type, ...)
+void
+opt_add (void *ptr, int tree, char *name, int type, ...)
 {
   Opt *optr;
   va_list args;
   int i;
 
-  if (!strcasecmp(name, "synthesizer"))
+  if (!strcasecmp (name, "synthesizer"))
     synthopt = curopt;
   optr = &opt[curopt];
   optr->ptr = ptr;
@@ -100,50 +106,51 @@ void opt_add(void *ptr, int tree, char *name, int type, ...)
   optr->internal_name = name;
   optr->localized_name = _(name);
   optr->type = type;
-  va_start(args, type);
+  va_start (args, type);
   switch (type & 0x3f)
   {
   case OT_INT:			/* Numeric value.  Expects a min and a max. */
-    optr->v.val_int.min = va_arg(args, int);
-    optr->v.val_int.max = va_arg(args, int);
+    optr->v.val_int.min = va_arg (args, int);
+    optr->v.val_int.max = va_arg (args, int);
     break;
-  case OT_FLOAT:			/* Numeric value.  Expects a min and a max. */
-    optr->v.val_float.min = va_arg(args, double);
-    optr->v.val_float.max = va_arg(args, double);
+  case OT_FLOAT:		/* Numeric value.  Expects a min and a max. */
+    optr->v.val_float.min = va_arg (args, double);
+    optr->v.val_float.max = va_arg (args, double);
     break;
 
   case OT_ENUM:		/* Toggle between several values. Expects the 
 				 * number of values followed by a name for each.
 				 */
-    optr->v.enum_max = va_arg(args, int) - 1;
-    optr->arg = malloc((optr->v.enum_max + 1) * sizeof(char *));
+    optr->v.enum_max = va_arg (args, int) - 1;
+    optr->arg = malloc ((optr->v.enum_max + 1) * sizeof (char *));
     for (i = 0; i <= optr->v.enum_max; i++)
     {
-      optr->arg[i] = strdup(va_arg(args, char *));
+      optr->arg[i] = strdup (va_arg (args, char *));
     }
     break;
 
-  case OT_TREE:			/* Sub-menu -- Next option is id */
-    optr->v.submenu = va_arg(args, int);
+  case OT_TREE:		/* Sub-menu -- Next option is id */
+    optr->v.submenu = va_arg (args, int);
     break;
   }
   if (optr->type & OT_SYNTH)
   {
-    optr->synth = va_arg(args, int);
+    optr->synth = va_arg (args, int);
     if (optr->type != (OT_TREE | OT_SYNTH))
     {
-      optr->setstr = va_arg(args, char *);
+      optr->setstr = va_arg (args, char *);
     }
-  } else
+  }
+  else
   {
     optr->synth = 0;
   }
   if (optr->type & OT_BITSLICE)
   {
-    optr->shift = va_arg(args, int);
+    optr->shift = va_arg (args, int);
   }
   curopt++;
-  va_end(args);
+  va_end (args);
 }
 
 
@@ -154,9 +161,10 @@ void opt_add(void *ptr, int tree, char *name, int type, ...)
 #define data_size(x) (((x)->type & 0x3f) == OT_FLOAT? sizeof(double): sizeof(int))
 
 
-int opt_getval(int num, int flag)
+int
+opt_getval (int num, int flag)
 {
-  char *p = opt_ptr(num);
+  char *p = opt_ptr (num);
   int out = 0, count = 0;
   int retval;
 
@@ -171,32 +179,35 @@ int opt_getval(int num, int flag)
       v >>= 1;
     }
     return (out);
-  } else
+  }
+  else
   {
-    (void) memcpy(&retval, p, data_size(&opt[num]));
+    (void) memcpy (&retval, p, data_size (&opt[num]));
     return retval;
   }
 }
 
-double opt_getval_float(int num, int flag)
+double
+opt_getval_float (int num, int flag)
 {
-  char *p = opt_ptr(num);
+  char *p = opt_ptr (num);
   double retval;
 
-  (void) memcpy(&retval, p, data_size(&opt[num]));
+  (void) memcpy (&retval, p, data_size (&opt[num]));
   return retval;
 }
 
-static void opt_setval(int num, void *val)
+static void
+opt_setval (int num, void *val)
 {
-  char *p = opt_ptr(num);
+  char *p = opt_ptr (num);
   int count = 0;
   int out = *p;
 
   if (opt[num].type & OT_BITSLICE)
   {
     int v = opt[num].v.enum_max;
-    int val_int = *(int *)val;
+    int val_int = *(int *) val;
     while (v)
     {
       out &= ~(1 << (opt[num].shift + count));
@@ -205,37 +216,40 @@ static void opt_setval(int num, void *val)
     out |= val_int << opt[num].shift;
     *p = out;
   }
-  else (void) memcpy(p, val, data_size(&opt[num]));
+  else
+    (void) memcpy (p, val, data_size (&opt[num]));
 }
 
-void opt_preset(int num, char pre)
+void
+opt_preset (int num, char pre)
 {
   char *p;
 
-  (void) strcpy((char *) buf, opt[num].arg[(int) pre]);
-  strtok((char *) buf, ":");
-  while ((p = strtok(NULL, ":")))
+  (void) strcpy ((char *) buf, opt[num].arg[(int) pre]);
+  strtok ((char *) buf, ":");
+  while ((p = strtok (NULL, ":")))
   {
-    opt_read(p, tts.synth);
+    opt_read (p, tts.synth);
   }
 }
 
-static void opt_synth_update(int num, int optval)
+static void
+opt_synth_update (int num, int optval)
 {
   char *p1, *p2;
 
   p1 = opt[num].setstr;
   if (!p1 && (opt[num].type & 0x3f) == OT_ENUM)
   {
-    p1 = strstr(opt[num].arg[optval], ":") + 1;
+    p1 = strstr (opt[num].arg[optval], ":") + 1;
   }
 
   /* This assumes that no synth will need a \ code at the beginning of a
    * setstr string.  If one does, then this code will need to be changed.
    */
-  if (!strchr(p1 + 1, '\\') && !strstr(p1, "%s"))
+  if (!strchr (p1 + 1, '\\') && !strstr (p1, "%s"))
   {
-    (void) sprintf(ttsbuf, p1, optval);
+    (void) sprintf (ttsbuf, p1, optval);
   }
   else
   {
@@ -249,16 +263,16 @@ static void opt_synth_update(int num, int optval)
 	switch (*(p1++))
 	{
 	case 'l':
-	  *(p2++) = *((char *) opt_ptr(num)) + 64;
+	  *(p2++) = *((char *) opt_ptr (num)) + 64;
 	  break;
 	case 'p':
-	  *(p2++) = opt[num].arg[(int) *((char *) opt_ptr(num))][0];
+	  *(p2++) = opt[num].arg[(int) *((char *) opt_ptr (num))][0];
 	  break;
-	case '?':	/* hard-coded special handling */
+	case '?':		/* hard-coded special handling */
 	  switch (num)
 	  {
-	  case 32:	/* bns punctuation: tbd - rework using : form */
-	    switch (*(short *) opt_ptr(num))
+	  case 32:		/* bns punctuation: tbd - rework using : form */
+	    switch (*(short *) opt_ptr (num))
 	    {
 	    case 0:
 	      *(p2++) = 'Z';
@@ -281,9 +295,10 @@ static void opt_synth_update(int num, int optval)
 	p1++;
 	switch (*(p1++))
 	{
-	case 's':	/* send string of numeric option */
-	  strcpy(p2, opt[num].arg[optval]);
-	  while (*p2) p2++;
+	case 's':		/* send string of numeric option */
+	  strcpy (p2, opt[num].arg[optval]);
+	  while (*p2)
+	    p2++;
 	  break;
 	default:
 	  /* tbd - error */
@@ -296,30 +311,33 @@ static void opt_synth_update(int num, int optval)
     }
     *p2 = '\0';
   }
-  tts_send(ttsbuf, strlen(ttsbuf));
+  tts_send (ttsbuf, strlen (ttsbuf));
 }
 
-static void opt_synth_update_float(int num, double optval)
+static void
+opt_synth_update_float (int num, double optval)
 {
   int i;
-  
-  (void) sprintf(ttsbuf, opt[num].setstr, optval);
-  for (i=0; i<strlen(ttsbuf); i++)
-    {
-      if ((ttsbuf[i])==',')
-        ttsbuf[i]='.';
-    }
 
-  tts_send(ttsbuf, strlen(ttsbuf));
+  (void) sprintf (ttsbuf, opt[num].setstr, optval);
+  for (i = 0; i < strlen (ttsbuf); i++)
+  {
+    if ((ttsbuf[i]) == ',')
+      ttsbuf[i] = '.';
+  }
+
+  tts_send (ttsbuf, strlen (ttsbuf));
 }
 
-void opt_queue_empty(int mode)
+void
+opt_queue_empty (int mode)
 {
   int i;
   int max;
 
   max = (mode == 1 ? opq.lastlen : opq.len);
-  if (!max) return;
+  if (!max)
+    return;
   if (opq.saychar)
   {
     if (mode == 3)
@@ -327,25 +345,25 @@ void opt_queue_empty(int mode)
       opq.len = 0;
       return;
     }
-    tts_charoff();
+    tts_charoff ();
     opq.saychar = 0;
   }
   for (i = 0; i < max; i++)
   {
     if ((opt[opq.opt[i]].type & 0x3f) == OT_FLOAT)
     {
-      opt_synth_update_float(opq.opt[i], opq.v[i].val_float);
+      opt_synth_update_float (opq.opt[i], opq.v[i].val_float);
     }
     else
     {
-      opt_synth_update(opq.opt[i], opq.v[i].val);
+      opt_synth_update (opq.opt[i], opq.v[i].val);
     }
   }
   switch (mode)
   {
   case 3:
     opq.saychar = 1;
-    tts_charon();
+    tts_charon ();
   case 0:
     opq.lastlen = opq.len;
     opq.len = 0;
@@ -358,68 +376,71 @@ void opt_queue_empty(int mode)
   }
 }
 
-void opt_set(int num, void *val)
+void
+opt_set (int num, void *val)
 {
-  void *p = opt_ptr(num);
+  void *p = opt_ptr (num);
 
   switch (opt[num].type & 0x3f)
   {
   case OT_STR:
-    (void) strncpy((char *) p, val, OPT_STR_SIZE);
+    (void) strncpy ((char *) p, val, OPT_STR_SIZE);
     break;
 
   case OT_PRESET:
-    opt_preset(num, 0);
+    opt_preset (num, 0);
     if (*(char *) val)
     {
-      opt_preset(num, *(char *) val);
+      opt_preset (num, *(char *) val);
     }
 
   case OT_INT:
   case OT_ENUM:
   case OT_FLOAT:
-    opt_setval(num, val);
+    opt_setval (num, val);
     break;
   }
-  if (!(opt[num].type & OT_SYNTH) || opt[num].synth != tts.synth) return;
+  if (!(opt[num].type & OT_SYNTH) || opt[num].synth != tts.synth)
+    return;
   switch (opt[num].type & 0x3f)
   {
   case OT_INT:
   case OT_ENUM:
-    opt_queue_add(num, opt_getval(num, 1));
+    opt_queue_add (num, opt_getval (num, 1));
     break;
   case OT_FLOAT:
-    opt_queue_add(num, opt_getval_float(num, 1));
+    opt_queue_add (num, opt_getval_float (num, 1));
     break;
   }
 }
 
-void opt_say(int num, int flag)
+void
+opt_say (int num, int flag)
 {
-  void *p = opt_ptr(num);
+  void *p = opt_ptr (num);
 
   if (flag)
   {
-    (void) sprintf((char *) buf, "%s... ", opt[num].localized_name);
-    tts_say((char *) buf);
+    (void) sprintf ((char *) buf, "%s... ", opt[num].localized_name);
+    tts_say ((char *) buf);
   }
   switch (opt[num].type & 0x3f)
   {
   case OT_INT:
-    (void) sprintf((char *) buf, "%d", opt_getval(num, 0));
-    tts_say((char *) buf);
+    (void) sprintf ((char *) buf, "%d", opt_getval (num, 0));
+    tts_say ((char *) buf);
     break;
   case OT_FLOAT:
-    (void) sprintf((char *) buf, "%f", opt_getval_float(num, 0));
-    tts_say((char *) buf);
+    (void) sprintf ((char *) buf, "%f", opt_getval_float (num, 0));
+    tts_say ((char *) buf);
     break;
   case OT_ENUM:
-    (void) strcpy((char *) buf, opt[num].arg[opt_getval(num, 0)]);
-    strtok((char *) buf, ":");
-    tts_say(_((char *) buf));
+    (void) strcpy ((char *) buf, opt[num].arg[opt_getval (num, 0)]);
+    strtok ((char *) buf, ":");
+    tts_say (_((char *) buf));
     break;
   case OT_STR:
-    tts_say((char *) p);
+    tts_say ((char *) p);
     break;
   }
 }
@@ -429,7 +450,8 @@ void opt_say(int num, int flag)
                       opt[x].synth == tts.synth || \
                       opt[i].synth == -1))
 
-int optmenu(int ch)
+int
+optmenu (int ch)
 {
   int i;
   static int state = 0;
@@ -439,14 +461,16 @@ int optmenu(int ch)
   case 1:			/* User has just finished entering an integer */
     if (!ui.abort)
     {
-      int num = atoi(ui.str);
-      if (num >= opt[curopt].v.val_int.min && num <= opt[curopt].v.val_int.max)
+      int num = atoi (ui.str);
+      if (num >= opt[curopt].v.val_int.min
+	  && num <= opt[curopt].v.val_int.max)
       {
-	opt_set(curopt, &num);
-	tts_say(_("Value accepted."));
-      } else
+	opt_set (curopt, &num);
+	tts_say (_("Value accepted."));
+      }
+      else
       {
-	tts_say(_("Value out of range."));
+	tts_say (_("Value out of range."));
       }
     }
     state = 0;
@@ -455,14 +479,16 @@ int optmenu(int ch)
   case 2:			/* User has just finished entering a float */
     if (!ui.abort)
     {
-      double num = atof(ui.str);
-      if (num >= opt[curopt].v.val_float.min && num <= opt[curopt].v.val_float.max)
+      double num = atof (ui.str);
+      if (num >= opt[curopt].v.val_float.min
+	  && num <= opt[curopt].v.val_float.max)
       {
-	opt_set(curopt, &num);
-	tts_say(_("Value accepted."));
-      } else
+	opt_set (curopt, &num);
+	tts_say (_("Value accepted."));
+      }
+      else
       {
-	tts_say(_("Value out of range."));
+	tts_say (_("Value out of range."));
       }
     }
     state = 0;
@@ -471,8 +497,8 @@ int optmenu(int ch)
   case 3:			/* User has just entered a string -- not yet implemented */
     if (!ui.abort)
     {
-      opt_set(curopt, &ui.buf);
-      tts_say(_("value accepted."));
+      opt_set (curopt, &ui.buf);
+      tts_say (_("value accepted."));
     }
     return (1);
   }
@@ -480,38 +506,38 @@ int optmenu(int ch)
   switch (ch)
   {
   case 0:			/* initialize */
-    tts_say(_("Setting options..."));
-    opt_say(curopt = 0, 1);
+    tts_say (_("Setting options..."));
+    opt_say (curopt = 0, 1);
     break;
 
   case 0x1b5b41:		/* up arrow */
     for (i = curopt - 1; i >= 0; i--)
     {
-      if (opt_usable(i))
+      if (opt_usable (i))
       {
 	curopt = i;
 	break;
       }
     }
-    opt_say(curopt, 1);
+    opt_say (curopt, 1);
     break;
 
   case 0x1b5b42:		/* down arrow */
     for (i = curopt + 1; i < NUMOPTS; i++)
     {
-      if (opt_usable(i))
+      if (opt_usable (i))
       {
 	curopt = i;
 	break;
       }
     }
-    opt_say(curopt, 1);
+    opt_say (curopt, 1);
     break;
 
   case 0x1b5b44:		/* left arrow */
     if (!opt[curopt].tree)
     {
-      opt_say(curopt, 1);
+      opt_say (curopt, 1);
       break;
     }
     for (i = curopt - 1; i >= 0; i--)
@@ -525,7 +551,7 @@ int optmenu(int ch)
 	break;
       }
     }
-    opt_say(curopt, 1);
+    opt_say (curopt, 1);
     break;
 
   case 0x1b5b43:		/* right arrow */
@@ -534,25 +560,29 @@ int optmenu(int ch)
     switch (opt[curopt].type & 0x3f)
     {
     case OT_INT:
-      (void) sprintf((char *) buf, "%s %d %s %d.",_("Enter a number from"), opt[curopt].v.val_int.min, _("to"), opt[curopt].v.val_int.max);
-      tts_say((char *) buf);
-      ui_funcman(&ui_build_str);
+      (void) sprintf ((char *) buf, "%s %d %s %d.", _("Enter a number from"),
+		      opt[curopt].v.val_int.min, _("to"),
+		      opt[curopt].v.val_int.max);
+      tts_say ((char *) buf);
+      ui_funcman (&ui_build_str);
       state = 1;
       break;
     case OT_FLOAT:
-      (void) sprintf((char *) buf, "%s %lf %s %lf.",_("Enter a number from"), opt[curopt].v.val_float.min,_("to"),  opt[curopt].v.val_float.max);
-      tts_say((char *) buf);
-      ui_funcman(&ui_build_str);
+      (void) sprintf ((char *) buf, "%s %lf %s %lf.",
+		      _("Enter a number from"), opt[curopt].v.val_float.min,
+		      _("to"), opt[curopt].v.val_float.max);
+      tts_say ((char *) buf);
+      ui_funcman (&ui_build_str);
       state = 2;
       break;
 
     case OT_ENUM:
-      i = (opt_getval(curopt, 0) + 1) % (opt[curopt].v.enum_max + 1);
-      opt_set(curopt, &i);
-      opt_say(curopt, 1);
+      i = (opt_getval (curopt, 0) + 1) % (opt[curopt].v.enum_max + 1);
+      opt_set (curopt, &i);
+      opt_say (curopt, 1);
       break;
 
-    case OT_STR:			/* tbd -- allow the user to enter a string here */
+    case OT_STR:		/* tbd -- allow the user to enter a string here */
       break;
 
     case OT_TREE:
@@ -566,36 +596,37 @@ int optmenu(int ch)
 	  break;
 	}
       }
-      opt_say(curopt, 1);
+      opt_say (curopt, 1);
     }
     break;
 
   case 27:
-    tts_say(_("exiting options menu."));
-    ui_funcman(0);
+    tts_say (_("exiting options menu."));
+    ui_funcman (0);
     break;
 
   default:
-    if ((ch & 0xffffff00) || !isalpha(ch))
+    if ((ch & 0xffffff00) || !isalpha (ch))
     {
       break;
     }
     ch |= 0x20;
     for (i = (curopt + 1) % NUMOPTS; i != curopt; i = (i + 1) % NUMOPTS)
     {
-      if ((opt[i].localized_name[0] | 0x20) == ch && opt_usable(i))
+      if ((opt[i].localized_name[0] | 0x20) == ch && opt_usable (i))
       {
 	curopt = i;
 	break;
       }
     }
-    opt_say(curopt, 1);
+    opt_say (curopt, 1);
   }
 
   return (1);
 }
 
-static char *strro(char *s, char c, int j)
+static char *
+strro (char *s, char c, int j)
 {
   static char buf[500];
   char *p = s, *q = buf;
@@ -622,29 +653,30 @@ static char *strro(char *s, char c, int j)
   return (buf);
 }
 
-int opt_read(char *buf, int synth)
+int
+opt_read (char *buf, int synth)
 {
   int i, j;
   void *p;
   float float_val;
 
-  strtok(buf, "=");
-  i = strlen(buf);
+  strtok (buf, "=");
+  i = strlen (buf);
   while (i && buf[i] == ' ')
     buf[i--] = '\0';
-  if (!strcasecmp(buf, "synthesizer") && cl_synth)
+  if (!strcasecmp (buf, "synthesizer") && cl_synth)
   {
     cl_synth = 0;
     return (0);
   }
-  if (!strcasecmp(buf, "synthesizer port") && cl_synthport)
+  if (!strcasecmp (buf, "synthesizer port") && cl_synthport)
   {
     cl_synthport = 0;
     return 0;
   }
   for (i = 0; i < NUMOPTS; i++)
   {
-    if (!strcasecmp(buf, opt[i].internal_name) && opt[i].synth == synth)
+    if (!strcasecmp (buf, opt[i].internal_name) && opt[i].synth == synth)
     {
       break;
     }
@@ -653,26 +685,26 @@ int opt_read(char *buf, int synth)
   {
     return (-1);
   }
-  if (!(p = strtok(NULL, "")))
+  if (!(p = strtok (NULL, "")))
   {
     return (-1);
   }
   switch (opt[i].type & 0x3f)
   {
   case OT_INT:
-    j = strtol(p, NULL, 0);
-    opt_set(i, &j);
+    j = strtol (p, NULL, 0);
+    opt_set (i, &j);
     break;
 
   case OT_FLOAT:
-    sscanf(p, "%f", &float_val);
-    opt_set(i, &float_val);
+    sscanf (p, "%f", &float_val);
+    opt_set (i, &float_val);
     break;
 
   case OT_ENUM:
     for (j = 0; j <= opt[i].v.enum_max; j++)
     {
-      if (!strcasecmp(p, strro(opt[i].arg[j], ':', 0)))
+      if (!strcasecmp (p, strro (opt[i].arg[j], ':', 0)))
       {
 	break;
       }
@@ -681,37 +713,42 @@ int opt_read(char *buf, int synth)
     {
       return (-1);
     }
-    opt_set(i, &j);
+    opt_set (i, &j);
     break;
   case OT_STR:
-    opt_set(i, p);
+    opt_set (i, p);
     break;
   }
 
   return (0);
 }
 
-void opt_write_single(FILE * fp, int i)
+void
+opt_write_single (FILE * fp, int i)
 {
   switch (opt[i].type & 0x3f)
   {
   case OT_INT:
-    (void) fprintf(fp, "%s=%d\n", opt[i].internal_name, opt_getval(i, 0));
+    (void) fprintf (fp, "%s=%d\n", opt[i].internal_name, opt_getval (i, 0));
     break;
   case OT_FLOAT:
-    (void) fprintf(fp, "%s=%lf\n", opt[i].internal_name, opt_getval_float(i, 0));
+    (void) fprintf (fp, "%s=%lf\n", opt[i].internal_name,
+		    opt_getval_float (i, 0));
     break;
   case OT_ENUM:
-    (void) fprintf(fp, "%s=%s\n",
-	opt[i].internal_name, strro(opt[i].arg[opt_getval(i, 0)], ':', 0));
+    (void) fprintf (fp, "%s=%s\n",
+		    opt[i].internal_name,
+		    strro (opt[i].arg[opt_getval (i, 0)], ':', 0));
     break;
   case OT_STR:
-    (void) fprintf(fp, "%s=%s\n", opt[i].internal_name, (char *) opt_ptr(i));
+    (void) fprintf (fp, "%s=%s\n", opt[i].internal_name,
+		    (char *) opt_ptr (i));
     break;
   }
 }
 
-void opt_write(FILE * fp)
+void
+opt_write (FILE * fp)
 {
   int i, j;
 
@@ -719,107 +756,153 @@ void opt_write(FILE * fp)
   {
     if (!(opt[i].type & OT_SYNTH))
     {
-      opt_write_single(fp, i);
+      opt_write_single (fp, i);
     }
   }
   for (i = 0; i <= opt[synthopt].v.enum_max; i++)
   {
-    (void) fprintf(fp, "[%s]\n", opt[synthopt].arg[i]);
+    (void) fprintf (fp, "[%s]\n", opt[synthopt].arg[i]);
     for (j = 0; j < NUMOPTS; j++)
     {
       if ((opt[j].type & OT_SYNTH) && opt[j].synth == i)
       {
-	opt_write_single(fp, j);
+	opt_write_single (fp, j);
       }
     }
   }
 }
 
-void opt_init()
+void
+opt_init ()
 {
   opq.len = opq.lastlen = 0;
-  opt_add(&ui.curtrack, 0, N_("cursor tracking"), OT_ENUM, 3, N_("off"), N_("arrow keys"), N_("full"));
-  opt_add(&tts.synth, 0, N_("synthesizer"), OT_ENUM, 9, N_("speakout"), N_("dectalk"), N_("Emacspeak server"), N_("doubletalk"), N_("bns"), N_("apollo"), N_("festival"), N_("Ciber232"), N_("speech dispatcher"));
-  opt_add(tts.port, 0, N_("synthesizer port"), OT_STR);
-  opt_add(&ui.kbsay, 0, N_("key echo"), OT_ENUM, 3, N_("off"), N_("keys"), N_("words"));
-  opt_add(usershell, 0, N_("shell"), OT_STR);
+  opt_add (&ui.curtrack, 0, N_("cursor tracking"), OT_ENUM, 3, N_("off"),
+	   N_("arrow keys"), N_("full"));
+  opt_add (&tts.synth, 0, N_("synthesizer"), OT_ENUM, 9, N_("speakout"),
+	   N_("dectalk"), N_("Emacspeak server"), N_("doubletalk"), N_("bns"),
+	   N_("apollo"), N_("festival"), N_("Ciber232"),
+	   N_("speech dispatcher"));
+  opt_add (tts.port, 0, N_("synthesizer port"), OT_STR);
+  opt_add (&ui.kbsay, 0, N_("key echo"), OT_ENUM, 3, N_("off"), N_("keys"),
+	   N_("words"));
+  opt_add (usershell, 0, N_("shell"), OT_STR);
 
 /* tbd - The following is a bad hack that I use to play Angband.  It should
  * be replaced with a more general facility for defining screen windows.
  */
-  opt_add(&special, 255, "special", OT_ENUM, 2, "off", "on");
+  opt_add (&special, 255, "special", OT_ENUM, 2, "off", "on");
 
-  opt_add(&rev.udmode, 0, N_("up and down arrows"), OT_ENUM, 3, N_("speak line"), N_("speak character"), N_("speak word"));
+  opt_add (&rev.udmode, 0, N_("up and down arrows"), OT_ENUM, 3,
+	   N_("speak line"), N_("speak character"), N_("speak word"));
 
 /* tbd - allow the user to enter 0x to indicate a Hex number, somehow */
-  opt_add(&ui.disable, 255, N_("DisableKey"), OT_INT, 0, 0x7fffffff);
+  opt_add (&ui.disable, 255, N_("DisableKey"), OT_INT, 0, 0x7fffffff);
 
-  opt_add(&ui.split_caps, 0, "Split caps", OT_ENUM, 2, "off", "on");
+  opt_add (&ui.split_caps, 0, "Split caps", OT_ENUM, 2, "off", "on");
 
-  opt_add(NULL, 0, N_("synthesizer options"), OT_TREE | OT_SYNTH, -1, -1);
+  opt_add (NULL, 0, N_("synthesizer options"), OT_TREE | OT_SYNTH, -1, -1);
 
 /* Speakout settings (first index is 10) */
-  opt_add((void *) 4, -1,N_( "rate"), OT_INT | OT_SYNTH, 0, 9, 0, "\005r%d");
-  opt_add((void *) 8, -1, N_("pitch"), OT_INT | OT_SYNTH, 0, 9, 0, "\005p%d");
-  opt_add((void *) 12, -1, N_("volume"), OT_INT | OT_SYNTH, 0, 9, 0, "\005v%d");
-  opt_add((void *) 16, -1, N_("tone"), OT_INT | OT_SYNTH, 1, 26, 0, "\005t\\l");
-  opt_add(NULL, -1, N_("Punctuation"), OT_TREE | OT_SYNTH, -2, 0);
-  opt_add(NULL, -2, N_("textual"), OT_ENUM | OT_SYNTH | OT_BITSLICE, 2, N_("off"), N_("on")":!,.:;", 0, "\005y%x", 3);
-  opt_add(NULL, -2, N_("math"), OT_ENUM | OT_SYNTH | OT_BITSLICE, 2, N_("off"), N_("on")":%^*()/-<=>+", 0, "\005y%x", 2);
-  opt_add(NULL, -2, N_("miscelaneous"), OT_ENUM | OT_SYNTH | OT_BITSLICE, 2, N_("off"), N_("on")":[]{}\\|_\"'@#$&", 0, "\005y%x", 1);
-  opt_add(NULL, -2, N_("spaces"), OT_ENUM | OT_SYNTH | OT_BITSLICE, 2, N_("off"), N_("on")": ", 0, "\005y%x", 0);
+  opt_add ((void *) 4, -1, N_("rate"), OT_INT | OT_SYNTH, 0, 9, 0, "\005r%d");
+  opt_add ((void *) 8, -1, N_("pitch"), OT_INT | OT_SYNTH, 0, 9, 0,
+	   "\005p%d");
+  opt_add ((void *) 12, -1, N_("volume"), OT_INT | OT_SYNTH, 0, 9, 0,
+	   "\005v%d");
+  opt_add ((void *) 16, -1, N_("tone"), OT_INT | OT_SYNTH, 1, 26, 0,
+	   "\005t\\l");
+  opt_add (NULL, -1, N_("Punctuation"), OT_TREE | OT_SYNTH, -2, 0);
+  opt_add (NULL, -2, N_("textual"), OT_ENUM | OT_SYNTH | OT_BITSLICE, 2,
+	   N_("off"), N_("on") ":!,.:;", 0, "\005y%x", 3);
+  opt_add (NULL, -2, N_("math"), OT_ENUM | OT_SYNTH | OT_BITSLICE, 2,
+	   N_("off"), N_("on") ":%^*()/-<=>+", 0, "\005y%x", 2);
+  opt_add (NULL, -2, N_("miscelaneous"), OT_ENUM | OT_SYNTH | OT_BITSLICE, 2,
+	   N_("off"), N_("on") ":[]{}\\|_\"'@#$&", 0, "\005y%x", 1);
+  opt_add (NULL, -2, N_("spaces"), OT_ENUM | OT_SYNTH | OT_BITSLICE, 2,
+	   N_("off"), N_("on") ": ", 0, "\005y%x", 0);
 
 /* DEC-Talk settings (first index is 19) */
-  opt_add((void *) 4, -1, N_("rate"), OT_INT | OT_SYNTH, 75, 650, 1, "[:ra%d]");
-  opt_add((void *) 8, -1, N_("volume"), OT_INT | OT_SYNTH, 0, 99, 1, "[:vol set %d]");
-  opt_add((void *) 12, -1, N_("voice"), OT_ENUM | OT_SYNTH, 10, N_("paul"), N_("harry"), N_("frank"), N_("dennis"), N_("betty"), N_("ursula"), N_("rita"), N_("wendy"), N_("kit"), N_("val"), 1, "[:n\\p]");
-  opt_add((void *) 0, -1, N_("punctuation"), OT_ENUM | OT_SYNTH, 3, N_("some"), N_("none"), N_("all"), 1, "[:pu \\p]");
+  opt_add ((void *) 4, -1, N_("rate"), OT_INT | OT_SYNTH, 75, 650, 1,
+	   "[:ra%d]");
+  opt_add ((void *) 8, -1, N_("volume"), OT_INT | OT_SYNTH, 0, 99, 1,
+	   "[:vol set %d]");
+  opt_add ((void *) 12, -1, N_("voice"), OT_ENUM | OT_SYNTH, 10, N_("paul"),
+	   N_("harry"), N_("frank"), N_("dennis"), N_("betty"), N_("ursula"),
+	   N_("rita"), N_("wendy"), N_("kit"), N_("val"), 1, "[:n\\p]");
+  opt_add ((void *) 0, -1, N_("punctuation"), OT_ENUM | OT_SYNTH, 3,
+	   N_("some"), N_("none"), N_("all"), 1, "[:pu \\p]");
 
 /* Emacspeak settings (first index is 23) */
-  opt_add((void *) 4, -1, N_("rate"), OT_INT | OT_SYNTH, 0, 999, 2, "tts_set_speech_rate {%d}\r");
-  opt_add((void *) 0, -1, N_("punctuation"), OT_ENUM | OT_SYNTH, 3, N_("none"), N_("some"), N_("all"), 2, "tts_set_punctuations %s\r");
+  opt_add ((void *) 4, -1, N_("rate"), OT_INT | OT_SYNTH, 0, 999, 2,
+	   "tts_set_speech_rate {%d}\r");
+  opt_add ((void *) 0, -1, N_("punctuation"), OT_ENUM | OT_SYNTH, 3,
+	   N_("none"), N_("some"), N_("all"), 2, "tts_set_punctuations %s\r");
 
 /* DoubleTalk settings (first index is 24) */
-  opt_add((void *) 4, -1, N_("rate"), OT_INT | OT_SYNTH, 0, 9, 3, "\001%ds");
-  opt_add((void *) 8, -1, N_("pitch"), OT_INT | OT_SYNTH, 0, 99, 3, "\001%dp");
-  opt_add((void *) 12, -1, N_("volume"), OT_INT | OT_SYNTH, 0, 9, 3, "\001%dv");
-  opt_add((void *) 16, -1, N_("tone"), OT_INT | OT_SYNTH, 0, 2, 3, "\001%dX");
-  opt_add((void *) 20, -1, N_("voice"), OT_ENUM | OT_SYNTH, 8, N_("paul"), N_("vader"), N_("bob"), N_("pete"), N_("randy"), N_("biff"), N_("skip"), N_("roborobert"), 3, "\001%dO");
-  opt_add((void *) 0, -1, N_("punctuation"), OT_ENUM | OT_SYNTH, 4, N_("none")":\0017b", N_("some")":\0016b", N_("most")":\0015b", N_("all")":\0014b", 3, NULL);
+  opt_add ((void *) 4, -1, N_("rate"), OT_INT | OT_SYNTH, 0, 9, 3, "\001%ds");
+  opt_add ((void *) 8, -1, N_("pitch"), OT_INT | OT_SYNTH, 0, 99, 3,
+	   "\001%dp");
+  opt_add ((void *) 12, -1, N_("volume"), OT_INT | OT_SYNTH, 0, 9, 3,
+	   "\001%dv");
+  opt_add ((void *) 16, -1, N_("tone"), OT_INT | OT_SYNTH, 0, 2, 3,
+	   "\001%dX");
+  opt_add ((void *) 20, -1, N_("voice"), OT_ENUM | OT_SYNTH, 8, N_("paul"),
+	   N_("vader"), N_("bob"), N_("pete"), N_("randy"), N_("biff"),
+	   N_("skip"), N_("roborobert"), 3, "\001%dO");
+  opt_add ((void *) 0, -1, N_("punctuation"), OT_ENUM | OT_SYNTH, 4,
+	   N_("none") ":\0017b", N_("some") ":\0016b", N_("most") ":\0015b",
+	   N_("all") ":\0014b", 3, NULL);
 
 /* Braille 'n Speak settings (first index is 30) */
-  opt_add((void *) 4, -1, N_("rate"), OT_INT | OT_SYNTH, 1, 15, 4, "\005%dE");
-  opt_add((void *) 8, -1, N_("pitch"), OT_INT | OT_SYNTH, 1, 63, 4, "\005%dP");
-  opt_add((void *) 12, -1, N_("volume"), OT_INT | OT_SYNTH, 1, 15, 4, "\005%dV");
-  opt_add((void *) 0, -1, N_("punctuation"), OT_ENUM | OT_SYNTH, 4, N_("none"), N_("some"), N_("most"), N_("all"), 4, "\005\\?");
+  opt_add ((void *) 4, -1, N_("rate"), OT_INT | OT_SYNTH, 1, 15, 4,
+	   "\005%dE");
+  opt_add ((void *) 8, -1, N_("pitch"), OT_INT | OT_SYNTH, 1, 63, 4,
+	   "\005%dP");
+  opt_add ((void *) 12, -1, N_("volume"), OT_INT | OT_SYNTH, 1, 15, 4,
+	   "\005%dV");
+  opt_add ((void *) 0, -1, N_("punctuation"), OT_ENUM | OT_SYNTH, 4,
+	   N_("none"), N_("some"), N_("most"), N_("all"), 4, "\005\\?");
 
 /* Apollo settings (first index is 34) */
-  opt_add((void *) 0, -1, N_("punctuation"), OT_ENUM | OT_SYNTH, 2, N_("off"), N_("on"), 5, "@P%d");
-  opt_add((void *) 4, -1, N_("rate"), OT_INT | OT_SYNTH, 1, 9, 5, "@W%d");
-  opt_add((void *) 8, -1, N_("pitch"), OT_INT | OT_SYNTH, 1, 15, 5, "@F%x");
-  opt_add((void *) 12, -1, N_("prosody"), OT_INT | OT_SYNTH, 1, 7, 5, "@R%d");
-  opt_add((void *) 16, -1, N_("word pause"), OT_INT | OT_SYNTH, 1, 9, 5, "@Q%d");
-  opt_add((void *) 20, -1, N_("sentence pause"), OT_INT | OT_SYNTH, 1, 15, 5, "@D%x");
-  opt_add((void *) 24, -1, N_("degree"), OT_INT | OT_SYNTH, 1, 8, 5, "@B%d");
-  opt_add((void *) 28, -1, N_("volume"), OT_INT | OT_SYNTH, 1, 15, 5, "@A%x");
-  opt_add((void *) 32, -1, N_("voice"), OT_INT | OT_SYNTH, 1, 6, 5, "@V%d");
+  opt_add ((void *) 0, -1, N_("punctuation"), OT_ENUM | OT_SYNTH, 2,
+	   N_("off"), N_("on"), 5, "@P%d");
+  opt_add ((void *) 4, -1, N_("rate"), OT_INT | OT_SYNTH, 1, 9, 5, "@W%d");
+  opt_add ((void *) 8, -1, N_("pitch"), OT_INT | OT_SYNTH, 1, 15, 5, "@F%x");
+  opt_add ((void *) 12, -1, N_("prosody"), OT_INT | OT_SYNTH, 1, 7, 5,
+	   "@R%d");
+  opt_add ((void *) 16, -1, N_("word pause"), OT_INT | OT_SYNTH, 1, 9, 5,
+	   "@Q%d");
+  opt_add ((void *) 20, -1, N_("sentence pause"), OT_INT | OT_SYNTH, 1, 15, 5,
+	   "@D%x");
+  opt_add ((void *) 24, -1, N_("degree"), OT_INT | OT_SYNTH, 1, 8, 5, "@B%d");
+  opt_add ((void *) 28, -1, N_("volume"), OT_INT | OT_SYNTH, 1, 15, 5,
+	   "@A%x");
+  opt_add ((void *) 32, -1, N_("voice"), OT_INT | OT_SYNTH, 1, 6, 5, "@V%d");
 
   /* festival settings (first index is 44) */
-  opt_add((void *)4, -1, N_("rate"), OT_FLOAT|OT_SYNTH, (double)0.4, (double)2.5, 6, "(Parameter.set 'Duration_Stretch %e)");
+  opt_add ((void *) 4, -1, N_("rate"), OT_FLOAT | OT_SYNTH, (double) 0.4,
+	   (double) 2.5, 6, "(Parameter.set 'Duration_Stretch %e)");
 
 /* Ciber232 settings  (first index 44)*/
-  opt_add((void *) 4, -1, N_("rate"), OT_INT | OT_SYNTH, 0, 9, 7, "@b%d");
-  opt_add((void *) 8, -1, N_("volume"), OT_INT | OT_SYNTH, 0, 9, 7, "@d%d");
-  opt_add((void *) 12, -1, N_("pitch"), OT_INT | OT_SYNTH, 0, 9, 7, "@a%d");
-  opt_add((void *) 16, -1, N_("sex"), OT_INT | OT_SYNTH, 0, 1, 7, "@c%d");
-  opt_add((void *) 20, -1, N_("Voice"), OT_INT | OT_SYNTH, 0, 1, 7, "@q%d");
-  opt_add((void *) 24, -1, N_("entonation"), OT_INT | OT_SYNTH, 0, 9, 7, "@r%d");
-  opt_add((void *) 28, -1, N_("caseonwarning"), OT_INT | OT_SYNTH, 0, 1, 7, "@n%d");
-  opt_add((void *) 32, -1, N_("deviceonwarning"), OT_INT | OT_SYNTH, 0, 1, 7, "@t%d");
+  opt_add ((void *) 4, -1, N_("rate"), OT_INT | OT_SYNTH, 0, 9, 7, "@b%d");
+  opt_add ((void *) 8, -1, N_("volume"), OT_INT | OT_SYNTH, 0, 9, 7, "@d%d");
+  opt_add ((void *) 12, -1, N_("pitch"), OT_INT | OT_SYNTH, 0, 9, 7, "@a%d");
+  opt_add ((void *) 16, -1, N_("sex"), OT_INT | OT_SYNTH, 0, 1, 7, "@c%d");
+  opt_add ((void *) 20, -1, N_("Voice"), OT_INT | OT_SYNTH, 0, 1, 7, "@q%d");
+  opt_add ((void *) 24, -1, N_("entonation"), OT_INT | OT_SYNTH, 0, 9, 7,
+	   "@r%d");
+  opt_add ((void *) 28, -1, N_("caseonwarning"), OT_INT | OT_SYNTH, 0, 1, 7,
+	   "@n%d");
+  opt_add ((void *) 32, -1, N_("deviceonwarning"), OT_INT | OT_SYNTH, 0, 1, 7,
+	   "@t%d");
 
 /* Speech Dispatcher settings  (first index ?52?)*/
-  opt_add((void *) 4, -1, N_("rate"), OT_INT | OT_SYNTH, -100, 100, 8, "SET SELF RATE %d\r\n");
-  opt_add((void *) 8, -1, N_("pitch"), OT_INT | OT_SYNTH, -100, 100, 8, "SET SELF PITCH %d\r\n");
-  opt_add((void *) 12, -1, N_("volume"), OT_INT | OT_SYNTH, -100, 100, 8, "SET SELF VOLUME %d\r\n");
-  opt_add((void *) 0, -1, N_("punctuation"), OT_ENUM | OT_SYNTH, 3, N_("none"), N_("some"), N_("all"), 8, "SET SELF PUNCTUATION %s\r\n");
+  opt_add ((void *) 4, -1, N_("rate"), OT_INT | OT_SYNTH, -100, 100, 8,
+	   "SET SELF RATE %d\r\n");
+  opt_add ((void *) 8, -1, N_("pitch"), OT_INT | OT_SYNTH, -100, 100, 8,
+	   "SET SELF PITCH %d\r\n");
+  opt_add ((void *) 12, -1, N_("volume"), OT_INT | OT_SYNTH, -100, 100, 8,
+	   "SET SELF VOLUME %d\r\n");
+  opt_add ((void *) 0, -1, N_("punctuation"), OT_ENUM | OT_SYNTH, 3,
+	   N_("none"), N_("some"), N_("all"), 8,
+	   "SET SELF PUNCTUATION %s\r\n");
 }
