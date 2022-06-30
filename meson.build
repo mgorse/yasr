@@ -20,8 +20,9 @@ add_global_arguments([
 
 prefix = get_option('prefix')
 datadir = join_paths(prefix, get_option('datadir'))
+pkgdatadir = join_paths(datadir, meson.project_name())
+conf.set_quoted('PACKAGE_DATA_DIR', pkgdatadir)
 localedir = join_paths(prefix, get_option('localedir'))
-conf.set_quoted('PACKAGE_DATA_DIR', datadir)
 conf.set_quoted('LOCALEDIR', localedir)
 
 foreach h : [ 'fcntl.h', 'sys/ioctl.h', 'sys/time.h', 'unistd.h',  'utmpx.h',
