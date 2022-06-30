@@ -2,7 +2,7 @@
  * YASR ("Yet Another Screen Reader") is an attempt at a lightweight,
  * portable screen reader.
  *
- * Copyright (C) 2001-2002 by Michael P. Gorse. All rights reserved.
+ * Copyright (C) 2001-2022 by Mike Gorse. All rights reserved.
  *
  * YASR comes with ABSOLUTELY NO WARRANTY.
  *
@@ -13,7 +13,7 @@
  * Web Page: http://mgorse.dhs.org:8000/yasr/
  *
  * This software is maintained by:
- * Michael P. Gorse <mgorse@users.sourceforge.net>
+ * Mike Gorse <mgorse@alum.wpi.edu>
  */
 
 /* openpty.c - replacement for openpty() */
