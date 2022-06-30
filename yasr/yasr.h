@@ -209,6 +209,73 @@ struct Opt
   char **arg;
 };
 
+typedef struct
+{
+  struct {
+    int punctuation;
+    int rate;
+    int pitch;
+    int volume;
+    int tone;
+  } speakout;
+  struct {
+    int punctuation;
+    int rate;
+    int volume;
+    int voice;
+  } dectalk;
+  struct {
+    int punctuation;
+    int rate;
+  } emacspeak;
+  struct {
+    int punctuation;
+    int rate;
+    int pitch;
+    int volume;
+    int tone;
+    int voice;
+  } doubletalk;
+  struct {
+    int punctuation;
+    int rate;
+    int pitch;
+    int volume;
+  } bns;
+  struct {
+    int punctuation;
+    int rate;
+    int pitch;
+    int prosody;
+    int word_pause;
+    int sentence_pause;
+    int degree;
+    int volume;
+    int voice;
+  } apollo;
+  struct {
+    int punctuation;
+    double rate;
+  } festival;
+  struct {
+    int punctuation;
+    int rate;
+    int volume;
+    int pitch;
+    int sex;
+    int voice;
+    int entonation;
+    int case_on_warning;
+    int device_on_warning;
+  } ciber232;
+  struct {
+    int punctuation;
+    int rate;
+    int pitch;
+    int volume;
+  } speechd;
+} Voices;
+
 extern Tts tts;
 extern Ui ui;
 extern Uirev rev;
@@ -224,7 +291,7 @@ extern int kbuf[100];
 extern int kbuflen;
 extern char usershell[OPT_STR_SIZE];
 extern char ttsbuf[80];
-extern char voices[TTS_SYNTH_COUNT][64];
+extern Voices voices;
 extern int special;
 extern char charmap[];
 extern Func funcs[];

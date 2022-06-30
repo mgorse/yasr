@@ -55,7 +55,7 @@ int kbuflen = 0;
 static wchar_t okbuf[100];
 static int okbuflen = 0;
 static int oldcr = 0, oldcc = 0, oldch = 0;
-char voices[TTS_SYNTH_COUNT][64];
+Voices voices;
 static int shell = 0;
 int special = 0;
 int cl_synth = 0;
@@ -1496,7 +1496,7 @@ main (int argc, char *argv[])
   uinit ();
   (void) memset (&tts, 0, sizeof (Tts));
   opt_init ();
-  (void) memset (voices, 0, sizeof (voices));
+  (void) memset (&voices, 0, sizeof (voices));
   while (flag)
   {
     switch (getopt (argc, argv, "C:c:s:p:"))

@@ -154,9 +154,7 @@ opt_add (void *ptr, int tree, char *name, int type, ...)
 }
 
 
-#define opt_ptr(x) (opt[x].type & OT_SYNTH ? \
-                    (void *)(voices[opt[x].synth] + (long) opt[x].ptr) : \
-                    opt[x].ptr)
+#define opt_ptr(x) (void *)(opt[x].ptr)
 
 #define data_size(x) (((x)->type & 0x3f) == OT_FLOAT? sizeof(double): sizeof(int))
 
@@ -804,106 +802,126 @@ opt_init ()
   opt_add (NULL, 0, N_("synthesizer options"), OT_TREE | OT_SYNTH, -1, -1);
 
 /* Speakout settings (first index is 10) */
-  opt_add ((void *) 4, -1, N_("rate"), OT_INT | OT_SYNTH, 0, 9, 0, "\005r%d");
-  opt_add ((void *) 8, -1, N_("pitch"), OT_INT | OT_SYNTH, 0, 9, 0,
-	   "\005p%d");
-  opt_add ((void *) 12, -1, N_("volume"), OT_INT | OT_SYNTH, 0, 9, 0,
-	   "\005v%d");
-  opt_add ((void *) 16, -1, N_("tone"), OT_INT | OT_SYNTH, 1, 26, 0,
+  opt_add (&voices.speakout.rate, -1, N_("rate"), OT_INT | OT_SYNTH, 0, 9, 0,
+	   "\005r%d");
+  opt_add (&voices.speakout.pitch, -1, N_("pitch"), OT_INT | OT_SYNTH, 0, 9,
+	   0, "\005p%d");
+  opt_add (&voices.speakout.volume, -1, N_("volume"), OT_INT | OT_SYNTH, 0, 9,
+	   0, "\005v%d");
+  opt_add (&voices.speakout.tone, -1, N_("tone"), OT_INT | OT_SYNTH, 1, 26, 0,
 	   "\005t\\l");
-  opt_add (NULL, -1, N_("Punctuation"), OT_TREE | OT_SYNTH, -2, 0);
-  opt_add (NULL, -2, N_("textual"), OT_ENUM | OT_SYNTH | OT_BITSLICE, 2,
-	   N_("off"), N_("on") ":!,.:;", 0, "\005y%x", 3);
-  opt_add (NULL, -2, N_("math"), OT_ENUM | OT_SYNTH | OT_BITSLICE, 2,
-	   N_("off"), N_("on") ":%^*()/-<=>+", 0, "\005y%x", 2);
-  opt_add (NULL, -2, N_("miscelaneous"), OT_ENUM | OT_SYNTH | OT_BITSLICE, 2,
-	   N_("off"), N_("on") ":[]{}\\|_\"'@#$&", 0, "\005y%x", 1);
-  opt_add (NULL, -2, N_("spaces"), OT_ENUM | OT_SYNTH | OT_BITSLICE, 2,
-	   N_("off"), N_("on") ": ", 0, "\005y%x", 0);
+  opt_add (&voices.speakout.punctuation, -1, N_("Punctuation"),
+	   OT_TREE | OT_SYNTH, -2, 0);
+  opt_add (&voices.speakout.punctuation, -2, N_("textual"),
+	   OT_ENUM | OT_SYNTH | OT_BITSLICE, 2, N_("off"), N_("on") ":!,.:;",
+	   0, "\005y%x", 3);
+  opt_add (&voices.speakout.punctuation, -2, N_("math"),
+	   OT_ENUM | OT_SYNTH | OT_BITSLICE, 2, N_("off"),
+	   N_("on") ":%^*()/-<=>+", 0, "\005y%x", 2);
+  opt_add (&voices.speakout.punctuation, -2, N_("miscelaneous"),
+	   OT_ENUM | OT_SYNTH | OT_BITSLICE, 2, N_("off"),
+	   N_("on") ":[]{}\\|_\"'@#$&", 0, "\005y%x", 1);
+  opt_add (&voices.speakout.punctuation, -2, N_("spaces"),
+	   OT_ENUM | OT_SYNTH | OT_BITSLICE, 2, N_("off"), N_("on") ": ", 0,
+	   "\005y%x", 0);
 
 /* DEC-Talk settings (first index is 19) */
-  opt_add ((void *) 4, -1, N_("rate"), OT_INT | OT_SYNTH, 75, 650, 1,
-	   "[:ra%d]");
-  opt_add ((void *) 8, -1, N_("volume"), OT_INT | OT_SYNTH, 0, 99, 1,
-	   "[:vol set %d]");
-  opt_add ((void *) 12, -1, N_("voice"), OT_ENUM | OT_SYNTH, 10, N_("paul"),
-	   N_("harry"), N_("frank"), N_("dennis"), N_("betty"), N_("ursula"),
-	   N_("rita"), N_("wendy"), N_("kit"), N_("val"), 1, "[:n\\p]");
-  opt_add ((void *) 0, -1, N_("punctuation"), OT_ENUM | OT_SYNTH, 3,
-	   N_("some"), N_("none"), N_("all"), 1, "[:pu \\p]");
+  opt_add (&voices.dectalk.rate, -1, N_("rate"), OT_INT | OT_SYNTH, 75, 650,
+	   1, "[:ra%d]");
+  opt_add (&voices.dectalk.volume, -1, N_("volume"), OT_INT | OT_SYNTH, 0, 99,
+	   1, "[:vol set %d]");
+  opt_add (&voices.dectalk.voice, -1, N_("voice"), OT_ENUM | OT_SYNTH, 10,
+	   N_("paul"), N_("harry"), N_("frank"), N_("dennis"), N_("betty"),
+	   N_("ursula"), N_("rita"), N_("wendy"), N_("kit"), N_("val"), 1,
+	   "[:n\\p]");
+  opt_add (&voices.dectalk.punctuation, -1, N_("punctuation"),
+	   OT_ENUM | OT_SYNTH, 3, N_("some"), N_("none"), N_("all"), 1,
+	   "[:pu \\p]");
 
 /* Emacspeak settings (first index is 23) */
-  opt_add ((void *) 4, -1, N_("rate"), OT_INT | OT_SYNTH, 0, 999, 2,
-	   "tts_set_speech_rate {%d}\r");
-  opt_add ((void *) 0, -1, N_("punctuation"), OT_ENUM | OT_SYNTH, 3,
-	   N_("none"), N_("some"), N_("all"), 2, "tts_set_punctuations %s\r");
+  opt_add (&voices.emacspeak.rate, -1, N_("rate"), OT_INT | OT_SYNTH, 0, 999,
+	   2, "tts_set_speech_rate {%d}\r");
+  opt_add (&voices.emacspeak.punctuation, -1, N_("punctuation"),
+	   OT_ENUM | OT_SYNTH, 3, N_("none"), N_("some"), N_("all"), 2,
+	   "tts_set_punctuations %s\r");
 
 /* DoubleTalk settings (first index is 24) */
-  opt_add ((void *) 4, -1, N_("rate"), OT_INT | OT_SYNTH, 0, 9, 3, "\001%ds");
-  opt_add ((void *) 8, -1, N_("pitch"), OT_INT | OT_SYNTH, 0, 99, 3,
-	   "\001%dp");
-  opt_add ((void *) 12, -1, N_("volume"), OT_INT | OT_SYNTH, 0, 9, 3,
-	   "\001%dv");
-  opt_add ((void *) 16, -1, N_("tone"), OT_INT | OT_SYNTH, 0, 2, 3,
-	   "\001%dX");
-  opt_add ((void *) 20, -1, N_("voice"), OT_ENUM | OT_SYNTH, 8, N_("paul"),
-	   N_("vader"), N_("bob"), N_("pete"), N_("randy"), N_("biff"),
-	   N_("skip"), N_("roborobert"), 3, "\001%dO");
-  opt_add ((void *) 0, -1, N_("punctuation"), OT_ENUM | OT_SYNTH, 4,
-	   N_("none") ":\0017b", N_("some") ":\0016b", N_("most") ":\0015b",
-	   N_("all") ":\0014b", 3, NULL);
+  opt_add (&voices.doubletalk.rate, -1, N_("rate"), OT_INT | OT_SYNTH, 0, 9,
+	   3, "\001%ds");
+  opt_add (&voices.doubletalk.pitch, -1, N_("pitch"), OT_INT | OT_SYNTH, 0,
+	   99, 3, "\001%dp");
+  opt_add (&voices.doubletalk.volume, -1, N_("volume"), OT_INT | OT_SYNTH, 0,
+	   9, 3, "\001%dv");
+  opt_add (&voices.doubletalk.tone, -1, N_("tone"), OT_INT | OT_SYNTH, 0, 2,
+	   3, "\001%dX");
+  opt_add (&voices.doubletalk.voice, -1, N_("voice"), OT_ENUM | OT_SYNTH, 8,
+	   N_("paul"), N_("vader"), N_("bob"), N_("pete"), N_("randy"),
+	   N_("biff"), N_("skip"), N_("roborobert"), 3, "\001%dO");
+  opt_add (&voices.doubletalk.punctuation, -1, N_("punctuation"),
+	   OT_ENUM | OT_SYNTH, 4, N_("none") ":\0017b", N_("some") ":\0016b",
+	   N_("most") ":\0015b", N_("all") ":\0014b", 3, NULL);
 
 /* Braille 'n Speak settings (first index is 30) */
-  opt_add ((void *) 4, -1, N_("rate"), OT_INT | OT_SYNTH, 1, 15, 4,
+  opt_add (&voices.bns.rate, -1, N_("rate"), OT_INT | OT_SYNTH, 1, 15, 4,
 	   "\005%dE");
-  opt_add ((void *) 8, -1, N_("pitch"), OT_INT | OT_SYNTH, 1, 63, 4,
+  opt_add (&voices.bns.pitch, -1, N_("pitch"), OT_INT | OT_SYNTH, 1, 63, 4,
 	   "\005%dP");
-  opt_add ((void *) 12, -1, N_("volume"), OT_INT | OT_SYNTH, 1, 15, 4,
+  opt_add (&voices.bns.volume, -1, N_("volume"), OT_INT | OT_SYNTH, 1, 15, 4,
 	   "\005%dV");
-  opt_add ((void *) 0, -1, N_("punctuation"), OT_ENUM | OT_SYNTH, 4,
-	   N_("none"), N_("some"), N_("most"), N_("all"), 4, "\005\\?");
+  opt_add (&voices.bns.punctuation, -1, N_("punctuation"), OT_ENUM | OT_SYNTH,
+	   4, N_("none"), N_("some"), N_("most"), N_("all"), 4, "\005\\?");
 
 /* Apollo settings (first index is 34) */
-  opt_add ((void *) 0, -1, N_("punctuation"), OT_ENUM | OT_SYNTH, 2,
-	   N_("off"), N_("on"), 5, "@P%d");
-  opt_add ((void *) 4, -1, N_("rate"), OT_INT | OT_SYNTH, 1, 9, 5, "@W%d");
-  opt_add ((void *) 8, -1, N_("pitch"), OT_INT | OT_SYNTH, 1, 15, 5, "@F%x");
-  opt_add ((void *) 12, -1, N_("prosody"), OT_INT | OT_SYNTH, 1, 7, 5,
-	   "@R%d");
-  opt_add ((void *) 16, -1, N_("word pause"), OT_INT | OT_SYNTH, 1, 9, 5,
-	   "@Q%d");
-  opt_add ((void *) 20, -1, N_("sentence pause"), OT_INT | OT_SYNTH, 1, 15, 5,
-	   "@D%x");
-  opt_add ((void *) 24, -1, N_("degree"), OT_INT | OT_SYNTH, 1, 8, 5, "@B%d");
-  opt_add ((void *) 28, -1, N_("volume"), OT_INT | OT_SYNTH, 1, 15, 5,
-	   "@A%x");
-  opt_add ((void *) 32, -1, N_("voice"), OT_INT | OT_SYNTH, 1, 6, 5, "@V%d");
+  opt_add (&voices.apollo.punctuation, -1, N_("punctuation"),
+	   OT_ENUM | OT_SYNTH, 2, N_("off"), N_("on"), 5, "@P%d");
+  opt_add (&voices.apollo.rate, -1, N_("rate"), OT_INT | OT_SYNTH, 1, 9, 5,
+	   "@W%d");
+  opt_add (&voices.apollo.pitch, -1, N_("pitch"), OT_INT | OT_SYNTH, 1, 15, 5,
+	   "@F%x");
+  opt_add (&voices.apollo.prosody, -1, N_("prosody"), OT_INT | OT_SYNTH, 1, 7,
+	   5, "@R%d");
+  opt_add (&voices.apollo.word_pause, -1, N_("word pause"), OT_INT | OT_SYNTH,
+	   1, 9, 5, "@Q%d");
+  opt_add (&voices.apollo.sentence_pause, -1, N_("sentence pause"),
+	   OT_INT | OT_SYNTH, 1, 15, 5, "@D%x");
+  opt_add (&voices.apollo.degree, -1, N_("degree"), OT_INT | OT_SYNTH, 1, 8,
+	   5, "@B%d");
+  opt_add (&voices.apollo.volume, -1, N_("volume"), OT_INT | OT_SYNTH, 1, 15,
+	   5, "@A%x");
+  opt_add (&voices.apollo.voice, -1, N_("voice"), OT_INT | OT_SYNTH, 1, 6, 5,
+	   "@V%d");
 
   /* festival settings (first index is 44) */
-  opt_add ((void *) 4, -1, N_("rate"), OT_FLOAT | OT_SYNTH, (double) 0.4,
-	   (double) 2.5, 6, "(Parameter.set 'Duration_Stretch %e)");
+  opt_add (&voices.festival.rate, -1, N_("rate"), OT_FLOAT | OT_SYNTH,
+	   (double) 0.4, (double) 2.5, 6,
+	   "(Parameter.set 'Duration_Stretch %e)");
 
-/* Ciber232 settings  (first index 44)*/
-  opt_add ((void *) 4, -1, N_("rate"), OT_INT | OT_SYNTH, 0, 9, 7, "@b%d");
-  opt_add ((void *) 8, -1, N_("volume"), OT_INT | OT_SYNTH, 0, 9, 7, "@d%d");
-  opt_add ((void *) 12, -1, N_("pitch"), OT_INT | OT_SYNTH, 0, 9, 7, "@a%d");
-  opt_add ((void *) 16, -1, N_("sex"), OT_INT | OT_SYNTH, 0, 1, 7, "@c%d");
-  opt_add ((void *) 20, -1, N_("Voice"), OT_INT | OT_SYNTH, 0, 1, 7, "@q%d");
-  opt_add ((void *) 24, -1, N_("entonation"), OT_INT | OT_SYNTH, 0, 9, 7,
-	   "@r%d");
-  opt_add ((void *) 28, -1, N_("caseonwarning"), OT_INT | OT_SYNTH, 0, 1, 7,
-	   "@n%d");
-  opt_add ((void *) 32, -1, N_("deviceonwarning"), OT_INT | OT_SYNTH, 0, 1, 7,
-	   "@t%d");
+/* Ciber232 settings  (first index 445) */
+  opt_add (&voices.ciber232.rate, -1, N_("rate"), OT_INT | OT_SYNTH, 0, 9, 7,
+	   "@b%d");
+  opt_add (&voices.ciber232.volume, -1, N_("volume"), OT_INT | OT_SYNTH, 0, 9,
+	   7, "@d%d");
+  opt_add (&voices.ciber232.pitch, -1, N_("pitch"), OT_INT | OT_SYNTH, 0, 9,
+	   7, "@a%d");
+  opt_add (&voices.ciber232.sex, -1, N_("sex"), OT_INT | OT_SYNTH, 0, 1, 7,
+	   "@c%d");
+  opt_add (&voices.ciber232.voice, -1, N_("Voice"), OT_INT | OT_SYNTH, 0, 1,
+	   7, "@q%d");
+  opt_add (&voices.ciber232.entonation, -1, N_("entonation"),
+	   OT_INT | OT_SYNTH, 0, 9, 7, "@r%d");
+  opt_add (&voices.ciber232.case_on_warning, -1, N_("caseonwarning"),
+	   OT_INT | OT_SYNTH, 0, 1, 7, "@n%d");
+  opt_add (&voices.ciber232.device_on_warning, -1, N_("deviceonwarning"),
+	   OT_INT | OT_SYNTH, 0, 1, 7, "@t%d");
 
-/* Speech Dispatcher settings  (first index ?52?)*/
-  opt_add ((void *) 4, -1, N_("rate"), OT_INT | OT_SYNTH, -100, 100, 8,
-	   "SET SELF RATE %d\r\n");
-  opt_add ((void *) 8, -1, N_("pitch"), OT_INT | OT_SYNTH, -100, 100, 8,
-	   "SET SELF PITCH %d\r\n");
-  opt_add ((void *) 12, -1, N_("volume"), OT_INT | OT_SYNTH, -100, 100, 8,
-	   "SET SELF VOLUME %d\r\n");
-  opt_add ((void *) 0, -1, N_("punctuation"), OT_ENUM | OT_SYNTH, 3,
-	   N_("none"), N_("some"), N_("all"), 8,
+/* Speech Dispatcher settings  (first index ?53)*/
+  opt_add (&voices.speechd.rate, -1, N_("rate"), OT_INT | OT_SYNTH, -100, 100,
+	   8, "SET SELF RATE %d\r\n");
+  opt_add (&voices.speechd.pitch, -1, N_("pitch"), OT_INT | OT_SYNTH, -100,
+	   100, 8, "SET SELF PITCH %d\r\n");
+  opt_add (&voices.ciber232.volume, -1, N_("volume"), OT_INT | OT_SYNTH, -100,
+	   100, 8, "SET SELF VOLUME %d\r\n");
+  opt_add (&voices.speechd.punctuation, -1, N_("punctuation"),
+	   OT_ENUM | OT_SYNTH, 3, N_("none"), N_("some"), N_("all"), 8,
 	   "SET SELF PUNCTUATION %s\r\n");
 }
