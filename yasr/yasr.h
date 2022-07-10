@@ -58,6 +58,10 @@
 #include <wctype.h>
 #include "tts.h"
 
+#ifdef ENABLE_SPEECHD
+#include <libspeechd.h>
+#endif
+
 typedef struct
 {
   unsigned short attr;
@@ -128,6 +132,9 @@ typedef struct Tts Tts;
 struct Tts
 {
   int fd;
+  SPDConnection *speechd;
+  char **speechd_voices;
+  char **speechd_modules;
   int flood;
   char *obuf;
   int obufhead, obuflen, obuftail;
@@ -211,24 +218,28 @@ struct Opt
 
 typedef struct
 {
-  struct {
+  struct
+  {
     int punctuation;
     int rate;
     int pitch;
     int volume;
     int tone;
   } speakout;
-  struct {
+  struct
+  {
     int punctuation;
     int rate;
     int volume;
     int voice;
   } dectalk;
-  struct {
+  struct
+  {
     int punctuation;
     int rate;
   } emacspeak;
-  struct {
+  struct
+  {
     int punctuation;
     int rate;
     int pitch;
@@ -236,13 +247,15 @@ typedef struct
     int tone;
     int voice;
   } doubletalk;
-  struct {
+  struct
+  {
     int punctuation;
     int rate;
     int pitch;
     int volume;
   } bns;
-  struct {
+  struct
+  {
     int punctuation;
     int rate;
     int pitch;
@@ -253,11 +266,13 @@ typedef struct
     int volume;
     int voice;
   } apollo;
-  struct {
+  struct
+  {
     int punctuation;
     double rate;
   } festival;
-  struct {
+  struct
+  {
     int punctuation;
     int rate;
     int volume;
@@ -268,11 +283,14 @@ typedef struct
     int case_on_warning;
     int device_on_warning;
   } ciber232;
-  struct {
+  struct
+  {
     int punctuation;
     int rate;
     int pitch;
     int volume;
+    int module;
+    int voice;
   } speechd;
 } Voices;
 
@@ -353,6 +371,9 @@ extern int tts_reinit2 ();
 extern void tts_say_printf (char *fmt, ...);
 extern void tts_initsynth (int *argp);
 extern void tts_checkreset ();
+#ifdef ENABLE_SPEECHD
+extern void tts_update_speechd (int num, int optval);
+#endif
 extern int dict_read (char *buf);
 extern void dict_write (FILE * fp);
 
@@ -394,7 +415,7 @@ extern void opt_write (FILE * fp);
 #define cblank(r, c)  ((win->row[r][c].wchar & 0xdf) == 0)
 #define ttssend(x)    if (x) tts_send(x, strlen(x))
 
-#define NUMOPTS 57
+#define NUMOPTS 59
 
 /* Option types */
 #define OT_INT      0x00

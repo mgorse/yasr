@@ -62,6 +62,7 @@ readconf ()
   int i, key, ln = 0, mode = 0;
   char *home, *ptr, *s;
   char confname[MAXPATHLEN];
+  int tts_inited = 0;
 
   if ((home = getenv ("HOME")) != NULL)
   {
@@ -129,6 +130,11 @@ readconf ()
 	if (!strcasecmp ((char *) buf + 1, opt[synthopt].arg[i]))
 	{
 	  mode = -i - 1;
+	  if (!tts_inited)
+	  {
+	    tts_init (1);
+	    tts_inited = 1;
+	  }
 	}
       }
     }
@@ -195,6 +201,7 @@ readconf ()
 	if (!strcasecmp ((char *) buf, "synthesizer port"))
 	{
 	  (void) tts_init (1);
+	  tts_inited = 1;
 	}
 	break;
       }

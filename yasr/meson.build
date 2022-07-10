@@ -18,7 +18,7 @@ yasr_headers = [
 
 executable('yasr',
   yasr_sources,
-  dependencies: openpty_dep,
+  dependencies: [ openpty_dep, speechd_dep ],
   install: true)
 
 install_man('yasr.1')

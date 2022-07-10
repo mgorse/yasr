@@ -236,6 +236,12 @@ opt_synth_update (int num, int optval)
 {
   char *p1, *p2;
 
+  if (opt[num].synth == TTS_SPEECHD)
+  {
+    tts_update_speechd (num, optval);
+    return;
+  }
+
   p1 = opt[num].setstr;
   if (!p1 && (opt[num].type & 0x3f) == OT_ENUM)
   {
@@ -915,11 +921,15 @@ opt_init ()
 	   OT_INT | OT_SYNTH, 0, 1, 7, "@t%d");
 
 /* Speech Dispatcher settings  (first index ?53)*/
+  opt_add (&voices.speechd.module, -1, N_("module"), OT_ENUM | OT_SYNTH, 0,
+	   8, "");
+  opt_add (&voices.speechd.voice, -1, N_("voice"), OT_ENUM | OT_SYNTH, 0,
+	   8, "");
   opt_add (&voices.speechd.rate, -1, N_("rate"), OT_INT | OT_SYNTH, -100, 100,
 	   8, "SET SELF RATE %d\r\n");
   opt_add (&voices.speechd.pitch, -1, N_("pitch"), OT_INT | OT_SYNTH, -100,
 	   100, 8, "SET SELF PITCH %d\r\n");
-  opt_add (&voices.ciber232.volume, -1, N_("volume"), OT_INT | OT_SYNTH, -100,
+  opt_add (&voices.speechd.volume, -1, N_("volume"), OT_INT | OT_SYNTH, -100,
 	   100, 8, "SET SELF VOLUME %d\r\n");
   opt_add (&voices.speechd.punctuation, -1, N_("punctuation"),
 	   OT_ENUM | OT_SYNTH, 3, N_("none"), N_("some"), N_("all"), 8,

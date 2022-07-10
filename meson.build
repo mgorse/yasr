@@ -41,6 +41,11 @@ if xgettext.found()
   conf.set('ENABLE_NLS', 1)
 endif
 
+  speechd_dep = dependency('speech-dispatcher', required: false)
+if speechd_dep.found()
+  conf.set('ENABLE_SPEECHD', 1)
+endif
+
 configure_file(output: 'config.h', configuration: conf)
 
 subdir('yasr')

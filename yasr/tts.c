@@ -143,8 +143,15 @@ tts_silence ()
   {
     return;
   }
-  (void) tcflush (tts.fd, TCOFLUSH);
   tts.obufhead = tts.obuftail = tts.flood = 0;
+#ifdef ENABLE_SPEECHD
+  if (tts.synth == TTS_SPEECHD)
+  {
+    spd_cancel (tts.speechd);
+    return;
+  }
+#endif
+  (void) tcflush (tts.fd, TCOFLUSH);
   opt_queue_empty (1);
   tts_send (synth[tts.synth].flush, strlen (synth[tts.synth].flush));
   tts.oflag = 0;
@@ -396,10 +403,7 @@ tts_send_iso (char *buf, int len)
 #endif
 
 
-/* High level function to speak the given string of wide characters, first
- * converting to UTF-8.
- * TODO: this duplicates code from tts_out. Probably better to simply convert
- * to UTF-8 and have tts_out do the work from there. */
+/* High level function to speak the given string of wide characters. */
 void
 tts_out_w (wchar_t *buf, int len)
 {
@@ -411,22 +415,10 @@ tts_out_w (wchar_t *buf, int len)
 
   if (!len)
     return;
-  opt_queue_empty (0);
   if (tts.synth == TTS_SPEECHD)
   {
-    tts_send ("SPEAK\r\n", 7);
-    if (*buf == '.' && len > 1 && buf[1] == '\r')
-    {
-      tts_send (".", 1);
-    }
     while (len > 0)
     {
-      if (len >= 3 && buf[0] == '\r' && buf[1] == '.' && buf[2] == '\r')
-      {
-	len -= 3;
-	buf += 3;
-	continue;
-      }
       if (*buf < 0x80)
       {
 	obuf[obo++] = *buf;
@@ -446,17 +438,17 @@ tts_out_w (wchar_t *buf, int len)
 	obuf[obo++] = ' ';
       if (obo >= 1020)
       {
-	tts_send (obuf, obo);
+	tts_out ((unsigned char *) obuf, obo);
 	obo = 0;
       }
       buf++;
       len--;
     }
     if (obo)
-      tts_send (obuf, obo);
-    tts_send ("\r\n.\r\n", 5);
+      tts_out ((unsigned char *) obuf, obo);
     return;
   }
+  opt_queue_empty (0);
   /* for other synthesizers we assume they works internally in
      ISO-8859-1 */
   p = synth[tts.synth].say;
@@ -545,6 +537,11 @@ tts_out (unsigned char *buf, int len)
   opt_queue_empty (0);
   if (tts.synth == TTS_SPEECHD)
   {
+#ifdef ENABLE_SPEECHD
+    p = strndup ((char *) buf, len);
+    spd_say (tts.speechd, SPD_MESSAGE, p);
+    free (p);
+#else
     char *q;
     tts_send ("SPEAK\r\n", 7);
     if (buf[0] == '.' && buf[1] == '\r')
@@ -556,6 +553,7 @@ tts_out (unsigned char *buf, int len)
     }
     tts_send_iso (p, (long) buf + len - (long) p);
     tts_send ("\r\n.\r\n", 5);
+#endif
     return;
   }
   p = synth[tts.synth].say;
@@ -655,6 +653,7 @@ tts_saychar (wchar_t ch)
 {
   int i, j = 0;
   int stack[10];
+  char buf[8];
 
   if (!ch)
   {
@@ -662,6 +661,12 @@ tts_saychar (wchar_t ch)
   }
   if (tts.synth == TTS_SPEECHD)
   {
+#ifdef ENABLE_SPEECHD
+    /* spd_wchar is buggy through 0.11.1, so we cannot use it */
+    memset (buf, 0, sizeof (buf));
+    wcrtomb (buf, ch, NULL);
+    spd_char (tts.speechd, SPD_MESSAGE, buf);
+#else
     if (ch == 32 || ch == 160)
       tts_send ("CHAR space\r\n", 12);
 #ifndef ENABLE_NLS
@@ -689,6 +694,7 @@ tts_saychar (wchar_t ch)
       *cout = 0;
       tts_printf_ll ("CHAR %s\r\n", buf);
     }
+#endif
 #endif
     return;
   }
@@ -827,6 +833,41 @@ open_tcp (char *port)
   return fd;
 }
 
+#ifdef ENABLE_SPEECHD
+static void
+refresh_speechd_option (const char *name, char **values)
+{
+  Opt *optr = opt;
+  int i, count;
+
+  while (optr->synth != TTS_SPEECHD
+	 || strcmp (optr->internal_name, name) != 0)
+    optr++;
+
+  for (i = 0; i <= optr->v.enum_max; i++)
+    free (optr->arg[i]);
+  free (optr->arg);
+
+  count = 0;
+  while (values[count])
+    count++;
+
+  optr->v.enum_max = count - 1;
+  optr->arg = (char **) malloc (count * sizeof (char *));
+  for (i = 0; i < count; i++)
+    optr->arg[i] = strdup (values[i]);
+}
+
+static void
+tts_speechd_refresh_voices ()
+{
+  if (tts.speechd_voices)
+    free_spd_modules (tts.speechd_voices);
+  tts.speechd_voices = spd_list_voices (tts.speechd);
+  refresh_speechd_option ("voice", tts.speechd_voices);
+}
+#endif
+
 int
 tts_init (int first_call)
 {
@@ -850,6 +891,28 @@ tts_init (int first_call)
     perror ("open");
   }
 #endif
+
+#ifdef ENABLE_SPEECHD
+  if (tts.synth == TTS_SPEECHD)
+  {
+    tts.speechd = spd_open ("yar", "main", NULL, SPD_MODE_THREADED);
+    if (!tts.speechd)
+    {
+      fprintf (stderr, "Couldn't initialize speech-dispatcher\n");
+      return -1;
+    }
+
+    if (tts.speechd_modules)
+      free_spd_modules (tts.speechd_modules);
+    tts.speechd_modules = spd_list_modules (tts.speechd);
+    refresh_speechd_option ("module", tts.speechd_modules);
+
+    tts_speechd_refresh_voices ();
+
+    return 0;
+  }
+#endif
+
   if (first_call && tts.port[0] != '|' && strstr (tts.port, ":"))
   {
     tts.fd = open_tcp (tts.port);
@@ -1068,3 +1131,27 @@ tts_printf_ll (const char *str, ...)
   vsprintf (buf, str, args);
   tts_send (buf, strlen (buf));
 }
+
+#ifdef ENABLE_SPEECHD
+void
+tts_update_speechd (int num, int optval)
+{
+  const char *name = opt[num].internal_name;
+
+  if (!strcmp (name, "module"))
+  {
+    spd_set_output_module (tts.speechd, opt[num].arg[optval]);
+    tts_speechd_refresh_voices ();
+  }
+  else if (!strcmp (name, "voice"))
+    spd_set_synthesis_voice (tts.speechd, opt[num].arg[optval]);
+  else if (!strcmp (name, "rate"))
+    spd_set_voice_rate (tts.speechd, optval);
+  else if (!strcmp (name, "pitch"))
+    spd_set_voice_pitch (tts.speechd, optval);
+  else if (!strcmp (name, "volume"))
+    spd_set_volume (tts.speechd, optval);
+  else if (!strcmp (name, "punctuation"))
+    spd_set_punctuation (tts.speechd, optval);
+}
+#endif
