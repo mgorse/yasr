@@ -22,3 +22,6 @@ executable('yasr',
   install: true)
 
 install_man('yasr.1')
+
+  install_data('yasr.conf',
+               install_dir: pkgdatadir)
