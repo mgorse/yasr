@@ -1464,7 +1464,9 @@ main (int argc, char *argv[])
 
   /* initialize gettext */
 #ifdef ENABLE_NLS
+#ifdef HAVE_LOCALE_H
   setlocale (LC_ALL, "");
+#endif
   bindtextdomain (GETTEXT_PACKAGE, LOCALEDIR);
   textdomain (GETTEXT_PACKAGE);
   strcpy (charmap, nl_langinfo (CODESET));
