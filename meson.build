@@ -36,7 +36,7 @@ openpty_dep = cc.find_library('util')
 
 i18n = import('i18n')
 
-xgettext = find_program('xgettext', required : false)
+xgettext = find_program('xgettext', required : true)
 if xgettext.found()
   conf.set('ENABLE_NLS', 1)
 endif
