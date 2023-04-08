@@ -1470,6 +1470,9 @@ main (int argc, char *argv[])
   bindtextdomain (GETTEXT_PACKAGE, LOCALEDIR);
   textdomain (GETTEXT_PACKAGE);
   strcpy (charmap, nl_langinfo (CODESET));
+  if (!strcmp (charmap, "ANSI_X3.4-1968"))
+    strcpy (charmap, "UTF-8");
+
   ih_inp = iconv_open ("WCHAR_T", charmap);
   if (ih_inp == (iconv_t) - 1)
   {
