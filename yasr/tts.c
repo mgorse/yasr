@@ -653,7 +653,9 @@ tts_saychar (wchar_t ch)
 {
   int i, j = 0;
   int stack[10];
+#ifdef ENABLE_SPEECHD
   char buf[8];
+#endif
 
   if (!ch)
   {

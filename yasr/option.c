@@ -236,11 +236,13 @@ opt_synth_update (int num, int optval)
 {
   char *p1, *p2;
 
+#ifdef ENABLE_SPEECHD
   if (opt[num].synth == TTS_SPEECHD)
   {
     tts_update_speechd (num, optval);
     return;
   }
+#endif
 
   p1 = opt[num].setstr;
   if (!p1 && (opt[num].type & 0x3f) == OT_ENUM)

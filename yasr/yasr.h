@@ -132,7 +132,9 @@ typedef struct Tts Tts;
 struct Tts
 {
   int fd;
+#ifdef ENABLE_SPEECHD
   SPDConnection *speechd;
+#endif
   char **speechd_voices;
   char **speechd_modules;
   int flood;
