@@ -96,7 +96,7 @@ struct Win
 typedef struct Func Func;
 struct Func
 {
-  void (*f) ();
+    void (*f) (int *argp);
   char *desc;
 };
 
