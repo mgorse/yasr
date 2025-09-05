@@ -1137,3 +1137,38 @@ ui_sayascii (int *argp)
   }
   tts_say_printf ("%d", win->row[cr][cc].wchar);
 }
+
+static int
+get_region_val (int raw_val, int index)
+{
+  int max = (index == 1 || index == 3 ? win->cols : win->rows);
+
+  if (raw_val == 0 && (index == 0 || index == 1))
+    return 0;
+
+  if (raw_val <= 0)
+    return max - 1 + raw_val;
+
+  return raw_val - 1;
+}
+
+void
+ui_sw (int *argp)
+{
+  if (!argp)
+  {
+    sw_top = 0;
+    sw_left = 0;
+    sw_right = 65535;
+    sw_bottom = 65535;
+    tts_say (_("Bounds cleared"));
+  }
+  else
+  {
+    sw_top = get_region_val (argp[0], 0);
+    sw_left = get_region_val (argp[1], 1);
+    sw_bottom = get_region_val (argp[2], 2);
+    sw_right = get_region_val (argp[3], 3);
+    tts_say (_("Bounds set"));
+  }
+}

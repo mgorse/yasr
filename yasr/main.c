@@ -57,9 +57,10 @@ static int okbuflen = 0;
 static int oldcr = 0, oldcc = 0, oldch = 0;
 Voices voices;
 static int shell = 0;
-int special = 0;
 int cl_synth = 0;
 int cl_synthport = 0;
+
+int sw_top = 0, sw_left = 0, sw_bottom = 65535, sw_right = 65535;
 
 static char **subprog = NULL;	/* if non-NULL, then exec it instead of shell */
 
@@ -1095,6 +1096,12 @@ lastword (int cr, int cc)
   return (1);
 }
 
+static int
+in_speaking_window ()
+{
+  return (win->cr >= sw_top && win->cr <= sw_bottom && win->cc >= sw_left && win->cc <= sw_right);
+}
+
 static void
 getoutput ()
 {
@@ -1230,7 +1237,7 @@ getoutput ()
       }
       else
       {
-	win_addchr (ch, speaking && (!special || !win->cr));
+	win_addchr (ch, speaking && in_speaking_window ());
       }
       chr = 1;
     }

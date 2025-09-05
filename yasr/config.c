@@ -50,6 +50,7 @@ Func funcs[] = {
   {&ui_sayascii, "ascii"},	/* 25 */
   {&rev_nextpar, "next paragraph"},	/* 26 */
   {&rev_prevpar, "previous paragraph"},	/* 27 */
+  {&ui_sw, "speaking window"},	/* 28 */
   {NULL, NULL}			/* required terminator */
 };
 

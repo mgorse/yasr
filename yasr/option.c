@@ -794,11 +794,6 @@ opt_init ()
 	   N_("words"));
   opt_add (usershell, 0, N_("shell"), OT_STR);
 
-/* TODO: The following is a bad hack that I use to play Angband.  It should
- * be replaced with a more general facility for defining screen windows.
- */
-  opt_add (&special, 255, "special", OT_ENUM, 2, "off", "on");
-
   opt_add (&rev.udmode, 0, N_("up and down arrows"), OT_ENUM, 3,
 	   N_("speak line"), N_("speak character"), N_("speak word"));
 

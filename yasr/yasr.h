@@ -312,7 +312,7 @@ extern int kbuflen;
 extern char usershell[OPT_STR_SIZE];
 extern char ttsbuf[80];
 extern Voices voices;
-extern int special;
+extern int sw_top, sw_left, sw_bottom, sw_right;
 extern char charmap[];
 extern Func funcs[];
 
@@ -349,6 +349,7 @@ extern void ui_bol (int *argp);
 extern void ui_eol (int *argp);
 extern int ui_keypress (int key);
 extern void ui_sayascii (int *argp);
+extern void ui_sw (int *argp);
 extern void rev_nextpar (int *argp);
 extern void rev_prevpar (int *argp);
 extern void uinit ();
@@ -417,7 +418,7 @@ extern void opt_write (FILE * fp);
 #define cblank(r, c)  ((win->row[r][c].wchar & 0xdf) == 0)
 #define ttssend(x)    if (x) tts_send(x, strlen(x))
 
-#define NUMOPTS 59
+#define NUMOPTS 58
 
 /* Option types */
 #define OT_INT      0x00
