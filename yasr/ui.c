@@ -1172,3 +1172,24 @@ ui_sw (int *argp)
     tts_say (_("Bounds set"));
   }
 }
+
+void
+ui_silentwindow (int *argp)
+{
+  if (!argp)
+  {
+    sw_top = 0;
+    sw_left = 0;
+    sw_right = 65535;
+    sw_bottom = 65535;
+    tts_say (_("Bounds cleared"));
+  }
+  else
+  {
+    sw_top = -get_region_val (argp[0], 0);
+    sw_left = -get_region_val (argp[1], 1);
+    sw_bottom = -get_region_val (argp[2], 2);
+    sw_right = -get_region_val (argp[3], 3);
+    tts_say (_("Bounds set"));
+  }
+}

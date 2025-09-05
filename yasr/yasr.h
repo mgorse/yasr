@@ -350,6 +350,7 @@ extern void ui_eol (int *argp);
 extern int ui_keypress (int key);
 extern void ui_sayascii (int *argp);
 extern void ui_sw (int *argp);
+extern void ui_silentwindow (int *argp);
 extern void rev_nextpar (int *argp);
 extern void rev_prevpar (int *argp);
 extern void uinit ();

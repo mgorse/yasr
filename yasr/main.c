@@ -1099,7 +1099,10 @@ lastword (int cr, int cc)
 static int
 in_speaking_window ()
 {
-  return (win->cr >= sw_top && win->cr <= sw_bottom && win->cc >= sw_left && win->cc <= sw_right);
+  if (sw_top > 0)
+    return (win->cr >= sw_top && win->cr <= sw_bottom && win->cc >= sw_left && win->cc <= sw_right);
+  else
+    return !(win->cr >= -sw_top && win->cr <= -sw_bottom && win->cc >= -sw_left && win->cc <= -sw_right);
 }
 
 static void

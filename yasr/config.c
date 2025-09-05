@@ -51,6 +51,7 @@ Func funcs[] = {
   {&rev_nextpar, "next paragraph"},	/* 26 */
   {&rev_prevpar, "previous paragraph"},	/* 27 */
   {&ui_sw, "speaking window"},	/* 28 */
+  {&ui_silentwindow, "silent window"},	/* 29 */
   {NULL, NULL}			/* required terminator */
 };
 
