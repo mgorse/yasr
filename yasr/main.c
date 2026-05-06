@@ -711,6 +711,9 @@ win_csi (wchar_t **pp)
       break;			/* TODO: is this redundant? */
   }
 
+  if (*p >= 0x20&& *p <= 0x2f)
+    p++;
+
   *pp = p + 1;
   if (ignore)
   {
