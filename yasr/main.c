@@ -974,6 +974,28 @@ win_csi (wchar_t **pp)
 }
 
 static void
+win_osc (wchar_t **pp)
+{
+  wchar_t *p;
+
+  p = *pp;
+  if (*p == ']')
+    p++;
+  while (!*p || *p >= ' ')
+  {
+    if (!*p)
+    {
+      if (!(p = gulp (p, pp)))
+	return;
+    }
+      p++;
+  }
+  if (*p == 0x1b && p[1] == '\\')
+    p++;
+  *pp = p + 1;
+}
+
+static void
 win_addchr (wchar_t ch, int tflag)
 {
   if (win->cc == win->cols)
@@ -1212,6 +1234,9 @@ getoutput ()
 	break;
       case '[':
 	win_csi (&p);
+	break;
+      case ']':
+	win_osc (&p);
 	break;
       }
       break;
