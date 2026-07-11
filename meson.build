@@ -34,7 +34,7 @@ localedir = join_paths(prefix, get_option('localedir'))
 conf.set_quoted('LOCALEDIR', localedir)
 
 foreach h : [ 'fcntl.h', 'sys/ioctl.h', 'sys/time.h', 'unistd.h',  'utmpx.h',
-  'pty.h', 'locale.h']
+  'pty.h', 'locale.h', 'util.h']
   if cc.check_header(h)
     conf.set('HAVE_@0@'.format(h.underscorify().to_upper()), 1)
   endif
