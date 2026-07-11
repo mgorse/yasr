@@ -18,12 +18,14 @@ add_global_arguments([
   '-I' + meson.build_root(), # config.h
 ], language: 'c')
 
-inc = []
+extra_includes = []
+extra_libdirs = []
 if (host_machine.system() == 'darwin'
     and find_program('brew', required : false).found())
 	r = run_command('brew', '--prefix', check: true)
 	brewoutput = r.stdout().strip()
-	inc += include_directories(brewoutput + '/include')
+	extra_includes += include_directories(brewoutput + '/include')
+	extra_libdirs += brewoutput + '/lib'
 endif
 
 prefix = get_option('prefix')
@@ -39,6 +41,10 @@ foreach h : [ 'fcntl.h', 'sys/ioctl.h', 'sys/time.h', 'unistd.h',  'utmpx.h',
     conf.set('HAVE_@0@'.format(h.underscorify().to_upper()), 1)
   endif
 endforeach
+
+iconv_dep = cc.find_library('iconv', required : false)
+
+libintl_dep = cc.find_library('intl', dirs : extra_libdirs, required : false)
 
 openpty_dep = cc.find_library('util')
 
