@@ -18,6 +18,14 @@ add_global_arguments([
   '-I' + meson.build_root(), # config.h
 ], language: 'c')
 
+inc = []
+if (host_machine.system() == 'darwin'
+    and find_program('brew', required : false).found())
+	r = run_command('brew', '--prefix', check: true)
+	brewoutput = r.stdout().strip()
+	inc += include_directories(brewoutput + '/include')
+endif
+
 prefix = get_option('prefix')
 datadir = join_paths(prefix, get_option('datadir'))
 pkgdatadir = join_paths(datadir, meson.project_name())
